@@ -5,7 +5,8 @@
 1. Create a virtual environment (optional).
 ```
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate # linux
+venv/scripts/activate # windows
 ```
 
 2. Install required packages.
