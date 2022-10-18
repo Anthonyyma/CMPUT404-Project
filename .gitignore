@@ -1,3 +1,5 @@
 venv/
 __pycache__/
-.vscode
+.vscode/*
+!.vscode/extensions.json
+social/db.sqlite3

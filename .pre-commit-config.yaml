@@ -1,0 +1,18 @@
+# Configures git pre-commit hooks
+# https://pre-commit.com/
+repos:
+  # sort imports with isort
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+  # format files with black
+  - repo: https://github.com/psf/black
+    rev: 21.12b0
+    hooks:
+    - id: black
+  # lint with flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 5.0.4
+    hooks:
+      - id: flake8
