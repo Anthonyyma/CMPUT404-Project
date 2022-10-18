@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -12,11 +14,13 @@ class ContentTypes(models.TextChoices):
 
 # Create your models here.
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile_image = models.ImageField(upload_to="profile_images", blank=True)
     github_url = models.URLField(blank=True)
 
 
 class Follow(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     follower = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="following"
     )
@@ -29,6 +33,7 @@ class Follow(models.Model):
 
 
 class FollowRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     follower = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="outgoing_follow_requests"
     )
@@ -41,6 +46,7 @@ class FollowRequest(models.Model):
 
 
 class Post(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     title = models.TextField()
     source = models.TextField()
@@ -59,6 +65,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField()
@@ -70,6 +77,7 @@ class Comment(models.Model):
 
 
 class Like(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="likes")
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name="likes", blank=True, null=True
@@ -84,6 +92,7 @@ class Like(models.Model):
 
 
 class Inbox(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="inbox")
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 

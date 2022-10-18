@@ -1,0 +1,5 @@
+[tool.black]
+force-exclude = '^.*\b(migrations)\b.*$'
+
+[tool.isort]
+skip = 'migrations'
