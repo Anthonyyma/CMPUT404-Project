@@ -1,13 +1,21 @@
 # import form class from django
 from django import forms
-from forms import Post
+from django.forms import TextInput
+from .models import Post
  
-# import GeeksModel from models.py
-from .models import GeeksModel
  
-# create a ModelForm
-class GeeksForm(forms.ModelForm):
-    # specify the name of model to use
+class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = "__all__"
+        fields = ["title", "content"]
+        # fields = ["title", "categories", "content", "friends_only", "unlisted"]
+        widgets = {
+            "title": TextInput(attrs={
+                "class": "forms",
+                "placeholder": "Title"
+            }),
+            "content": TextInput(attrs={
+                "class": "forms",
+                "style": "height: 200px",
+                "placeholder": "Content"
+            }),        }
