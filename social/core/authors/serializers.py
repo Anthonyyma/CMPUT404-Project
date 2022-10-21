@@ -6,6 +6,8 @@ from rest_framework.request import Request
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     type = serializers.ReadOnlyField(default="author")
     host = serializers.SerializerMethodField()
+    displayName = serializers.CharField(source="username")
+    github = serializers.CharField(source="github_url")
 
     class Meta:
         model = User
@@ -14,7 +16,8 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "url",
             "host",
-            "username",
+            "displayName",
+            "github",
             "email",
         ]
         extra_kwargs = {

@@ -10,7 +10,7 @@ class AuthorViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
 ):
-    queryset = User.objects.all()
+    queryset = User.objects.order_by("id").all()
     serializer_class = AuthorSerializer
     permission_class = [permissions.AllowAny]
     pagination_class = CustomPagination
