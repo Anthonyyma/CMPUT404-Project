@@ -1,18 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .forms import PostForm
 
-def editPost(request):
-    context ={}
- 
+def editPost(request): 
     # create object of form
     form = PostForm()
-     
-    # check if form data is valid
-    if form.is_valid():
-        # save the form data to model
-        form.save()
- 
-    context['form']= form
+
+    if request.method == "POST":
+        print(request.POST)
+        form = PostForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+    context = {'form':form}
     return render(request, "editPost.html", context)
 
  
