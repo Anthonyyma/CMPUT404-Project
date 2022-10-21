@@ -7,7 +7,6 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     type = serializers.ReadOnlyField(default="author")
     host = serializers.SerializerMethodField()
     displayName = serializers.CharField(source="username")
-    github = serializers.CharField(source="github_url")
 
     class Meta:
         model = User

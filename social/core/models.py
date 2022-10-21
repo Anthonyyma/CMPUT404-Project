@@ -16,7 +16,7 @@ class ContentTypes(models.TextChoices):
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile_image = models.ImageField(upload_to="profile_images", blank=True)
-    github_url = models.URLField(blank=True)
+    github = models.URLField(blank=True)
 
 
 class Follow(models.Model):
