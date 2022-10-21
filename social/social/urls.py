@@ -23,6 +23,7 @@ router = routers.DefaultRouter()
 router.register(r"authors", AuthorViewSet)
 
 urlpatterns = [
+    path("", include('core.urls')),
     path("admin/", admin.site.urls),
     path("service/", include(router.urls)),
 ]
