@@ -9,9 +9,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 </head>
 <body>
-    <div class="vertical-menu">
+    <div class="post-display">
         {% for post in object_list %}
-        <a href="{% url 'createPost' %}?id={{ post.id }}">{{ post.title }}<br>{{ post.content }}</a>
+        <a href="{% url 'editPost' %}?id={{ post.id }}">{{ post.title }}<br>{{ post.content }}</a>
         {% endfor %}
     </div>
 

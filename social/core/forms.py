@@ -8,34 +8,27 @@ from .models import Post
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        exclude = ["id"]
+        exclude = ["id", "content_type"]
         # fields = ["author", "title", "source", "content_type", "categories", "content", "published",]
         # fields = ["title", "categories", "content", "friends_only", "unlisted"]
         widgets = {
             "title": TextInput(attrs={
-                "class": "forms",
-                "placeholder": "Title"
+                "class": "form-group form",
             }),
             "source": TextInput(attrs={
-                "class": "forms",
-                "placeholder": "Source"
+                "class": "form-group form",
             }),
             "origin": TextInput(attrs={
-                "class": "forms",
-                "placeholder": "origin"
+                "class": "form-group form",
             }),
-            "content_type": TextInput(attrs={
-                "class": "forms",
-                "placeholder": "content_type"
-            }),
+            # "content_type": TextInput(attrs={
+            #     "class": "form-group form",
+            # }),
             "categories": TextInput(attrs={
-                "class": "forms",
-                "placeholder": "categories"
+                "class": "form-group form",
             }),
             "content": TextInput(attrs={
-                "class": "forms",
-                "style": "height: 200px",
-                "placeholder": "Content"
+                "class": "form-group form",
             }),        
             # "published": TextInput(attrs={
             #     "class": "forms",

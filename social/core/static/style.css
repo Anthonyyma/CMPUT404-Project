@@ -1,28 +1,89 @@
+body {
+  background-color: #04AA6D;
+  font-family: 'Lato', sans-serif;
+  align-items: center;
+	justify-content: center;
+  height: 100%;
+}
 h1 {
     color: pink
 }
 .forms {
     min-width: 300px;
 }
-.vertical-menu {
-  width: 200px; /* Set a width if you like */
+.post-display {
+  width: 200px;
 }
-
-.vertical-menu a {
-  background-color: rgb(24, 247, 235); /* Grey background color */
-  color: black; /* Black text color */
-  display: block; /* Make the links appear below each other */
-  padding: 12px; /* Add some padding */
-  text-decoration: none; /* Remove underline from links */
+.post-display a {
+  background-color: rgb(24, 247, 235);
+  color: black;
+  display: block;
+  padding: 10px;
+  text-decoration: none;
   border-radius: 10px;
   margin-bottom: 10px;
 }
-
-.vertical-menu a:hover {
-  background-color: #ccc; /* Dark grey background on mouse-over */
+.post-display a:hover {
+  background-color: rgb(231, 24, 197);
 }
-
-.vertical-menu a.active {
-  background-color: #04AA6D; /* Add a green color to the "active/current" link */
-  color: white;
+label {
+  font-weight: 500;
+  display: block;
+  margin: 4px 0;
+  text-transform: uppercase;
+  font-size: 13px;
+  overflow: hidden;
+}
+.form {
+  display: block;
+  padding: 5px;
+  width: 100%;
+  font-size: 1em;
+  background-color: rgba(69, 10, 10, 0.2);
+  border: 2px solid rgba(34, 247, 240, 0.3);
+  color: #fff;
+  font-weight: 200;
+}
+.form:focus {
+  outline: -webkit-focus-ring-color auto 5px;
+}
+.form-group {
+  max-width: 500px;
+  margin: auto;
+  margin-bottom: 30px;
+}
+.post-type a{
+	width: 150px;
+	height: 50px;
+  border-radius: 10px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #7f5a83;
+	background-image: linear-gradient(315deg, #7f5a83 0%, #0d324d 74%);
+	background-size: 200% 100%;
+  background-position: left;
+	transition: 500ms;
+  text-decoration: None;
+}
+.post-type a:before {
+	color: rgba(255,255,255,0.5);
+	font-size: 16px;
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 140px;
+	height: 40px;
+	background-color: #1b2845;
+	background-image: linear-gradient(315deg, #1b2845 0%, #274060 74%);
+	transition: 500ms;
+}
+.post-type a:hover {
+	background-position: right;
+}
+.post-type a:visited {
+  text-decoration: None;
+  color: wheat;
 }

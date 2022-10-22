@@ -1,0 +1,22 @@
+<!-- https://codepen.io/chancesq/pen/bGpddXE -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+
+</head>
+<body>
+    <span class="post-type"><a href="{% url 'editPost' %}?type=TEXT">Plain Text</a></span>
+    <span class="post-type"><a href="{% url 'editPost' %}?type=APP64">Application64</a></span>
+    <span class="post-type"><a href="{% url 'editPost' %}?type=MD">Markdown</a></span>
+    <span class="post-type"><a href="{% url 'editPost' %}?type=PNG">PNG</a></span>
+    <span class="post-type"><a href="{% url 'editPost' %}?type=JPEG">JPEG</a></span>
+</body>
+</html>
+

@@ -8,22 +8,29 @@ class PostList(ListView):
     model = Post
 
 def createPost(request):
-    form = PostForm(request.POST or None)
+    form = PostForm(request.POST or None, request.FILES or None)
     postId = request.GET.get('id')
+    type = request.GET.get('type')
     if postId != None:
         post = Post.objects.get(id=postId)
         form = PostForm(instance=post)
+        type = form.instance.content_type
 
     if request.method == "POST":
         if postId != None:
             form = PostForm(request.POST, instance=post)
         else:
-            form = PostForm(request.POST)
+            form = PostForm(request.POST, request.FILES,)
         if form.is_valid():
             form.instance.author = request.user
+            form.instance.content_type = type
             form.save()
         else:
             print(form.errors)
 
-    context = {'form': form}
+    context = {'form': form, 'type':type}
     return render(request, "createPost.html", context)
+
+def postType(request):
+    return render(request, "postType.html")
+
