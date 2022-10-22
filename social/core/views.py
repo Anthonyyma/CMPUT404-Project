@@ -1,31 +1,39 @@
 from django.shortcuts import render
 from .forms import PostForm
+from .models import Post
 
-def editPost(request): 
-    # create object of form
-    form = PostForm()
+def createPost(request):
+    form = PostForm(request.POST or None)
+    post = Post.objects.get(author=request.user)
+
+    # form = PostForm(instance=post)
+    print(post.id)
 
     if request.method == "POST":
-        print(request.POST)
-        form = PostForm(request.POST)
+        # form = PostForm(request.POST)
         if form.is_valid():
+            form.instance.author = request.user
             form.save()
+        else:
+            print(form.errors)
 
-    context = {'form':form}
-    return render(request, "editPost.html", context)
+    context = {'form': form}
+    return render(request, "createPost.html", context)
 
- 
-# def homepage(request):
-# 	if request.method == "POST":
-# 		movie_form = MovieForm(request.POST, request.FILES)
-# 		if movie_form.is_valid():
-# 			movie_form.save()
-# 			messages.success(request, ('Your movie was successfully added!'))
-# 		else:
-# 			messages.error(request, 'Error saving form')
-		
-		
-# 		return redirect("main:homepage")
-# 	movie_form = MovieForm()
-# 	movies = Post.objects.all()
-# 	return render(request=request, template_name="editPost.html", context={'movie_form':movie_form, 'movies':movies})
+def editPost(request): 
+    pass
+    # create object of form
+
+    # post = Post.objects.get(author="a")
+    # print(post.id)
+    # form = ""
+    # form = PostForm(instance=post)
+
+    # if request.method == "POST":
+    #     print(request.POST)
+    #     form = PostForm(request.POST)
+    #     if form.is_valid():
+    #         form.save()
+
+    # context = {'form':'a'}
+    # return render(request, "editPost.html", context)

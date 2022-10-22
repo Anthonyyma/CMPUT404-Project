@@ -5,6 +5,7 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('', views.editPost, name='editPost'),
+    path('createPost/', views.createPost, name='createPost'),
     # path('info/', views.info, name='info'),
     # path('favicon.ico/', RedirectView.as_view(url=staticfiles_storage.url('img/favicon.png'))),
 ]

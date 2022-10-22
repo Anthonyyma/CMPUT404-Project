@@ -44,15 +44,23 @@ class FollowRequest(models.Model):
     def __str__(self):
         return f"{self.follower} wants to follow {self.followee}"
 
+CONTENT_TYPES = (
+    ("TEXT", "text/plain"),
+    ("MD", "text/markdown"),
+    ("APP64", "application/base64"),
+    ("PNG", "image/png"),
+    ("JPEG", "image/jpeg")
+)
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts", blank=True)
     title = models.TextField()
     source = models.TextField()
+    origin = models.TextField()
     # use .get_content_type_display()
     content_type = models.CharField(
-        max_length=5, choices=ContentTypes.choices, default=ContentTypes.TEXT
+        max_length=5, choices=CONTENT_TYPES, default="TEXT"
     )
     categories = models.TextField()  # just use space seperated strings for now lol
     content = models.TextField()
