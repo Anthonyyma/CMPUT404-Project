@@ -1,16 +1,24 @@
 from django.shortcuts import render
 from .forms import PostForm
 from .models import Post
+from django.views.generic import ListView
+
+class PostList(ListView):
+    template_name = "myPosts.html"
+    model = Post
 
 def createPost(request):
     form = PostForm(request.POST or None)
-    post = Post.objects.get(author=request.user)
-
-    # form = PostForm(instance=post)
-    print(post.id)
+    postId = request.GET.get('id')
+    if postId != None:
+        post = Post.objects.get(id=postId)
+        form = PostForm(instance=post)
 
     if request.method == "POST":
-        # form = PostForm(request.POST)
+        if postId != None:
+            form = PostForm(request.POST, instance=post)
+        else:
+            form = PostForm(request.POST)
         if form.is_valid():
             form.instance.author = request.user
             form.save()
@@ -19,21 +27,3 @@ def createPost(request):
 
     context = {'form': form}
     return render(request, "createPost.html", context)
-
-def editPost(request): 
-    pass
-    # create object of form
-
-    # post = Post.objects.get(author="a")
-    # print(post.id)
-    # form = ""
-    # form = PostForm(instance=post)
-
-    # if request.method == "POST":
-    #     print(request.POST)
-    #     form = PostForm(request.POST)
-    #     if form.is_valid():
-    #         form.save()
-
-    # context = {'form':'a'}
-    # return render(request, "editPost.html", context)
