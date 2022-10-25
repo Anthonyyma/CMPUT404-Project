@@ -64,7 +64,7 @@ class Post(models.Model):
     )
     categories = models.TextField()  # just use space seperated strings for now lol
     content = models.TextField()
-    image = models.ImageField()
+    image = models.ImageField(blank=True)
     published = models.DateTimeField(auto_now_add=True)
     friends_only = models.BooleanField(default=False)
     unlisted = models.BooleanField(default=False)

@@ -1,21 +1,25 @@
+html {
+  height: 100%;
+}
 body {
-  background-color: #04AA6D;
+  background-color: #a2eff5;
   font-family: 'Lato', sans-serif;
   align-items: center;
 	justify-content: center;
   height: 100%;
+  display: flex;
 }
 h1 {
-    color: pink
+  color: pink
 }
 .forms {
-    min-width: 300px;
+  min-width: 300px;
 }
 .post-display {
   width: 200px;
 }
 .post-display a {
-  background-color: rgb(24, 247, 235);
+  background-color: #faaca8;
   color: black;
   display: block;
   padding: 10px;
@@ -24,7 +28,7 @@ h1 {
   margin-bottom: 10px;
 }
 .post-display a:hover {
-  background-color: rgb(231, 24, 197);
+  background-color: #ddd6f3;
 }
 label {
   font-weight: 500;
@@ -41,7 +45,7 @@ label {
   font-size: 1em;
   background-color: rgba(69, 10, 10, 0.2);
   border: 2px solid rgba(34, 247, 240, 0.3);
-  color: #fff;
+  color: black;
   font-weight: 200;
 }
 .form:focus {
@@ -53,19 +57,21 @@ label {
   margin-bottom: 30px;
 }
 .post-type a{
-	width: 150px;
-	height: 50px;
+	width: 300px;
+	height: 65px;
   border-radius: 10px;
 	cursor: pointer;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	background-color: #7f5a83;
-	background-image: linear-gradient(315deg, #7f5a83 0%, #0d324d 74%);
+	background-image: linear-gradient(315deg, #ddd6f3 0%, #faaca8 74%);
 	background-size: 200% 100%;
   background-position: left;
 	transition: 500ms;
   text-decoration: None;
+  margin: 10px;
+  color: black;
 }
 .post-type a:before {
 	color: rgba(255,255,255,0.5);
@@ -85,5 +91,5 @@ label {
 }
 .post-type a:visited {
   text-decoration: None;
-  color: wheat;
+  color: black;
 }

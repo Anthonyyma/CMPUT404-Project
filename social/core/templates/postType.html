@@ -12,11 +12,13 @@
 
 </head>
 <body>
-    <span class="post-type"><a href="{% url 'editPost' %}?type=TEXT">Plain Text</a></span>
-    <span class="post-type"><a href="{% url 'editPost' %}?type=APP64">Application64</a></span>
-    <span class="post-type"><a href="{% url 'editPost' %}?type=MD">Markdown</a></span>
-    <span class="post-type"><a href="{% url 'editPost' %}?type=PNG">PNG</a></span>
-    <span class="post-type"><a href="{% url 'editPost' %}?type=JPEG">JPEG</a></span>
+    <div class="post-type">
+        <div><a href="{% url 'editPost' %}?type=TEXT">Plain Text</a></div>
+        <div><a href="{% url 'editPost' %}?type=MD">Markdown</a></div>
+        <div><a href="{% url 'editPost' %}?type=APP64">Application64</a></div>
+        <div><a href="{% url 'editPost' %}?type=PNG">PNG</a></div>
+        <div><a href="{% url 'editPost' %}?type=JPEG">JPEG</a></div>
+    </div>
 </body>
 </html>
 

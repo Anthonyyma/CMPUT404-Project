@@ -2,6 +2,9 @@ from django.shortcuts import render
 from .forms import PostForm
 from .models import Post
 from django.views.generic import ListView
+from django.shortcuts import redirect
+
+
 
 class PostList(ListView):
     template_name = "myPosts.html"
@@ -25,6 +28,8 @@ def createPost(request):
             form.instance.author = request.user
             form.instance.content_type = type
             form.save()
+            print("test")
+            return redirect("/")
         else:
             print(form.errors)
 
