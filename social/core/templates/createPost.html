@@ -32,12 +32,15 @@
             {{ form.content }}  
         </div>
         {% if type == "PNG" or type == "JPEG" %}
-            <div class="form-group">
+            <div class="form-group" name="image-field">
             <label>Image</label>
             {{ form.image }}  
         </div>
         {% else %}
             <div style="display: block;">
+        {% endif %}
+        {% if messages %}
+            <h1>Please Select an Image</h1>
         {% endif %}
         <div class="form-group">
             <label>Friends Only</label>

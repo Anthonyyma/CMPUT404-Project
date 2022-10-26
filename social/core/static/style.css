@@ -24,8 +24,9 @@ h1 {
   display: block;
   padding: 10px;
   text-decoration: none;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  /* border-radius: 10px; */
+  border: 0 solid black;
+  box-sizing: border-box;
 }
 .post-display a:hover {
   background-color: #ddd6f3;
