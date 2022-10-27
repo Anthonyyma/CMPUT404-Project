@@ -24,6 +24,7 @@ router.register(r"authors", AuthorViewSet)
 
 urlpatterns = [
     path("", include("core.urls")),
+    path("", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
 ]
