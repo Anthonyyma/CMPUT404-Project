@@ -10,14 +10,13 @@
 </head>
 <body>
     <div class="post-display">
-        <div style="margin-bottom: 50px;"><a href="{% url 'createPost' %}">Create Post</a></div>
+        <div style="margin-bottom: 50px"><a href="{% url 'createPost' %}">Create Post</a></div>
         {% for post in object_list %}
-            <a href="{% url 'editPost' %}?id={{ post.id }}">{{ post.title }}<br>{{ post.content }}</a>
-            {% if post.image %}
-                {% if post.image.url != '/media/default.jpg'%}
-                    <img src="{{ post.image.url }}" style="width: 100px">
+            <a href="{% url 'editPost' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
                 {% endif %}
-            {% endif %}
+            </a>
         {% endfor %}
     </div>
 
