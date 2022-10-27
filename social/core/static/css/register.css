@@ -1,0 +1,42 @@
+body{
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: table;
+    position: absolute;
+}
+
+.btn:hover{
+    color: #f9af42!important;
+    background-color: #13a7a5;
+}
+  
+a:link {
+    color: #0d6efd;
+    background-color: transparent;
+    text-decoration: none;
+}
+    
+a:visited {
+    color: #0d6efd;
+    background-color: transparent;
+    text-decoration: none;
+}
+  
+a:hover {
+    color:  #f9af42;
+    background-color: transparent;
+    text-decoration: underline;
+}
+  
+a:active {
+    color:  #f9af42;
+    background-color: transparent;
+    text-decoration: underline;
+}
+  
+.vertical-center{
+    display: table-cell;
+    vertical-align: middle;
+}
