@@ -47,8 +47,13 @@ def createPost(request):
         else:
             print(form.errors)
 
-    context = {'form': form, 'type':type}
+    context = {'form': form, 'type':type, 'id':postId}
     return render(request, "createPost.html", context)
+
+def deletePost(request):
+    postId = request.GET.get('id')
+    Post.objects.filter(pk=postId).delete()
+    return redirect("/")
 
 def postType(request):
     return render(request, "postType.html")

@@ -51,6 +51,7 @@
             {{ form.unlisted }}  
         </div>
         <button type="submit" >Save</button>  
+        <div><a id="delete-button" href="{% url 'deletePost' %}?id={{ id }}">Delete Post</a></div>
     </form>  
 </body>  
 </html>  
