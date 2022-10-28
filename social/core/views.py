@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.contrib import auth, messages
+from django.shortcuts import redirect, render
+from django.views.generic import DetailView, ListView
+
 from .forms import PostForm
-from .models import Post
-from django.views.generic import ListView, DetailView
-from django.shortcuts import redirect
-from django.contrib import messages
+from .models import Follow, FollowRequest, Post
 
 
 class PostList(ListView):
@@ -47,6 +47,14 @@ def createPost(request):
     context = {'form': form, 'type':type}
     return render(request, "createPost.html", context)
 
+
 def postType(request):
     return render(request, "postType.html")
 
+
+def friends(request):
+    users = auth.get_user_model().objects.all().values()
+    friends = Follow.objects.get(followee=request.user)
+    friendRequest = FollowRequest()
+    data = {'users': users, 'friends': friends}
+    return render(request, "friends.html", data)

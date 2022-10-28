@@ -15,6 +15,7 @@ class ContentTypes(models.TextChoices):
 # Create your models here.
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    display_name = models.CharField(max_length=255, blank=True, null=True)
     profile_image = models.ImageField(upload_to="profile_images", blank=True)
     github = models.URLField(blank=True)
 
@@ -44,6 +45,7 @@ class FollowRequest(models.Model):
     def __str__(self):
         return f"{self.follower} wants to follow {self.followee}"
 
+
 CONTENT_TYPES = (
     ("TEXT", "text/plain"),
     ("MD", "text/markdown"),
@@ -52,9 +54,11 @@ CONTENT_TYPES = (
     ("JPEG", "image/jpeg")
 )
 
+
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts", blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+     related_name="posts", blank=True)
     title = models.TextField()
     source = models.TextField()
     origin = models.TextField()

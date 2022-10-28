@@ -1,10 +1,11 @@
 # import form class from django
-from msilib.schema import CheckBox
+# from msilib.schema import CheckBox # Removed because it's Windows only
 from django import forms
-from django.forms import TextInput, Textarea
+from django.forms import Textarea, TextInput
+
 from .models import Post
- 
- 
+
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
