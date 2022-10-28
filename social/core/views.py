@@ -36,17 +36,13 @@ def createPost(request):
             form.instance.author = request.user
             form.instance.content_type = type
             if type == "PNG" or type == "JPEG":
-                if form.instance.image:
-                    form.save()
-                    return redirect("/")
-                else:
-                    messages.info(request, "test")
+                if not form.instance.image:
+                    messages.info(request, "No Image")
             elif type == "MD":
                 parser = commonmark.Parser()
                 form.instance.content = parser.parse(form.instance.content)
-            else:
-                form.save()
-                return redirect("/")
+            form.save()
+            return redirect("/")
         else:
             print(form.errors)
 
