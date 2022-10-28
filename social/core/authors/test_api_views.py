@@ -1,6 +1,6 @@
 import json
 
-from core.models import User
+from core.models import Follow, User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -13,6 +13,8 @@ class AuthorTest(APITestCase):
         self.user1.save()
         self.user2 = User(username="test2", password="test1")
         self.user2.save()
+        # user2 follows user1
+        Follow.objects.create(follower=self.user2, followee=self.user1).save()
 
     def test_get_authors_paginated(self):
         resp = self.client.get("/api/authors", follow=True)
@@ -49,3 +51,21 @@ class AuthorTest(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.user1.refresh_from_db()
         self.assertEqual(self.user1.github, new_github)
+
+    def test_get_author_followers(self):
+        path = f"/api/authors/{self.user1.id}/followers/"
+        resp = self.client.get(path, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.json()
+        self.assertEqual(len(data["items"]), 1)
+        self.assertEqual(data["type"], "followers")
+        follower = data["items"][0]
+        self.assertEqual(follower["displayName"], self.user2.username)
+
+    def test_get_author_followers_does_not_return_followees(self):
+        # user2 follows user1, so user1 should not be returned
+        path = f"/api/authors/{self.user2.id}/followers/"
+        resp = self.client.get(path, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.json()
+        self.assertEqual(len(data["items"]), 0)

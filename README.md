@@ -35,5 +35,10 @@ It's listed in `.vscode/extensions.json` so if you are using vscode then it sugg
 ## Run Server
 
 ```
+# from /social
 python manage.py runserver
 ```
+
+### Testing
+
+You can run the tests from `/social` by running `python manage.py test`
