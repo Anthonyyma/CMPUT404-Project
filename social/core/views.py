@@ -4,17 +4,21 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from .forms import PostForm
 from .models import Post
-from django.views.generic import ListView
 from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import ListView, DetailView
 from django.contrib import messages
-
 
 
 class PostList(ListView):
     template_name = "myPosts.html"
     model = Post
 
+def test(request):
+    postId = request.GET.get('id')
+    post = Post.objects.get(id=postId)
+
 def createPost(request):
+    list(messages.get_messages(request))
     form = PostForm(request.POST or None, request.FILES or None)
     postId = request.GET.get('id')
     type = request.GET.get('type')
@@ -31,9 +35,15 @@ def createPost(request):
         if form.is_valid():
             form.instance.author = request.user
             form.instance.content_type = type
-            form.save()
-            print("test")
-            return redirect("/")
+            if type == "PNG" or type == "JPEG":
+                if form.instance.image:
+                    form.save()
+                    return redirect("/")
+                else:
+                    messages.info(request, "test")
+            else:
+                form.save()
+                return redirect("/")
         else:
             print(form.errors)
 
