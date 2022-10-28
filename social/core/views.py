@@ -7,7 +7,7 @@ from .models import Post
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
-
+import commonmark
 
 class PostList(ListView):
     template_name = "myPosts.html"
@@ -41,6 +41,9 @@ def createPost(request):
                     return redirect("/")
                 else:
                     messages.info(request, "test")
+            elif type == "MD":
+                parser = commonmark.Parser()
+                form.instance.content = parser.parse(form.instance.content)
             else:
                 form.save()
                 return redirect("/")
