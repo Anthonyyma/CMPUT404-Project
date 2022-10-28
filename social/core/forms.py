@@ -4,8 +4,7 @@ from django import forms
 from django.forms import TextInput, Textarea
 from .models import Post
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
- 
+from .models import User
  
 class PostForm(forms.ModelForm):
     class Meta:

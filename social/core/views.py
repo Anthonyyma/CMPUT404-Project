@@ -61,7 +61,10 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('')
+            return redirect('myPosts')
+        else:
+            messages.success(request, ("Please double check that you are using the correct username and password"))
+            return redirect('login')
     else:
         return render(request, "registration/login.html", {})
 
@@ -88,10 +91,7 @@ def register_user(request):
             password = form.cleaned_data['password1']
             user = authenticate(request, username=username, password=password)
             login(request, user)
-            return redirect('') # once registered redirect to a different page
-        else:
-            # Do something in case if form is not valid
-            raise Http404
+            return redirect('myPosts') # once registered redirect to a different page
     else:
         form = RegisterForm()
     # render the registeration html template
