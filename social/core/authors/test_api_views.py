@@ -84,3 +84,34 @@ class AuthorTest(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.json()
         self.assertEqual(len(data["items"]), 0)
+
+    def test_check_follow(self):
+        # user2 follows user1, so this should succeed
+        user2_follows_user1 = f"/api/authors/{self.user1.id}/followers/{self.user2.id}/"
+        resp = self.client.get(user2_follows_user1, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # user1 does not follow user1, so this should fail
+        user1_follows_user2 = f"/api/authors/{self.user2.id}/followers/{self.user1.id}/"
+        resp = self.client.get(user1_follows_user2, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_add_follower(self):
+        # As user2, try to add user1 as a follower
+        path = f"/api/authors/{self.user2.id}/followers/{self.user1.id}/"
+        self.login(self.user2)
+        resp = self.client.put(path)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assert_(
+            Follow.objects.filter(follower=self.user1, followee=self.user2).exists()
+        )
+
+    def test_remove_follower(self):
+        # As user1, try to remove user2 as a follower
+        path = f"/api/authors/{self.user1.id}/followers/{self.user2.id}/"
+        self.login(self.user1)
+        resp = self.client.delete(path)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertFalse(
+            Follow.objects.filter(follower=self.user2, followee=self.user1)
+        )
