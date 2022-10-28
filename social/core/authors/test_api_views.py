@@ -16,6 +16,9 @@ class AuthorTest(APITestCase):
         # user2 follows user1
         Follow.objects.create(follower=self.user2, followee=self.user1).save()
 
+    def login(self, user):
+        self.client.force_authenticate(user=user)
+
     def test_get_authors_paginated(self):
         resp = self.client.get("/api/authors", follow=True)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -42,6 +45,7 @@ class AuthorTest(APITestCase):
     def test_update_author(self):
         path = f"/api/authors/{self.user1.id}/"
         new_github = "http://github.com/new-github"
+        self.login(self.user1)
         resp = self.client.post(
             path,
             json.dumps({"github": new_github}),
@@ -51,6 +55,17 @@ class AuthorTest(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.user1.refresh_from_db()
         self.assertEqual(self.user1.github, new_github)
+
+    def test_cannot_update_other_authors(self):
+        path = f"/api/authors/{self.user1.id}/"
+        new_github = "http://github.com/new-github"
+        self.login(self.user2)
+        resp = self.client.post(
+            path,
+            json.dumps({"github": new_github}),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_author_followers(self):
         path = f"/api/authors/{self.user1.id}/followers/"
