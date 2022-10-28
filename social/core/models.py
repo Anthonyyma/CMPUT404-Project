@@ -13,36 +13,6 @@ class ContentTypes(models.TextChoices):
 
 
 # Create your models here.
-
-# new addition still not complete
-class UserManager(BaseUserManager):
-    def create_user(self, username, first_name, last_name, email, password=None):
-        if not username:
-            raise ValueError('Users must have a username')
-        user = self.model(
-            username=username,
-            email=self.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name,
-        )
-
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, username, first_name, last_name, email, is_admin, password=None):
-        user = self.model(
-            username=username,
-            email=self.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name,
-            is_admin=is_admin,
-        )
-        user.is_admin = True
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile_image = models.ImageField(upload_to="profile_images", blank=True)
