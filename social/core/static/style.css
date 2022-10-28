@@ -1,7 +1,106 @@
+html {
+  height: 100%;
+}
+body {
+  background-color: #ffffff;
+  font-family: 'Lato', sans-serif;
+  align-items: center;
+	justify-content: center;
+  height: 100%;
+  display: flex;
+}
 h1 {
-    color: pink
+  color: pink
+}
+#delete-button {
+  margin-top: 50px;
+  background-color: red;
+  color: white;
+  padding: 1em 1.5em;
+  text-decoration: none;
+  text-transform: uppercase;
+  display: block;
 }
 .forms {
-    min-width: 300px;
-    
+  min-width: 300px;
+}
+.post-display {
+  width: 50%;
+  position: absolute;
+}
+.post-display a {
+  background-color: #ffffff;
+  color: black;
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  border-style: solid;
+  border-width: thin;
+  box-sizing: border-box;
+}
+.post-display a:hover {
+  background-color: #ddd6f3;
+}
+label {
+  font-weight: 500;
+  display: block;
+  margin: 4px 0;
+  text-transform: uppercase;
+  font-size: 13px;
+  overflow: hidden;
+}
+.form {
+  display: block;
+  padding: 5px;
+  width: 100%;
+  font-size: 1em;
+  background-color: rgba(69, 10, 10, 0.2);
+  border: 2px solid rgba(34, 247, 240, 0.3);
+  color: black;
+  font-weight: 200;
+}
+.form:focus {
+  outline: -webkit-focus-ring-color auto 5px;
+}
+.form-group {
+  max-width: 500px;
+  margin: auto;
+  margin-bottom: 30px;
+}
+.post-type a{
+	width: 300px;
+	height: 65px;
+  border-radius: 10px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #7f5a83;
+	background-image: linear-gradient(315deg, #ddd6f3 0%, #faaca8 74%);
+	background-size: 200% 100%;
+  background-position: left;
+	transition: 500ms;
+  text-decoration: None;
+  margin: 10px;
+  color: black;
+}
+.post-type a:before {
+	color: rgba(255,255,255,0.5);
+	font-size: 16px;
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 140px;
+	height: 40px;
+	background-color: #1b2845;
+	background-image: linear-gradient(315deg, #1b2845 0%, #274060 74%);
+	transition: 500ms;
+}
+.post-type a:hover {
+	background-position: right;
+}
+.post-type a:visited {
+  text-decoration: None;
+  color: black;
 }
