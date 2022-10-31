@@ -3,20 +3,29 @@ from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from .forms import PostForm
-from .models import Post
+from .models import Post, User
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
 import commonmark
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class PostList(ListView):
+
+class PostList(LoginRequiredMixin, ListView):
+    login_url = "/login/"
     template_name = "myPosts.html"
     model = Post
+
+    def get_queryset(self):
+        queryset = super(PostList, self).get_queryset()
+        return queryset.filter(author=self.request.user)
 
 def test(request):
     postId = request.GET.get('id')
     post = Post.objects.get(id=postId)
 
+@login_required
 def createPost(request):
     list(messages.get_messages(request))
     form = PostForm(request.POST or None, request.FILES or None)
@@ -49,14 +58,15 @@ def createPost(request):
     context = {'form': form, 'type':type, 'id':postId}
     return render(request, "createPost.html", context)
 
+@login_required
 def deletePost(request):
     postId = request.GET.get('id')
     Post.objects.filter(pk=postId).delete()
     return redirect("/")
 
+@login_required
 def postType(request):
     return render(request, "postType.html")
-
 
 def login_user(request):
     if request.method == "POST":
