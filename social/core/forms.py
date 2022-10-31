@@ -31,6 +31,9 @@ class PostForm(forms.ModelForm):
             "content": Textarea(attrs={
                 "class": "form-group form",
             }),        
+            "private_to": TextInput(attrs={
+                "class": "form-group form",
+            }),        
             # "published": TextInput(attrs={
             #     "class": "forms",
             #     "style": "height: 200px",

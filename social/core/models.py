@@ -68,6 +68,7 @@ class Post(models.Model):
     published = models.DateTimeField(auto_now_add=True)
     friends_only = models.BooleanField(default=False)
     unlisted = models.BooleanField(default=False)
+    private_to = models.TextField(blank=True)
 
     def __str__(self):
         return f'"{self.title}" by {self.author}, posted at {self.published}'
