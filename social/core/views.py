@@ -47,11 +47,13 @@ def createPost(request):
             if type == "PNG" or type == "JPEG":
                 if not form.instance.image:
                     messages.info(request, "No Image")
+                    notValid = True
             elif type == "MD":
                 parser = commonmark.Parser()
                 form.instance.content = parser.parse(form.instance.content)
-            form.save()
-            return redirect("/")
+            if not notValid:
+                form.save()
+                return redirect("/")
         else:
             print(form.errors)
 
