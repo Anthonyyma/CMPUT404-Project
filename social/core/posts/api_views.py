@@ -1,5 +1,5 @@
+from core.drf_utils import labelled_pagination
 from core.models import Post
-from core.pagination import labelled_pagination
 from core.posts.serializers import PostSerializer
 from rest_framework import viewsets
 

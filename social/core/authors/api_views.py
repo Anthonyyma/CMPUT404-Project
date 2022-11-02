@@ -1,6 +1,6 @@
 from core.authors.serializers import AuthorSerializer
+from core.drf_utils import CustomPagination, labelled_pagination
 from core.models import Follow, User
-from core.pagination import CustomPagination, labelled_pagination
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response

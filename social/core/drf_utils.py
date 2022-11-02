@@ -35,3 +35,13 @@ def labelled_pagination(label: str):
             )
 
     return Pagination
+
+
+def get_api_root_url(request) -> str:
+    """
+    Returns the root url of the API
+    https://domain.com/api/
+    """
+    url: str = request.build_absolute_uri()
+    base_url = url.split("/api/")[0]
+    return f"{base_url}/api/"
