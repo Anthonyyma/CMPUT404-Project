@@ -14,19 +14,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from core.authors.api_views import AuthorViewSet
+import core.authors.api_views as author_views
+from django.conf import settings
 from django.contrib import admin
+from django.contrib.staticfiles.urls import static
 from django.urls import include, path
 from rest_framework import routers
-from django.conf import settings
-from django.contrib.staticfiles.urls import static
+
 # from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
-router.register(r"authors", AuthorViewSet)
+router.register(r"authors", author_views.AuthorViewSet)
 
 urlpatterns = [
     path("", include("core.urls")),
+    path("", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
+    path(r"api/authors/<author1>/followers/<author2>/", author_views.follow_view),
+    # path(r"crap/", author_views.check_follow),
     path("api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

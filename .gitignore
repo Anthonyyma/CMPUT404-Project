@@ -3,4 +3,4 @@ __pycache__/
 .vscode/*
 !.vscode/extensions.json
 social/db.sqlite3
-env/
+.DS_Store

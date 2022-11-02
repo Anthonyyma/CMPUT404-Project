@@ -40,7 +40,7 @@
             <div style="display: block;">
         {% endif %}
         {% if messages %}
-            <h1>Please Select an Image</h1>
+            <h2 style="color: red;">Please Select an Image</h2>
         {% endif %}
         <div class="form-group">
             <label>Friends Only</label>
@@ -50,7 +50,12 @@
             <label>Unlisted</label>
             {{ form.unlisted }}  
         </div>
+        <div class="form-group">
+            <label>Private To [Username]</label>
+            {{ form.private_to }}  
+        </div>
         <button type="submit" >Save</button>  
+        <div><a id="delete-button" href="{% url 'deletePost' %}?id={{ id }}">Delete Post</a></div>
     </form>  
 </body>  
 </html>  

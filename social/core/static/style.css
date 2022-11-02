@@ -2,7 +2,7 @@ html {
   height: 100%;
 }
 body {
-  background-color: #a2eff5;
+  background-color: #ffffff;
   font-family: 'Lato', sans-serif;
   align-items: center;
 	justify-content: center;
@@ -12,20 +12,30 @@ body {
 h1 {
   color: pink
 }
+#delete-button {
+  margin-top: 50px;
+  background-color: red;
+  color: white;
+  padding: 1em 1.5em;
+  text-decoration: none;
+  text-transform: uppercase;
+  display: block;
+}
 .forms {
   min-width: 300px;
 }
 .post-display {
-  width: 200px;
+  width: 50%;
+  position: absolute;
 }
 .post-display a {
-  background-color: #faaca8;
+  background-color: #ffffff;
   color: black;
   display: block;
   padding: 10px;
   text-decoration: none;
-  /* border-radius: 10px; */
-  border: 0 solid black;
+  border-style: solid;
+  border-width: thin;
   box-sizing: border-box;
 }
 .post-display a:hover {
