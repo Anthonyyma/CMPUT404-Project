@@ -30,8 +30,10 @@ from rest_framework_nested import routers
 router = routers.DefaultRouter()
 router.register(r"authors", author_views.AuthorViewSet)
 
-posts_router = routers.NestedSimpleRouter(router, r"authors", lookup="author")
-posts_router.register(r"posts", post_views.PostViewSet, basename="author-posts")
+author_router = routers.NestedSimpleRouter(router, r"authors", lookup="author")
+author_router.register(r"posts", post_views.PostViewSet, basename="posts")
+post_router = routers.NestedSimpleRouter(author_router, r"posts", lookup="post")
+post_router.register(r"comments", post_views.CommentViewSet, basename="comments")
 
 urlpatterns = [
     path("", include("core.urls")),
@@ -40,5 +42,6 @@ urlpatterns = [
     path(r"api/authors/<author1>/followers/<author2>/", author_views.follow_view),
     # path(r"crap/", author_views.check_follow),
     path("api/", include(router.urls)),
-    path("api/", include(posts_router.urls)),
+    path("api/", include(author_router.urls)),
+    path("api/", include(post_router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

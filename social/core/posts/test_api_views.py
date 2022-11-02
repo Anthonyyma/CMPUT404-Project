@@ -26,7 +26,7 @@ class AuthorTest(APITestCase):
         post = data["items"][0]
         self.assertEqual(post["content"], self.post1.content)
         self.assertEqual(post["visibility"], "PUBLIC")
-        # self.assertEqual(post["author"]["displayName"], self.user1.username)
+        self.assertEqual(post["author"]["displayName"], self.user1.username)
 
     def test_get_posts_returns_comments_correctly(self):
         # create one comment on each post
@@ -38,11 +38,12 @@ class AuthorTest(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.json()
         self.assertEqual(data["count"], 1)
+        # url to comments is correct
         self.assertTrue(
             f"authors/{self.post1.author.id}/posts/{self.post1.id}/comments"
             in data["comments"]
         )
 
-        # self.assertEqual(
-        #     data["commentsSrc"][0]["author"]["displayName"], self.user1.username
-        # )
+        self.assertEqual(
+            data["commentsSrc"][0]["author"]["displayName"], self.user1.username
+        )

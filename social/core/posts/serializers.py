@@ -16,6 +16,7 @@ class CommentSerializer(serializers.ModelSerializer):
     comment = serializers.CharField(source="content")
     contentType = serializers.CharField(source="content_type", default="text/markdown")
     type = serializers.ReadOnlyField(default="comment")
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
