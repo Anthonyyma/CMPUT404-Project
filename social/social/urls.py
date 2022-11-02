@@ -15,16 +15,23 @@ Including another URLconf
 """
 
 import core.authors.api_views as author_views
+import core.posts.api_views as post_views
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.staticfiles.urls import static
 from django.urls import include, path
-from rest_framework import routers
+from rest_framework_nested import routers
+
+# from rest_framework import routers
+
 
 # from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
 router.register(r"authors", author_views.AuthorViewSet)
+
+posts_router = routers.NestedSimpleRouter(router, r"authors", lookup="author")
+posts_router.register(r"posts", post_views.PostViewSet, basename="author-posts")
 
 urlpatterns = [
     path("", include("core.urls")),
@@ -33,4 +40,5 @@ urlpatterns = [
     path(r"api/authors/<author1>/followers/<author2>/", author_views.follow_view),
     # path(r"crap/", author_views.check_follow),
     path("api/", include(router.urls)),
+    path("api/", include(posts_router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
