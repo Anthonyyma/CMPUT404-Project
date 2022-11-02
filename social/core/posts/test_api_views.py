@@ -44,5 +44,5 @@ class AuthorTest(APITestCase):
         )
 
         # self.assertEqual(
-        #     data["comments"][0]["author"]["displayName"], self.user1.username
+        #     data["commentsSrc"][0]["author"]["displayName"], self.user1.username
         # )

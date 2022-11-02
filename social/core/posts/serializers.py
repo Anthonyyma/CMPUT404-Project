@@ -1,6 +1,36 @@
 from core.authors.serializers import AuthorSerializer
-from core.models import Post
+from core.drf_utils import get_api_root_url
+from core.models import Comment, Post
 from rest_framework import serializers
+
+
+def get_post_url(post: Post, request) -> str:
+    """
+    Returns the api url for a post
+    """
+    return f"{get_api_root_url(request)}authors/{post.author.id}/posts/{post.id}/"
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(read_only=True)
+    comment = serializers.CharField(source="content")
+    contentType = serializers.CharField(source="content_type", default="text/markdown")
+    type = serializers.ReadOnlyField(default="comment")
+
+    class Meta:
+        model = Comment
+        fields = (
+            "type",
+            "author",
+            "comment",
+            "contentType",
+            "published",
+            "comment",
+            "id",
+        )
+
+    def get_id(self, obj: Comment):
+        return get_post_url(obj.post, self.context["request"]) + f"comments/{obj.id}/"
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -15,6 +45,7 @@ class PostSerializer(serializers.ModelSerializer):
     count = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
+    commentsSrc = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -29,20 +60,11 @@ class PostSerializer(serializers.ModelSerializer):
             "categories",
             "count",
             "comments",
+            "commentsSrc",
             "visibility",
             "published",
             "unlisted",
         ]
-
-    def _get_api_root_url(self) -> str:
-        """
-        Returns the root url of the API
-        https://domain.com/api/
-        """
-        request = self.context["request"]
-        url: str = request.build_absolute_uri()
-        base_url = url.split("/api/")[0]
-        return f"{base_url}/api/"
 
     def get_visibility(self, obj: Post) -> str:
         if obj.friends_only:
@@ -61,11 +83,21 @@ class PostSerializer(serializers.ModelSerializer):
         return obj.comments.count()
 
     def get_id(self, obj: Post):
-        api_root = self._get_api_root_url()
-        id = f"{api_root}/authors/{obj.author.id}/posts/{obj.id}/"
-        return id
+        return get_post_url(obj, self.context["request"])
 
     def get_comments(self, obj: Post):
-        api_root = self._get_api_root_url()
-        id = f"{api_root}/authors/{obj.author.id}/posts/{obj.id}/comments/"
-        return id
+        return get_post_url(obj, self.context["request"]) + "comments/"
+
+    def get_commentsSrc(self, obj: Post):
+        recent_comments = obj.comments.order_by("-published")[:5]
+        comment_serializer = CommentSerializer(
+            recent_comments, many=True, context=self.context
+        )
+        return {
+            "type": "comments",
+            "page": 1,
+            "size": recent_comments.count(),
+            "post": get_post_url(obj, self.context["request"]),
+            "id": get_post_url(obj, self.context["request"]) + "comments/",
+            "comments": comment_serializer.data,
+        }
