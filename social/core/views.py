@@ -31,6 +31,7 @@ def createPost(request):
     form = PostForm(request.POST or None, request.FILES or None)
     postId = request.GET.get('id')
     type = request.GET.get('type')
+    notValid = False
     if postId != None:
         post = Post.objects.get(id=postId)
         form = PostForm(instance=post)
