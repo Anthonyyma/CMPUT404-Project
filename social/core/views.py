@@ -21,10 +21,6 @@ class PostList(LoginRequiredMixin, ListView):
         queryset = super(PostList, self).get_queryset()
         return queryset.filter(author=self.request.user)
 
-def test(request):
-    postId = request.GET.get('id')
-    post = Post.objects.get(id=postId)
-
 # @login_required
 def createPost(request):
     list(messages.get_messages(request))
@@ -73,12 +69,15 @@ def postType(request):
 
 def postContent(request):
     postId = request.GET.get('id')
-    post = Post.objects.filter(id=postId)
+    post = Post.objects.get(id=postId)
     user = request.user
+    ownPost = False
+    if user == post.author:
+        ownPost = True
     if post:
         profilePic = user.profile_image
     
-    context = {'profilePic': profilePic, 'name': user.username}
+    context = {'post':post, 'ownPost':ownPost, 'profilePic': profilePic, 'username': user.username, 'content': post.content, 'img': post.image}
     return render(request, "postContent/postContent.html", context)
 
 def login_user(request):
