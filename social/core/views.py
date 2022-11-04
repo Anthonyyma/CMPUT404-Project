@@ -60,7 +60,8 @@ def createPost(request):
 # @login_required
 def deletePost(request):
     postId = request.GET.get('id')
-    Post.objects.filter(pk=postId).delete()
+    if postId != "None":
+        Post.objects.filter(pk=postId).delete()
     return redirect("/")
 
 # @login_required
