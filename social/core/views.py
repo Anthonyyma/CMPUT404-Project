@@ -7,7 +7,8 @@ from .models import Post, User
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
-import commonmark
+import markdown
+from html.parser import HTMLParser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -20,6 +21,11 @@ class PostList(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super(PostList, self).get_queryset()
         return queryset.filter(author=self.request.user)
+
+class MDParser(HTMLParser):
+    md = ""
+    def handle_data(self, data):
+        self.md += data
 
 # @login_required
 def createPost(request):
@@ -46,8 +52,10 @@ def createPost(request):
                     messages.info(request, "No Image")
                     notValid = True
             elif type == "MD":
-                parser = commonmark.Parser()
-                form.instance.content = parser.parse(form.instance.content)
+                data = markdown.markdown(form.instance.content)
+                parser = MDParser()
+                parser.feed(data)
+                form.instance.content = parser.md
             if not notValid:
                 form.save()
                 return redirect("/")
