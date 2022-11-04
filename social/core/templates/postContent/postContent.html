@@ -10,23 +10,29 @@
     <link rel="stylesheet" type="text/css" href="{% static 'postContent/postContent.css' %}">
 </head>  
 <body>  
-    <div class="userHeader">
-        <div style="display:flex; align-items: center;">
-            <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-            <a href="#" id="username">{{ username }}</a>
+    <div class="mainPost">
+        <div>
+            <a href="#" style="color: black;"><i style="font-size: 2em" class="material-icons">arrow_back</i></a>
+            <h1 style="display: inline-block; padding-left: 1em;">Post</h1>
         </div>
-        {% if ownPost %}
-            <a href="{% url 'editPost' %}?id={{ post.id }}" style="height: 40px; border-radius:10px"><i style="font-size: 2em" class="material-icons">create</i></a>
-        {% endif %}
-    </div>
-    <div class="mainContent">
-        <p>
-            {{ content }}
-        </p>
-    </div>
-    <div class="imgContainer">
-        <img src="/media/{{ img }}" alt="mainImage">
-    </div>
+        <div class="userHeader">
+            <div style="display:flex; align-items: center;">
+                <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
+                <a href="#" id="username">{{ username }}</a>
+            </div>
+            {% if ownPost %}
+                <a href="{% url 'editPost' %}?id={{ post.id }}"><i style="font-size: 2em" class="material-icons">create</i></a>
+            {% endif %}
+        </div>
+        <div class="mainContent">
+            <p>
+                {{ content }}
+            </p>
+        </div>
+        <div class="imgContainer">
+            <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
+        </div>
+    </div> 
     <div>
         <!-- Add Comments Here -->
     </div>
