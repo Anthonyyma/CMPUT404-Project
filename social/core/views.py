@@ -25,7 +25,7 @@ def test(request):
     postId = request.GET.get('id')
     post = Post.objects.get(id=postId)
 
-@login_required
+# @login_required
 def createPost(request):
     list(messages.get_messages(request))
     form = PostForm(request.POST or None, request.FILES or None)
@@ -61,15 +61,25 @@ def createPost(request):
     context = {'form': form, 'type':type, 'id':postId}
     return render(request, "createPost.html", context)
 
-@login_required
+# @login_required
 def deletePost(request):
     postId = request.GET.get('id')
     Post.objects.filter(pk=postId).delete()
     return redirect("/")
 
-@login_required
+# @login_required
 def postType(request):
     return render(request, "postType.html")
+
+def postContent(request):
+    postId = request.GET.get('id')
+    post = Post.objects.filter(id=postId)
+    user = request.user
+    if post:
+        profilePic = user.profile_image
+    
+    context = {'profilePic': profilePic, 'name': user.username}
+    return render(request, "postContent/postContent.html", context)
 
 def login_user(request):
     if request.method == "POST":

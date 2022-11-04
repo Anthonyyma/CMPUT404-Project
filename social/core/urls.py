@@ -11,6 +11,7 @@ urlpatterns = [
     path("editPost/", views.createPost, name="editPost"),
     path("createPost/", views.postType, name="createPost"),
     path("deletePost/", views.deletePost, name="deletePost"),
+    path("postContent/", views.postContent, name="postContent"),
     path("login/", views.login_user, name="login"),
     path("register/", views.register_user, name="register")
     # path('info/', views.info, name='info'),

@@ -1,5 +1,6 @@
 html {
   height: 100%;
+  width: 100%;
 }
 body {
   background-color: #ffffff;
@@ -7,7 +8,9 @@ body {
   align-items: center;
 	justify-content: center;
   height: 100%;
+  width: 100%;
   display: flex;
+  position: relative;
 }
 h1 {
   color: pink
@@ -52,7 +55,7 @@ label {
 .form {
   display: block;
   padding: 5px;
-  width: 100%;
+  width: 100vw;
   font-size: 1em;
   background-color: rgba(69, 10, 10, 0.2);
   border: 2px solid rgba(34, 247, 240, 0.3);
