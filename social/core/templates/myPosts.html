@@ -16,7 +16,7 @@
     <div class="post-display">
         <div style="margin-bottom: 50px"><a href="{% url 'createPost' %}">Create Post</a></div>
         {% for post in object_list %}
-            <a href="{% url 'editPost' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+            <a href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
                 {% if post.image %}
                     <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
                 {% endif %}
