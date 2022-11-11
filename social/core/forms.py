@@ -2,7 +2,7 @@
 #from msilib.schema import CheckBox
 from django import forms
 from django.forms import TextInput, Textarea
-from .models import Post
+from .models import Post, Comment
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
  
@@ -50,6 +50,18 @@ class PostForm(forms.ModelForm):
             #     "placeholder": "Content"
             # }),        
         }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        exclude = ["id", "content_type"]
+        # fields = ["author", "title", "source", "content_type", "categories", "content", "published",]
+        # fields = ["title", "categories", "content", "friends_only", "unlisted"]
+        widgets = {
+            "content": Textarea(attrs={
+                "class": "form-group form",
+            }),        
+        }     
 
 # RegisterForm that inherits from Django's UserCreationForm
 class RegisterForm(UserCreationForm):

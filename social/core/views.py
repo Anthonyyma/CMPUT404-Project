@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
-from .forms import PostForm
-from .models import Post, User
+from .forms import PostForm, CommentForm
+from .models import Post, User, Comment
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
@@ -66,6 +66,33 @@ def createPost(request):
     return render(request, "createPost.html", context)
 
 # @login_required
+def createComment(request):
+    list(messages.get_messages(request))
+    form = CommentForm(request.POST or None)
+    commentId = request.GET.get('id')
+    notValid = False
+    if commentId != None:
+        comment = Comment.objects.get(id=commentId)
+        form = CommentForm(instance=comment)
+
+    if request.method == "POST":
+        if commentId != None:
+            form = CommentForm(request.POST, instance=comment)
+        else:
+            form = CommentForm(request.POST)
+        if form.is_valid():
+            form.instance.author = request.user
+            if not notValid:
+                form.save()
+                return redirect("/")
+        else:
+            print(form.errors)
+
+
+    context = {'form': form, 'id':commentId}
+    return render(request, "postContent/createComment.html", context)
+
+# @login_required
 def deletePost(request):
     postId = request.GET.get('id')
     if postId != "None":
@@ -102,6 +129,11 @@ def login_user(request):
             return redirect('login')
     else:
         return render(request, "registration/login.html", {})
+
+def logout_user(request):
+    logout(request)
+    messages.success(request, ("You have been succefully logged out"))
+    return redirect('login')
 
 def register_user(request):
     """

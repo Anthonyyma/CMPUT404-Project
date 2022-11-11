@@ -12,8 +12,10 @@ urlpatterns = [
     path("createPost/", views.postType, name="createPost"),
     path("deletePost/", views.deletePost, name="deletePost"),
     path("postContent/", views.postContent, name="postContent"),
+    path("createComment/", views.createComment, name="createComment"),
     path("login/", views.login_user, name="login"),
-    path("register/", views.register_user, name="register")
+    path("register/", views.register_user, name="register"),
+    path("logout", views.logout_user, name="logout"),
     # path('info/', views.info, name='info'),
     # path('info/', views.info, name='info'),
     # path('favicon.ico/',
