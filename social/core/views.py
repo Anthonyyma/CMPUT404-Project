@@ -1,24 +1,39 @@
-from django.contrib import auth, messages
-from django.shortcuts import redirect, render
-from django.views.generic import DetailView, ListView
-
+from django.shortcuts import render, redirect
+from django.http import Http404
+from django.contrib.auth import authenticate, login, logout
+from .forms import RegisterForm
 from .forms import PostForm
-from .models import Follow, FollowRequest, Post
+from .models import Post, User, Follow, FollowRequest
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import ListView, DetailView
+from django.contrib import messages
+import markdown
+from html.parser import HTMLParser
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class PostList(ListView):
+class PostList(LoginRequiredMixin, ListView):
+    login_url = "/login/"
     template_name = "myPosts.html"
     model = Post
 
-def test(request):
-    postId = request.GET.get('id')
-    post = Post.objects.get(id=postId)
+    def get_queryset(self):
+        queryset = super(PostList, self).get_queryset()
+        return queryset.filter(author=self.request.user)
 
+class MDParser(HTMLParser):
+    md = ""
+    def handle_data(self, data):
+        self.md += data
+
+# @login_required
 def createPost(request):
     list(messages.get_messages(request))
     form = PostForm(request.POST or None, request.FILES or None)
     postId = request.GET.get('id')
     type = request.GET.get('type')
+    notValid = False
     if postId != None:
         post = Post.objects.get(id=postId)
         form = PostForm(instance=post)
@@ -33,24 +48,44 @@ def createPost(request):
             form.instance.author = request.user
             form.instance.content_type = type
             if type == "PNG" or type == "JPEG":
-                if form.instance.image:
-                    form.save()
-                    return redirect("/")
-                else:
-                    messages.info(request, "test")
-            else:
+                if not form.instance.image:
+                    messages.info(request, "No Image")
+                    notValid = True
+            elif type == "MD":
+                data = markdown.markdown(form.instance.content)
+                parser = MDParser()
+                parser.feed(data)
+                form.instance.content = parser.md
+            if not notValid:
                 form.save()
                 return redirect("/")
         else:
             print(form.errors)
 
-    context = {'form': form, 'type':type}
+    context = {'form': form, 'type':type, 'id':postId}
     return render(request, "createPost.html", context)
 
+# @login_required
+def deletePost(request):
+    postId = request.GET.get('id')
+    if postId != "None":
+        Post.objects.filter(pk=postId).delete()
+    return redirect("/")
 
+# @login_required
 def postType(request):
     return render(request, "postType.html")
 
+def postContent(request):
+    postId = request.GET.get('id')
+    post = Post.objects.get(id=postId)
+    user = request.user
+    ownPost = False
+    if user == post.author:
+        ownPost = True
+    if post:
+        profilePic = user.profile_image
+    
 
 def friends(request):
     users = auth.get_user_model().objects.all().values()
@@ -58,3 +93,49 @@ def friends(request):
     friendRequest = FollowRequest()
     data = {'users': users, 'friends': friends}
     return render(request, "friends.html", data)
+
+    context = {'post':post, 'ownPost':ownPost, 'profilePic': profilePic, 'username': user.username, 'content': post.content, 'img': post.image}
+    return render(request, "postContent/postContent.html", context)
+
+def login_user(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('myPosts')
+        else:
+            messages.success(request, ("Please double check that you are using the correct username and password"))
+            return redirect('login')
+    else:
+        return render(request, "registration/login.html", {})
+
+def register_user(request):
+    """
+    registration function to provide a form for users to create an accout on
+
+    if POST request:
+        pass the form to display
+
+        check if the filled form is valid
+
+    return:
+        registration form
+    """
+    # if the method is POST
+    if request.method == "POST":
+        # pass the request's body to the registeration form
+        form = RegisterForm(request.POST)
+        # if the data is valid, save user in databse and redirect to homepage
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(request, username=username, password=password)
+            login(request, user)
+            return redirect('myPosts') # once registered redirect to a different page
+    else:
+        form = RegisterForm()
+    # render the registeration html template
+    return render(request, "registration/register.html", {"form": form})

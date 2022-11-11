@@ -1,0 +1,100 @@
+<!doctype html>
+{% extends 'registration/base.html' %}
+{% load static %}
+
+{% block content %}
+<html>
+    <head>
+        <title>Social Registeration</title>
+        <link rel="stylesheet" href="{% static 'css/registration/register.css' %}">
+    </head>
+
+    <body>
+        <div class="vertical-center">
+            <div class="container-sm">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <div class = "d-flex justify-content-center mt-3">
+                                <h5 style="font-size:x-large;">Social</h5>
+                            </div>
+                        </div>
+                        <h6 class="card-subtitle d-flex justify-content-center text-muted">Create an Account</h6>
+                        <form method="POST">  
+                            {% csrf_token %}
+                            <div>
+                                <label for="id_username" class="form-label">Username</label>
+                                {{form.username}}
+                                <p class="form-text">Must be at least 5 characters long</p>
+                            </div>
+                            <div>
+                                <label for="id_email" class="form-label">Email</label>
+                                {{form.email}}
+                                <p class="form-text" id="email_feedback" >Enter a valid email address.</p>
+                            </div>
+                            <div>
+                                <label for="id_first_name" class="form-label">First Name</label>
+                                {{form.first_name}}
+                            </div>
+                                <div>
+                                <label for="id_last_name" class="form-label">Last Name</label>
+                                {{form.last_name}}
+                            </div>
+                            <div>
+                                <label for="id_password1" class="form-label">Password</label>
+                                {{form.password1}}
+                                <p class="form-text" id="similar">Password cannot be too similar to your other personal information</p>
+                                <p class="form-text" id="common">Password cannot be a commonly used password</p>
+                                <p class="form-text" id="numeric">Password cannot be entirely numeric</p>
+                                <p class="form-text" id="short">Password must contain at least 8 characters</p>
+                            </div>
+                            <div>
+                                <label for="id_password2" class="form-label">Confirm Password</label>
+                                {{form.password2}}
+                                <p class="form-text" id="mismatch">Enter the same password as before, for verification</p>
+                            </div>
+                                {% for key, key_errors in form.errors.as_data.items %}
+                                    <body onload='makeRed("{{key_errors}}")'> 
+                                {% endfor %}
+                                
+                            <div class="d-flex justify-content-center mt-3" >
+                                <button type="submit" class="btn btn-secondary " name="register_button">Register</button>
+                            </div>
+                                <div class="d-flex justify-content-center mt-3">
+                                <p>Already have an account? <a href="\login">Login</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        function makeRed(errors){
+            console.log(errors)
+            if (errors.indexOf('The two password fields didn’t match.') !== -1){
+                document.getElementById("mismatch").style="color:red;";
+            }
+            if (errors.indexOf('This password is too short.') !== -1){
+                document.getElementById("short").style="color:red;";
+            }
+            if (errors.indexOf('This password is too common.') !== -1){
+                document.getElementById("common").style="color:red;";
+            }
+            if (errors.indexOf('This password is entirely numeric.') !== -1){
+                document.getElementById("numeric").style="color:red;";
+            }
+            if (errors.indexOf('The password is too similar to the username.') !== -1){
+                document.getElementById("similar").style="color:red;";
+            }
+            if (errors.indexOf('The password is too similar to the username.') !== -1){
+                document.getElementById("similar").style="color:red;";
+            }
+            if (errors.indexOf('Enter a valid email address.') !== -1){
+                document.getElementById("email_feedback").style="color:red;";
+            }
+        }
+    </script>
+</html>
+{% endblock %}
