@@ -1,0 +1,52 @@
+html {
+  height: 100%;
+    display: flex;
+    justify-content: center;
+}
+body {
+    height: 100%;
+    max-width: 50%;
+    display: block;
+    justify-content: center;
+}
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+#profilePicture {
+    width: 100px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 30px;
+}
+#username, a:visited {
+    font-size: 1.7em;
+    text-decoration: none;
+    color: black;
+}
+.mainPost {
+    border-style: solid;
+    border-color: gray;
+    padding: 1em;
+    border-width: 1px;
+}
+.userHeader {
+    height: 100px;
+    /* margin-top: 10px; */
+    border-color: blue;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.mainContent {
+    font-size: 2em;
+}
+.imgContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -15,7 +15,7 @@ class ContentTypes(models.TextChoices):
 # Create your models here.
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    profile_image = models.ImageField(upload_to="profile_images", blank=True)
+    profile_image = models.ImageField(default="defaultProPic.jpg", blank=True)
     github = models.URLField(blank=True)
 
 
@@ -66,7 +66,8 @@ class Post(models.Model):
     content_type = models.CharField(max_length=5, choices=CONTENT_TYPES, default="TEXT")
     categories = models.TextField()  # just use space seperated strings for now lol
     content = models.TextField()
-    image = models.ImageField(blank=True, upload_to="media/")
+    # image = models.ImageField(blank=True, upload_to="media/")
+    image = models.ImageField(blank=True)
     published = models.DateTimeField(auto_now_add=True)
     friends_only = models.BooleanField(default=False)
     unlisted = models.BooleanField(default=False)

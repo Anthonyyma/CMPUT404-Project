@@ -1,17 +1,21 @@
-<!DOCTYPE html>  
-<html lang="en">  
+<!doctype html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<html>
 <head> 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>  
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>  
 <body>  
     <form method="POST" enctype="multipart/form-data">  
         {% csrf_token %} 
-          <div class="form-group">
+        <div class="form-group">
             <label>Title</label>
             {{ form.title }}  
         </div>
@@ -54,8 +58,9 @@
             <label>Private To [Username]</label>
             {{ form.private_to }}  
         </div>
-        <button type="submit" >Save</button>  
+        <button type="submit" style="border-radius:50px; width: 100px; height: 50px">Save</button>  
         <div><a id="delete-button" href="{% url 'deletePost' %}?id={{ id }}">Delete Post</a></div>
     </form>  
 </body>  
 </html>  
+{% endblock %}

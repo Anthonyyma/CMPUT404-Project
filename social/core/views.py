@@ -7,7 +7,8 @@ from .models import Post, User
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
-import commonmark
+import markdown
+from html.parser import HTMLParser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -21,16 +22,18 @@ class PostList(LoginRequiredMixin, ListView):
         queryset = super(PostList, self).get_queryset()
         return queryset.filter(author=self.request.user)
 
-def test(request):
-    postId = request.GET.get('id')
-    post = Post.objects.get(id=postId)
+class MDParser(HTMLParser):
+    md = ""
+    def handle_data(self, data):
+        self.md += data
 
-@login_required
+# @login_required
 def createPost(request):
     list(messages.get_messages(request))
     form = PostForm(request.POST or None, request.FILES or None)
     postId = request.GET.get('id')
     type = request.GET.get('type')
+    notValid = False
     if postId != None:
         post = Post.objects.get(id=postId)
         form = PostForm(instance=post)
@@ -49,8 +52,10 @@ def createPost(request):
                     messages.info(request, "No Image")
                     notValid = True
             elif type == "MD":
-                parser = commonmark.Parser()
-                form.instance.content = parser.parse(form.instance.content)
+                data = markdown.markdown(form.instance.content)
+                parser = MDParser()
+                parser.feed(data)
+                form.instance.content = parser.md
             if not notValid:
                 form.save()
                 return redirect("/")
@@ -60,15 +65,29 @@ def createPost(request):
     context = {'form': form, 'type':type, 'id':postId}
     return render(request, "createPost.html", context)
 
-@login_required
+# @login_required
 def deletePost(request):
     postId = request.GET.get('id')
-    Post.objects.filter(pk=postId).delete()
+    if postId != "None":
+        Post.objects.filter(pk=postId).delete()
     return redirect("/")
 
-@login_required
+# @login_required
 def postType(request):
     return render(request, "postType.html")
+
+def postContent(request):
+    postId = request.GET.get('id')
+    post = Post.objects.get(id=postId)
+    user = request.user
+    ownPost = False
+    if user == post.author:
+        ownPost = True
+    if post:
+        profilePic = user.profile_image
+    
+    context = {'post':post, 'ownPost':ownPost, 'profilePic': profilePic, 'username': user.username, 'content': post.content, 'img': post.image}
+    return render(request, "postContent/postContent.html", context)
 
 def viewUser(request, userID):
     # Displays the information of a user
