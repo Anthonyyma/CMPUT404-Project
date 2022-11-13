@@ -91,7 +91,7 @@ def postContent(request):
 
 def viewUser(request, userID):
     # Displays the information of a user
-    # TODO: return different pages depending if it is the current user's page
+    # User has both custom fields and base fields (see models.py)
 
     if (userID is None):    #if a userID is not given default to current user
         userID = request.user.id    # Currently logged in user
