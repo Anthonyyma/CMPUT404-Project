@@ -70,6 +70,25 @@ def deletePost(request):
 def postType(request):
     return render(request, "postType.html")
 
+def viewUser(request, userID):
+    # Displays the information of a user
+    # TODO: return different pages depending if it is the current user's page
+
+    if (userID is None):    #if a userID is not given default to current user
+        userID = request.user.id    # Currently logged in user
+
+    user = User.objects.get(id=userID)  #this should get the user from the database
+
+    context = {"user":user.username, "pfp": user.profile_image, "github": user.github}
+    print(userID)
+
+    return render(request, "viewUser.html", context)
+
+def viewCurrentUser(request):
+    userID = request.user.id
+    return viewUser(request, userID)
+
+
 def login_user(request):
     if request.method == "POST":
         username = request.POST['username']
