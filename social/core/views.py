@@ -97,8 +97,8 @@ def viewUser(request, userID):
         userID = request.user.id    # Currently logged in user
 
     user = User.objects.get(id=userID)  #this should get the user from the database
-
-    context = {"user":user.username, "pfp": user.profile_image, "github": user.github}
+    
+    context = {"user":user}     # send the user to the template
     print(userID)
 
     return render(request, "viewUser.html", context)

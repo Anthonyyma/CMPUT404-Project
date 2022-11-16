@@ -1,0 +1,28 @@
+.info-block{
+    background-color: black;
+    display: flex;
+    justify-content: space-around;
+}
+
+h1{
+    font-size: medium;
+    font-family: 'Times New Roman', Times, serif;
+    color: white;
+}
+
+img{
+    width: 150px;
+    height: auto;
+    border-radius: 50%;
+}
+
+button{
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: medium;
+    font-family: 'Times New Roman', Times, serif;
+    cursor: pointer;
+}
