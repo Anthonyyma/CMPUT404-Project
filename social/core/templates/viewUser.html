@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block content %}
-<html lang="en">
 <head>
     <meta charset="utf-8">
     <title> {{user}} </title>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href=" % static 'css/viewUser.css' %">
 </head>
 <div class="info-block">
     <h1>UUID: {{user.username}}</h>
     <br>
     <h1>Github: {{user.github}}</h>
     <br>
-    <img src="{{user.profile_image.url}}">
+    <img src="{{user.profile_image.url}}"/>
     
     
 </div>
