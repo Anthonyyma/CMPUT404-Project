@@ -8,24 +8,18 @@ body {
   align-items: center;
 	justify-content: center;
   height: 100%;
-  width: 100%;
-  display: flex;
-  position: relative;
-}
-h1 {
-  color: pink
 }
 #delete-button {
   margin-top: 50px;
-  background-color: red;
-  color: white;
+  color: red;
   padding: 1em 1.5em;
   text-decoration: none;
-  text-transform: uppercase;
-  display: block;
+  display: inline;
 }
-.forms {
+form {
   min-width: 300px;
+  width: 50%;
+  margin: 0 auto;
 }
 .post-display {
   width: 50%;
@@ -55,10 +49,9 @@ label {
 .form {
   display: block;
   padding: 5px;
-  width: 100vw;
+  width: 100%;
   font-size: 1em;
   background-color: rgba(69, 10, 10, 0.2);
-  border: 2px solid rgba(34, 247, 240, 0.3);
   color: black;
   font-weight: 200;
 }
@@ -66,7 +59,6 @@ label {
   outline: -webkit-focus-ring-color auto 5px;
 }
 .form-group {
-  max-width: 500px;
   margin: auto;
   margin-bottom: 30px;
 }
