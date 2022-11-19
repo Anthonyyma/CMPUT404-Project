@@ -15,25 +15,28 @@ class PostForm(forms.ModelForm):
         widgets = {
             "title": TextInput(attrs={
                 "class": "form-group form",
+                "placeholder": "Title"
             }),
             "source": TextInput(attrs={
                 "class": "form-group form",
+                "placeholder": "Source"
             }),
             "origin": TextInput(attrs={
                 "class": "form-group form",
+                "placeholder": "Origin"
             }),
-            # "content_type": TextInput(attrs={
-            #     "class": "form-group form",
-            # }),
             "categories": TextInput(attrs={
                 "class": "form-group form",
+                "placeholder": "Categories"
             }),
             "content": Textarea(attrs={
                 "class": "form-group form",
+                "placeholder": "Content"
             }),        
             "private_to": TextInput(attrs={
                 "class": "form-group form",
-            }),        
+                "placeholder": "Private To"
+            }),         
             # "published": TextInput(attrs={
             #     "class": "forms",
             #     "style": "height: 200px",
