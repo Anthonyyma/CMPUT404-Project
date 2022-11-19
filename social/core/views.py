@@ -116,6 +116,25 @@ def postContent(request):
     context = {'post':post, 'ownPost':ownPost, 'profilePic': profilePic, 'username': user.username, 'content': post.content, 'img': post.image}
     return render(request, "postContent/postContent.html", context)
 
+def viewUser(request, userID):
+    # Displays the information of a user
+    # User has both custom fields and base fields (see models.py)
+
+    if (userID is None):    #if a userID is not given default to current user
+        userID = request.user.id    # Currently logged in user
+
+    user = User.objects.get(id=userID)  #this should get the user from the database
+    
+    context = {"user":user}     # send the user to the template
+    print(userID)
+
+    return render(request, "viewUser.html", context)
+
+def viewCurrentUser(request):
+    userID = request.user.id
+    return viewUser(request, userID)
+
+
 def login_user(request):
     if request.method == "POST":
         username = request.POST['username']
