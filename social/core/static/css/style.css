@@ -10,9 +10,7 @@ body {
   height: 100%;
 }
 #delete-button {
-  margin-top: 50px;
   color: red;
-  padding: 1em 1.5em;
   text-decoration: none;
   display: inline;
 }
@@ -20,6 +18,9 @@ form {
   min-width: 300px;
   width: 50%;
   margin: 0 auto;
+}
+.box {
+  width: 50px;
 }
 .post-display {
   width: 50%;
