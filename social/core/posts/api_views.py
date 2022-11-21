@@ -38,3 +38,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         post_id = self.kwargs["post_pk"]
         queryset = queryset.filter(post=post_id)
         return queryset
+
+    def perform_create(self, serializer):
+        author_id = self.request.data["author"]
+        post_id = self.kwargs["post_pk"]
+        return serializer.save(author_id=author_id, post_id=post_id)

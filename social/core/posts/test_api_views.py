@@ -70,3 +70,23 @@ class AuthorTest(APITestCase):
             },
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            Post.objects.filter(content="new post", author=self.user1).exists()
+        )
+
+    def test_create_comment(self):
+        path = f"/api/authors/{self.user1.id}/posts/{self.post1.id}/comments/"
+        resp = self.client.post(
+            path,
+            {
+                "author": self.user2.id,
+                "comment": "new comment",
+                "contentType": "text/markdown",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            Comment.objects.filter(
+                author=self.user2, post=self.post1, content="new comment"
+            ).exists()
+        )

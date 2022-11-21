@@ -12,7 +12,7 @@ def get_post_url(post: Post, request) -> str:
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer()
+    author = AuthorSerializer(read_only=True)
     comment = serializers.CharField(source="content")
     contentType = serializers.CharField(source="content_type", default="text/markdown")
     type = serializers.ReadOnlyField(default="comment")
