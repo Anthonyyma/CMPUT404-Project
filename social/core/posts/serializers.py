@@ -12,7 +12,7 @@ def get_post_url(post: Post, request) -> str:
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(read_only=True)
+    author = AuthorSerializer()
     comment = serializers.CharField(source="content")
     contentType = serializers.CharField(source="content_type", default="text/markdown")
     type = serializers.ReadOnlyField(default="comment")
@@ -39,7 +39,7 @@ class PostSerializer(serializers.ModelSerializer):
     contentType = serializers.CharField(source="content_type")
     # comments = serializers.HyperlinkedRelatedField()
     visibility = serializers.SerializerMethodField()
-    author = AuthorSerializer(read_only=True)
+    author = AuthorSerializer()
     categories = serializers.SerializerMethodField()
     author = AuthorSerializer(read_only=True)
     published = serializers.SerializerMethodField()

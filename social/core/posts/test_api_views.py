@@ -43,7 +43,30 @@ class AuthorTest(APITestCase):
             f"authors/{self.post1.author.id}/posts/{self.post1.id}/comments"
             in data["comments"]
         )
-
+        # user2 made the only comment on this post
         self.assertEqual(
-            data["commentsSrc"][0]["author"]["displayName"], self.user1.username
+            data["commentsSrc"]["comments"][0]["author"]["displayName"],
+            self.user2.username,
         )
+
+    def test_delete_post(self):
+        path = f"/api/authors/{self.user1.id}/posts/{self.post1.id}/"
+        resp = self.client.delete(path)
+
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Post.objects.filter(id=self.post1.id).exists())
+
+    def test_create_post(self):
+        path = f"/api/authors/{self.user1.id}/posts/"
+        resp = self.client.post(
+            path,
+            {
+                "author": self.user1.id,
+                "content": "new post",
+                "visibility": "PUBLIC",
+                "contentType": "text/plain",
+                "source": "http://www.example.com",
+                "origin": "http://www.example.com",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
