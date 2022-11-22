@@ -1,6 +1,7 @@
-from core.models import Comment, Post, User
+from core.models import Comment, Post, User, Like
 from rest_framework import status
 from rest_framework.test import APITestCase
+from time import sleep
 
 
 class AuthorTest(APITestCase):
@@ -90,3 +91,39 @@ class AuthorTest(APITestCase):
                 author=self.user2, post=self.post1, content="new comment"
             ).exists()
         )
+
+    def test_get_likes_on_post_with_no_likes(self):
+        path = f"/api/authors/{self.user1.id}/posts/{self.post1.id}/likes/"
+        resp = self.client.get(path, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.json()
+        self.assertEqual(data["type"], "like")
+        self.assertEqual(len(data["items"]), 0)
+
+    def test_get_likes_on_post(self):
+        Like.objects.create(post=self.post1, user=self.user1)
+        sleep(0.01)
+        Like.objects.create(post=self.post1, user=self.user2)
+        path = f"/api/authors/{self.user1.id}/posts/{self.post1.id}/likes/"
+        resp = self.client.get(path, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.json()
+        self.assertEqual(len(data["items"]), 2)
+        # likes are sorted by order of creation
+        self.assertEqual(data["items"][0]["author"]["displayName"], "test2")
+        self.assertEqual(data["items"][1]["author"]["displayName"], "test1")
+
+    def test_get_likes_on_comment(self):
+        comment = Comment.objects.create(
+            post=self.post1, author=self.user2, content="c1"
+        )
+        Like.objects.create(comment=comment, user=self.user1)
+        path = f"/api/authors/{self.user1.id}/posts/{self.post1.id}/comments/{comment.id}/likes/"
+        resp = self.client.get(path, follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.json()
+        self.assertEqual(len(data["items"]), 1)
+        self.assertEqual(data["items"][0]["author"]["displayName"], "test1")
