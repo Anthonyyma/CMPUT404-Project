@@ -11,7 +11,7 @@
     <title>Index</title>  
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'postContent/postContent.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/postContent/postContent.css' %}">
 </head>  
 <body>  
     <div class="mainPost">
@@ -41,11 +41,13 @@
             <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
         </div>
     </div> 
+    <!-- Link needs to still be fixed -->
     <a class="like-button" href="?id={{ post.id }}{% url 'likePost' %} ">
         <i class="material-icons insert-comment-icon">thumb_up</i>
     </a>
-    <a class="comment-button" href="?id={{ post.id }}{% url 'createComment' %}">
-        <i class="material-icons insert-comment-icon">insert_comment</i>
+    <!-- Link still needs to be fixed -->
+    <a class="comment-button" href="{% url 'createComment' %}">
+        <i name="post.id" class="material-icons insert-comment-icon">insert_comment</i>
     </a>
     <div class="comments">
         <h3>Comments</h3>

@@ -81,8 +81,8 @@ def likePost(request, postID):
 def createComment(request):
     list(messages.get_messages(request))
     form = CommentForm(request.POST or None)
-    commentId = request.GET.get('id')
-    print(request.user)
+    commentId = request.GET.get('post.id')
+    print(commentId)
     if commentId != None:
         comment = Comment.objects.get(id=commentId)
         form = CommentForm(instance=comment)
