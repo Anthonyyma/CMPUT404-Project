@@ -1,7 +1,7 @@
 # import form class from django
 #from msilib.schema import CheckBox
 from django import forms
-from django.forms import TextInput, Textarea, MultipleChoiceField
+from django.forms import TextInput, Textarea, CheckboxInput
 from .models import Post, Comment
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
@@ -31,27 +31,25 @@ class PostForm(forms.ModelForm):
             }),
             "content": Textarea(attrs={
                 "class": "form-group form",
-                "placeholder": "Content"
+                "placeholder": "Content",
             }),        
             "private_to": TextInput(attrs={
                 "class": "form-group form",
-                "placeholder": "Private To"
+                "placeholder": "Private To [Username]"
             }),         
             # "published": TextInput(attrs={
             #     "class": "forms",
             #     "style": "height: 200px",
             #     "placeholder": "published"
             # }),        
-            # "friends_only": CheckBox(attrs={
-            #     "class": "forms",
-            #     "style": "height: 200px",
-            #     "placeholder": "Content"
-            # }),        
-            # "unlisted": TextInput(attrs={
-            #     "class": "forms",
-            #     "style": "height: 200px",
-            #     "placeholder": "Content"
-            # }),        
+            "friends_only": CheckboxInput(attrs={
+                "class": "box",
+                "style": "height: 30px"
+            }),        
+            "unlisted": CheckboxInput(attrs={
+                "class": "box",
+                "style": "height: 30px"
+            }),        
         }
 
 class CommentForm(forms.ModelForm):

@@ -39,7 +39,7 @@ class PostSerializer(serializers.ModelSerializer):
     contentType = serializers.CharField(source="content_type")
     # comments = serializers.HyperlinkedRelatedField()
     visibility = serializers.SerializerMethodField()
-    author = AuthorSerializer(read_only=True)
+    author = AuthorSerializer()
     categories = serializers.SerializerMethodField()
     author = AuthorSerializer(read_only=True)
     published = serializers.SerializerMethodField()
