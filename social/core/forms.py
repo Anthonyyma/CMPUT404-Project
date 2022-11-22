@@ -1,7 +1,7 @@
 # import form class from django
 #from msilib.schema import CheckBox
 from django import forms
-from django.forms import TextInput, Textarea
+from django.forms import TextInput, Textarea, MultipleChoiceField
 from .models import Post, Comment
 from django.contrib.auth.forms import UserCreationForm
 from .models import User

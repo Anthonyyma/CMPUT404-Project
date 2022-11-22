@@ -41,14 +41,17 @@
             <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
         </div>
     </div> 
+    <a class="like-button" href="?id={{ post.id }}{% url 'likePost' %} ">
+        <i class="material-icons insert-comment-icon">thumb_up</i>
+    </a>
+    <a class="comment-button" href="?id={{ post.id }}{% url 'createComment' %}">
+        <i class="material-icons insert-comment-icon">insert_comment</i>
+    </a>
     <div class="comments">
         <h3>Comments</h3>
-        <a href="{% url 'createComment'%}">
-            <i class="material-icons insert-comment-icon">insert_comment</i>
-        </a>
         <div class="comment">
             {% if not post.comments.all %}
-                <p>No comments yet :(</p>
+                <p>No comments yet</p>
             {% else %}
                 {% for comment in post.comments.all %}
                     <a href="#"><strong>{{ comment.author }}</strong></a> on {{ comment.published }}

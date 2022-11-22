@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import HttpResponseRedirect, get_object_or_404, render, redirect
 from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from .forms import PostForm, CommentForm
-from .models import Post, User, Comment
+from .models import Post, User, Like, Comment
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
@@ -11,6 +11,7 @@ import markdown
 from html.parser import HTMLParser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 
 
 class PostList(LoginRequiredMixin, ListView):
@@ -65,12 +66,23 @@ def createPost(request):
     context = {'form': form, 'type':type, 'id':postId}
     return render(request, "createPost.html", context)
 
+# incomplete
+def likePost(request, postID):
+    form = Like(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.instance.user = request.user
+            form.instance.post = postID
+
+    return HttpResponseRedirect(reverse('postContent', args=[postID]))
+
 # @login_required
 def createComment(request):
     list(messages.get_messages(request))
     form = CommentForm(request.POST or None)
     commentId = request.GET.get('id')
-    notValid = False
+    print(request.user)
     if commentId != None:
         comment = Comment.objects.get(id=commentId)
         form = CommentForm(instance=comment)
@@ -80,11 +92,9 @@ def createComment(request):
             form = CommentForm(request.POST, instance=comment)
         else:
             form = CommentForm(request.POST)
+        print(form.is_valid)
         if form.is_valid():
             form.instance.author = request.user
-            if not notValid:
-                form.save()
-                return redirect("/")
         else:
             print(form.errors)
 
