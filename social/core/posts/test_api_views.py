@@ -127,3 +127,21 @@ class AuthorTest(APITestCase):
         data = resp.json()
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(data["items"][0]["author"]["displayName"], "test1")
+
+    def test_get_user_likes(self):
+        comment = Comment.objects.create(
+            post=self.post1, author=self.user2, content="c1"
+        )
+        Like.objects.create(comment=comment, user=self.user1)
+        Like.objects.create(post=self.post1, user=self.user1)
+        Like.objects.create(post=self.post2, user=self.user2)
+
+        path = f"/api/authors/{self.user1.id}/likes/"
+        resp = self.client.get(path, follow=True)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.json()
+        self.assertEqual(len(data["items"]), 2)
+        self.assertEqual(data["items"][0]["author"]["displayName"], self.user1.username)
+        self.assertDictContainsSubset({}, data["items"][0]["object"])
+        self.assertEqual(data["items"][1]["author"]["displayName"], self.user1.username)

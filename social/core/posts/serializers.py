@@ -115,9 +115,18 @@ class LikeSerializer(serializers.Serializer):
     type = serializers.ReadOnlyField(default="like")
     author = AuthorSerializer(read_only=True, source="user")
     object = serializers.SerializerMethodField()
+    summary = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Like
+        fields = ["type", "author", "object", "summary"]
 
     def get_object(self, like: Like):
         if like.post is not None:
             return get_post_url(like.post, self.context["request"])
         elif like.comment is not None:
             return get_comment_url(like.comment, self.context["request"])
+
+    def get_summary(self, like: Like):
+        type = "post" if like.post is not None else "comment"
+        return f"{like.user.username} likes your {type} "
