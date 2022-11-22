@@ -52,9 +52,10 @@ label {
   padding: 5px;
   width: 100%;
   font-size: 1em;
-  background-color: rgba(69, 10, 10, 0.2);
+  background-color: rgba(78, 77, 77, 0.2);
   color: black;
   font-weight: 200;
+  border-radius: 20px;  
 }
 .form:focus {
   outline: -webkit-focus-ring-color auto 5px;
@@ -99,4 +100,73 @@ label {
 .post-type a:visited {
   text-decoration: None;
   color: black;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+}
+
+.multi-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.multi-button button {
+  flex: 1;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  padding: 1rem 2rem;
+  border: 2px solid #f2f2f2;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 1.5em;
+  letter-spacing: 1px;
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.1);
+  color: black;
+  background: transparent;
+  overflow: hidden;
+}
+.multi-button button::before, .multi-button button::after {
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.multi-button button::after {
+  height: 0;
+  background-color: #5ce5fb;
+  transition: height 0.5s ease;
+  z-index: -1;
+}
+.multi-button button::before {
+  background-color: #fff;
+  height: 100%;
+  z-index: -2;
+}
+.multi-button button:hover {
+  color: #006377;
+  transition: 0.1s ease;
+}
+.multi-button button:hover::after {
+  height: 100%;
+}
+.multi-button button:nth-of-type(1) {
+  border-radius: 6px 0 0 6px;
+}
+.multi-button button:nth-of-type(3) {
+  border-radius: 0 6px 6px 0;
+}
+
+@keyframes towhite {
+  0% {
+    color: inherit;
+  }
+  100% {
+    color: white;
+  }
 }

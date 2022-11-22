@@ -31,7 +31,7 @@ class PostForm(forms.ModelForm):
             }),
             "content": Textarea(attrs={
                 "class": "form-group form",
-                "placeholder": "Content"
+                "placeholder": "Content",
             }),        
             "private_to": TextInput(attrs={
                 "class": "form-group form",
