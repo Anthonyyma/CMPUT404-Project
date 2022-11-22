@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from .forms import RegisterForm
 from .forms import PostForm
 from .models import Post, User, Follow, FollowRequest
@@ -88,14 +88,17 @@ def postContent(request):
     
 
 def friends(request):
-    users = auth.get_user_model().objects.all().values()
-    friends = Follow.objects.get(followee=request.user)
-    friendRequest = FollowRequest()
+    users = get_user_model().objects.all()
+    friends = None
+    
+    follower = Follow.objects.filter(follower=request.user)
+    followee = Follow.objects.filter(followee=request.user)
+    
     data = {'users': users, 'friends': friends}
     return render(request, "friends.html", data)
 
-    context = {'post':post, 'ownPost':ownPost, 'profilePic': profilePic, 'username': user.username, 'content': post.content, 'img': post.image}
-    return render(request, "postContent/postContent.html", context)
+    #context = {'post':post, 'ownPost':ownPost, 'profilePic': profilePic, 'username': user.username, 'content': post.content, 'img': post.image}
+    #return render(request, "postContent/postContent.html", context)
 
 def login_user(request):
     if request.method == "POST":
