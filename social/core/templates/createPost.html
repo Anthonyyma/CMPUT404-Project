@@ -39,20 +39,22 @@
             {% if messages %}
                 <h2 style="color: red;">Please Select an Image</h2>
             {% endif %}
-            <div class="form-group">
-                <label>Friends Only</label>
-                {{ form.friends_only }}  
-            </div>
-            <div class="form-group">
-                <label>Unlisted</label>
-                {{ form.unlisted }}  
+            <div class="form-group" style="display: flex; justify-content: space-evenly; accent-color: white;">
+                <div>
+                    <label style="position: relative; left: -15px;">Friends Only</label>
+                    {{ form.friends_only }}  
+                </div>
+                <div>
+                    <label>Unlisted</label>
+                    {{ form.unlisted }}  
+                </div>
             </div>
             <div class="form-group">
                 {{ form.private_to }}  
             </div>
             <div style="width: 100%; display: flex; justify-content: space-between;">
-                <button type="submit" style="border: 0; background-color: white; cursor: pointer;"><i style="font-size: 4em;" class="material-icons">save</i></button>  
-                <a id="delete-button" href="{% url 'deletePost' %}?id={{ id }}"><i style="font-size: 3em;" class="material-icons">delete</i></a>
+                <button type="submit" style="border: 0; background-color: white; cursor: pointer;"><i style="font-size: 25px;" class="material-icons">save</i></button>  
+                <a id="delete-button" href="{% url 'deletePost' %}?id={{ id }}"><i style="font-size: 25px;" class="material-icons">delete</i></a>
             </div>
         </form>  
     </div>
