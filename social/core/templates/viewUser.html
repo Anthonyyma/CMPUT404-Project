@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+
+{% block content %}
+<head>
+    <meta charset="utf-8">
+    <title> {{user}} </title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href=" % static 'css/viewUser.css' %">
+</head>
+<div class="info-block">
+    <h1>UUID: {{user.username}}</h>
+    <br>
+    <h1>Github: {{user.github}}</h>
+    <br>
+    <img src="{{user.profile_image.url}}"/>
+    
+    
+</div>
+
+
+<a href="#" class="button">Followers</a>
+<a href="#" class="button">Following</a>
+
+
+</html>
+{% endblock %}

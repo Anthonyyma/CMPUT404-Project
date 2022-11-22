@@ -9,6 +9,14 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     pagination_class = labelled_pagination("post")
 
+    def put(self, request, *args, **kwargs):
+        self.create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        # we need to manually pull out the author id
+        author_id = self.request.data["author"]
+        serializer.save(author_id=author_id)
+
     def get_queryset(self):
         queryset = Post.objects.order_by("published").all()
         # This comes from the nested router
@@ -30,3 +38,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         post_id = self.kwargs["post_pk"]
         queryset = queryset.filter(post=post_id)
         return queryset
+
+    def perform_create(self, serializer):
+        author_id = self.request.data["author"]
+        post_id = self.kwargs["post_pk"]
+        return serializer.save(author_id=author_id, post_id=post_id)
