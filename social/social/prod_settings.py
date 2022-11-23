@@ -11,4 +11,6 @@ DATABASES = {
     "default": dj_database_url.config(conn_max_age=600)
 }
 
+API_HOST_PATH = "https://c404-team8.herokuapp.com/api/"
+
 django_on_heroku.settings(locals())
