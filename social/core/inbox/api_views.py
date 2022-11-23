@@ -2,8 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import authentication, permissions, status
-from core.models import Like, Post, Comment, User
-from django.contrib.auth.models import User
+from core.models import Like, Post, Comment, User, Inbox, FollowRequest, Follow
 from django.conf import settings
 from core import path_utils
 from core.posts.serializers import LikeSerializer
@@ -18,12 +17,18 @@ class InboxView(APIView):
     GET: Returns the inbox for the current user
     """
 
-    def post(self, request: Request, *args, **kwargs):
+    def post(self, request: Request, recipient_id: str = "", **kwargs):
+        recipient = User.objects.get(id=recipient_id)
         data = request.data
         if data is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        if data.get("type") == "Like":
+        type = data.get("type").lower()
+        if type == "like":
             self.handle_like(data)
+        elif type == "post":
+            self.handle_post(data, recipient)
+        elif type == "follow":
+            self.handle_follow(data, recipient)
 
     def handle_like(self, data):
         like = Like()
@@ -50,3 +55,27 @@ class InboxView(APIView):
         like.save()
         serializer = LikeSerializer(like)
         return Response(status=status.HTTP_201_CREATED, data=serializer.data)
+
+    def handle_post(self, data, recipient: User):
+        post_url = data["id"]
+        inbox = Inbox(user=recipient, external_post=post_url)
+        inbox.save()
+
+    def handle_follow(self, data, recipient: User):
+        follower_url = data["actor"]["id"]
+
+        already_following = Follow.objects.filter(
+            followee=recipient, external_follower=follower_url
+        ).exists()
+        already_requested = FollowRequest.objects.filter(
+            followee=recipient, external_follower=follower_url
+        )
+        if already_following or already_requested:
+            return Response(status=status.HTTP_200_OK)
+
+        follow_request = FollowRequest(followee=recipient, follower=follower_url)
+        follow_request.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+    def handle_comment(self, data):
+        pass
