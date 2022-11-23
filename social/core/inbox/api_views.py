@@ -8,7 +8,7 @@ from core import path_utils
 from core.posts.serializers import LikeSerializer
 import re
 
-API_HOST_PATH = settings["API_HOST_PATH"]
+API_HOST_PATH = settings.API_HOST_PATH
 
 
 class InboxView(APIView):
