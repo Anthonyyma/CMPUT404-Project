@@ -4,3 +4,6 @@ __pycache__/
 !.vscode/extensions.json
 social/db.sqlite3
 .DS_Store
+*.jpeg
+*.jpg
+*.png
