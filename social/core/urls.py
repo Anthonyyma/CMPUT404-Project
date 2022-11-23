@@ -29,6 +29,7 @@ urlpatterns = [
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
+    path("user/edit/", views.editUser, name="editUser"),
     # path('info/', views.info, name='info'),
     # path('info/', views.info, name='info'),
     # path('favicon.ico/',
