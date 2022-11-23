@@ -51,6 +51,18 @@ class PostForm(forms.ModelForm):
             # }),        
         }
 
+class EditUserFrom(forms.Form):
+    username = forms.CharField(min_length=5, max_length=150,widget= forms.TextInput(attrs={'class':'form-control','placeholder':'Username'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class':'form-control','placeholder':'Enter email'}))
+    first_name = forms.CharField(max_length=30,widget=forms.TextInput(attrs={'class':'form-control','placeholder':'First Name'}))
+    last_name = forms.CharField(max_length=30,widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Last Name'}))
+    github = forms.CharField(max_length=100,required=False,widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Github'}))
+    profile_pic = forms.ImageField(required=False,widget=forms.FileInput(attrs={'class':'form-control'}))
+
+
+
+
+
 # RegisterForm that inherits from Django's UserCreationForm
 class RegisterForm(UserCreationForm):
     # define form fields

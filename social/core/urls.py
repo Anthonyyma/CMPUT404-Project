@@ -16,6 +16,7 @@ urlpatterns = [
     path("register/", views.register_user, name="register"),
     path("user/<userID>", views.viewUser, name="viewUser"),
     path("user/", views.viewCurrentUser, name="viewCurrentUser"),
+    path("user/edit/", views.editUser, name="editUser"),
     # path('info/', views.info, name='info'),
     # path('info/', views.info, name='info'),
     # path('favicon.ico/',
