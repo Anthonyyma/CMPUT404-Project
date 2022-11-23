@@ -37,10 +37,7 @@ SECRET_KEY = "django-insecure-5op=d1wm*f_*4)g969y&ib1k_2j9uc5d@1*#m9(ryr$ti+u_zk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "c404-team8.herokuapp.com"
-]
-
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -53,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "core",
+    "drf_yasg"
 ]
 
 MIDDLEWARE = [
