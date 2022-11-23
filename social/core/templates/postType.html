@@ -1,10 +1,6 @@
-<!-- https://codepen.io/chancesq/pen/bGpddXE -->
+<!-- Code for buttons taken from https://codepen.io/laurapierson/pen/RwNJPxK -->
 
 <!doctype html>
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
 <html>
 <head>
     <meta charset="UTF-8">
@@ -16,13 +12,27 @@
 
 </head>
 <body>
-    <div class="post-type">
-        <div><a href="{% url 'editPost' %}?type=TEXT">Plain Text</a></div>
-        <div><a href="{% url 'editPost' %}?type=MD">Markdown</a></div>
-        <div><a href="{% url 'editPost' %}?type=APP64">Application64</a></div>
-        <div><a href="{% url 'editPost' %}?type=PNG">PNG</a></div>
-        <div><a href="{% url 'editPost' %}?type=JPEG">JPEG</a></div>
+    <div class="multi-button">
+        <form method="post" action="{% url 'editPost' %}?type=TEXT" style="width: auto; min-width: auto">
+            {% csrf_token %} 
+            <button type='submit'>Plain Text</button>
+        </form>
+        <form method="post" action="{% url 'editPost' %}?type=MD" style="width: auto; min-width: auto">
+            {% csrf_token %} 
+            <button type='submit'>Markdown</button>
+        </form>
+        <form method="post" action="{% url 'editPost' %}?type=APP64" style="width: auto; min-width: auto">
+            {% csrf_token %} 
+            <button type='submit'>Application64</button>
+        </form>
+        <form method="post" action="{% url 'editPost' %}?type=PNG" style="width: auto; min-width: auto">
+            {% csrf_token %} 
+            <button type='submit'>PNG</button>
+        </form>
+        <form method="post" action="{% url 'editPost' %}?type=JPEG" style="width: auto; min-width: auto">
+            {% csrf_token %} 
+            <button type='submit'>JPEG</button>
+        </form>
     </div>
 </body>
 </html>
-{% endblock %}

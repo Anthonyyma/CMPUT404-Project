@@ -1,6 +1,6 @@
 from core.authors.serializers import AuthorSerializer
 from core.drf_utils import get_api_root_url
-from core.models import Comment, Post
+from core.models import Comment, Post, Like
 from rest_framework import serializers
 
 
@@ -9,6 +9,13 @@ def get_post_url(post: Post, request) -> str:
     Returns the api url for a post
     """
     return f"{get_api_root_url(request)}authors/{post.author.id}/posts/{post.id}/"
+
+
+def get_comment_url(comment: Comment, request) -> str:
+    """
+    Returns the api url for a comment
+    """
+    return get_post_url(comment.post, request) + f"comments/{comment.id}/"
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -39,7 +46,7 @@ class PostSerializer(serializers.ModelSerializer):
     contentType = serializers.CharField(source="content_type")
     # comments = serializers.HyperlinkedRelatedField()
     visibility = serializers.SerializerMethodField()
-    author = AuthorSerializer(read_only=True)
+    author = AuthorSerializer()
     categories = serializers.SerializerMethodField()
     author = AuthorSerializer(read_only=True)
     published = serializers.SerializerMethodField()
@@ -102,3 +109,24 @@ class PostSerializer(serializers.ModelSerializer):
             "id": get_post_url(obj, self.context["request"]) + "comments/",
             "comments": comment_serializer.data,
         }
+
+
+class LikeSerializer(serializers.Serializer):
+    type = serializers.ReadOnlyField(default="like")
+    author = AuthorSerializer(read_only=True, source="user")
+    object = serializers.SerializerMethodField()
+    summary = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Like
+        fields = ["type", "author", "object", "summary"]
+
+    def get_object(self, like: Like):
+        if like.post is not None:
+            return get_post_url(like.post, self.context["request"])
+        elif like.comment is not None:
+            return get_comment_url(like.comment, self.context["request"])
+
+    def get_summary(self, like: Like):
+        type = "post" if like.post is not None else "comment"
+        return f"{like.user.username} likes your {type} "

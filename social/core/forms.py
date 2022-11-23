@@ -1,7 +1,7 @@
 # import form class from django
 #from msilib.schema import CheckBox
 from django import forms
-from django.forms import TextInput, Textarea
+from django.forms import TextInput, Textarea, CheckboxInput
 from .models import Post
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
@@ -15,40 +15,41 @@ class PostForm(forms.ModelForm):
         widgets = {
             "title": TextInput(attrs={
                 "class": "form-group form",
+                "placeholder": "Title"
             }),
             "source": TextInput(attrs={
                 "class": "form-group form",
+                "placeholder": "Source"
             }),
             "origin": TextInput(attrs={
                 "class": "form-group form",
+                "placeholder": "Origin"
             }),
-            # "content_type": TextInput(attrs={
-            #     "class": "form-group form",
-            # }),
             "categories": TextInput(attrs={
                 "class": "form-group form",
+                "placeholder": "Categories"
             }),
             "content": Textarea(attrs={
                 "class": "form-group form",
+                "placeholder": "Content",
             }),        
             "private_to": TextInput(attrs={
                 "class": "form-group form",
-            }),        
+                "placeholder": "Private To [Username]"
+            }),         
             # "published": TextInput(attrs={
             #     "class": "forms",
             #     "style": "height: 200px",
             #     "placeholder": "published"
             # }),        
-            # "friends_only": CheckBox(attrs={
-            #     "class": "forms",
-            #     "style": "height: 200px",
-            #     "placeholder": "Content"
-            # }),        
-            # "unlisted": TextInput(attrs={
-            #     "class": "forms",
-            #     "style": "height: 200px",
-            #     "placeholder": "Content"
-            # }),        
+            "friends_only": CheckboxInput(attrs={
+                "class": "box",
+                "style": "height: 30px"
+            }),        
+            "unlisted": CheckboxInput(attrs={
+                "class": "box",
+                "style": "height: 30px"
+            }),        
         }
 
 class EditUserForm(forms.ModelForm):
