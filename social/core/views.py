@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
+from .forms import EditUserForm
 from .forms import PostForm
 from .models import Post, User
 from django.contrib.auth.forms import UserCreationForm
@@ -122,7 +123,7 @@ def editUser(request):
     # if the method is POST
     if request.method == "POST":
         # pass the request's body to the registeration form
-        form = EditUserForm(request.POST, instance=request.user)
+        form = EditUserForm(request.POST, request.FILES, instance=request.user)
         # if the data is valid, save user in databse and redirect to homepage
         if form.is_valid():
             form.save()
@@ -130,7 +131,7 @@ def editUser(request):
     else:
         form = EditUserForm(instance=request.user)
     # render the registeration html template
-    return render(request, "user/editUser.html", {"form": form})
+    return render(request, "editUser.html", {"form": form})
 
 
 def login_user(request):
