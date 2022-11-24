@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import HttpResponseRedirect, get_object_or_404, render, redirect
 from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
+from .forms import PostForm, CommentForm
+from .models import Post, User, Like, Comment
 from .forms import EditUserForm
-from .forms import PostForm
-from .models import Post, User
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
@@ -12,6 +12,7 @@ import markdown
 from html.parser import HTMLParser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 
 
 class PostList(LoginRequiredMixin, ListView):
@@ -65,6 +66,36 @@ def createPost(request):
 
     context = {'form': form, 'type':type, 'id':postId}
     return render(request, "createPost.html", context)
+
+# incomplete
+def likePost(request, postID):
+    form = Like(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.instance.user = request.user
+            form.instance.post = postID
+
+    return HttpResponseRedirect(reverse('postContent', args=[postID]))
+
+# @login_required
+def createComment(request):
+    list(messages.get_messages(request))
+    form = CommentForm(request.POST or None)
+    commentId = request.GET.get('post.id')
+    print(commentId)
+    if commentId != None:
+        comment = Comment.objects.get(id=commentId)
+        form = CommentForm(instance=comment)
+
+    if request.method == "POST":
+        if commentId != None:
+            form = CommentForm(request.POST, instance=comment)
+        else:
+            form = CommentForm(request.POST)
+        print(form.is_valid)
+
+    return render(request)
 
 # @login_required
 def deletePost(request):
@@ -147,6 +178,11 @@ def login_user(request):
             return redirect('login')
     else:
         return render(request, "registration/login.html", {})
+
+def logout_user(request):
+    logout(request)
+    messages.success(request, ("You have been succefully logged out"))
+    return redirect('login')
 
 def register_user(request):
     """
