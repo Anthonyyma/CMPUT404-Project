@@ -3,7 +3,7 @@ from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from .forms import PostForm, CommentForm
-from .models import Post, User, Like, Comment
+from .models import Post, User, Like, Comment, Inbox
 from .forms import EditUserForm
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
@@ -65,7 +65,11 @@ def createPost(request):
                 parser.feed(data)
                 form.instance.content = parser.md
             if not notValid:
-                form.save()
+                newPost = form.save()
+                newInbox = Inbox()
+                newInbox.user = request.user
+                newInbox.post = Post.objects.get(id=newPost.id)
+                newInbox.save()
                 return redirect("/")
         else:
             print(form.errors)
