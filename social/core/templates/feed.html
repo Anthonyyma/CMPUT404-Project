@@ -8,17 +8,24 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Posts</title>
+    <title>My feed</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
 </head>
 <body>
     <div class="post-display">
         <div style="margin-bottom: 50px"><a href="{% url 'createPost' %}">Create Post</a></div>
-        {% for post in object_list %}
+        {% for post in my_post_list %}
             <a href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
                 {% if post.image %}
                     <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+                {% endif %}
+            </a>
+        {% endfor %}
+        {% for post in friend_post_list %}
+            <a href="{% url 'postContent' %}?id={{ inbox.post.id }}"><b>{{ inbox.post.title }}</b><br>{{ inbox.post.content }}<br>
+                {% if inbox.post.image %}
+                    <img src="{{ inbox.post.image.url }}" style="width: 100px; transform: translate(100%)">
                 {% endif %}
             </a>
         {% endfor %}

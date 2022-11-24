@@ -3,7 +3,7 @@ from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from .forms import PostForm, CommentForm
-from .models import Post, User, Like, Comment
+from .models import Post, User, Like, Comment, Inbox
 from .forms import EditUserForm
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
@@ -17,12 +17,21 @@ from django.urls import reverse
 
 class PostList(LoginRequiredMixin, ListView):
     login_url = "/login/"
-    template_name = "myPosts.html"
-    model = Post
+    template_name = "feed.html"
+    model = Inbox
+    context_object_name = "friend_post_list"
+
+    def get_context_data(self, **kwargs):
+        context = super(ListView, self).get_context_data(**kwargs)
+        '''context.update({
+            "my_post_list": Post.objects.filter(author=self.request.user),  
+        })'''
+        context["my_post_list"] = Post.objects.filter(author=self.request.user)
+        return context
 
     def get_queryset(self):
         queryset = super(PostList, self).get_queryset()
-        return queryset.filter(author=self.request.user)
+        return queryset.all()
 
 class MDParser(HTMLParser):
     md = ""
@@ -172,7 +181,7 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('myPosts')
+            return redirect('feed')
         else:
             messages.success(request, ("Please double check that you are using the correct username and password"))
             return redirect('login')
