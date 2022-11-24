@@ -7,8 +7,12 @@
     <meta charset="utf-8">
     <title> {{user}} </title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href=" % static 'css/viewUser.css' %">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}">
 </head>
+<a href="#" class="button">Followers</a>
+<a href="#" class="button">Following</a>
+<a href="{% url 'editUser' %}" class="button">Edit Profile</a>
+
 <div class="info-block">
     <h1>UUID: {{user.username}}</h>
     <br>
@@ -16,14 +20,19 @@
     <br>
     <img src="{{user.profile_image.url}}"/>
     
-    
+</div>
+
+<div class="post-display">
+    {% for post in posts %}
+        <a href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+            {% if post.image %}
+                <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+            {% endif %}
+        </a>
+    {% endfor %}
 </div>
 
 
-<a href="#" class="button">Followers</a>
-<a href="#" class="button">Following</a>
-<a href="{% url 'editUser' %}" class="button">Edit Profile</a>
 
-
-</html>
 {% endblock %}
+</html>

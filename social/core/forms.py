@@ -57,8 +57,8 @@ class EditUserForm(forms.ModelForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class':'form-control','placeholder':'Enter email'}))
     first_name = forms.CharField(max_length=30,widget=forms.TextInput(attrs={'class':'form-control','placeholder':'First Name'}))
     last_name = forms.CharField(max_length=30,widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Last Name'}))
-    github = forms.CharField(max_length=100,required=False,widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Github'}))
     profile_image = forms.ImageField(required=False,widget=forms.FileInput(attrs={'class':'form-control'}))
+    github = forms.URLField(required=False,widget=forms.URLInput(attrs={'class':'form-control','placeholder':'Github URL'}))
 
     class Meta:
         model = User

@@ -25,3 +25,21 @@ button{
     font-family: 'Times New Roman', Times, serif;
     cursor: pointer;
 }
+
+.post-display {
+    width: 50%;
+    position: absolute;
+}
+.post-display a {
+    background-color: #ffffff;
+    color: black;
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    border-style: solid;
+    border-width: thin;
+    box-sizing: border-box;
+}
+.post-display a:hover {
+    background-color: #ddd6f3;
+}

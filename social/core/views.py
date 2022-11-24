@@ -100,7 +100,9 @@ def viewUser(request, userID):
     user = User.objects.get(id=userID)  #this should get the user from the database
     
     context = {"user":user}     # send the user to the template
-    print(userID)
+
+    posts = Post.objects.filter(author=user)
+    context["posts"] = posts
 
     return render(request, "viewUser.html", context)
 
