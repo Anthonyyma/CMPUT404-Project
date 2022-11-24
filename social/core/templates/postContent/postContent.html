@@ -46,9 +46,26 @@
         <i class="material-icons insert-comment-icon">thumb_up</i>
     </a>
     <!-- Link still needs to be fixed -->
-    <a class="comment-button" href="{% url 'createComment' %}">
-        <i name="post.id" class="material-icons insert-comment-icon">insert_comment</i>
-    </a>
+    {{ post.id }}
+    <input class="comment-box" id="comment-box" name="data-comment" type="text" placeholder="Write comment here">
+    <button class="comment-button" onclick="postComment(document.getElementById('comment-box').value, {{ post.author.id }}, {{ post.id }})">
+        <i class="material-icons insert-comment-icon" >insert_comment</i>
+    </button>
+    <script>
+        function postComment(comment, authorId, postId) {
+            $.ajax({
+                url: "{% url 'createComment' %}",
+                data: 
+                {'author': authorId,
+                'post': postId,
+                'content': comment,
+                'content-type': "text/plain"},
+                type: 'POST'
+            })
+        }
+    </script>
+    {% comment %} id = "post-{{post.id}}"
+    data-author-id = "{{ post.author.id }}" {% endcomment %}
     <div class="comments">
         <h3>Comments</h3>
         <div class="comment">

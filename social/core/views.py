@@ -93,14 +93,8 @@ def createComment(request):
         else:
             form = CommentForm(request.POST)
         print(form.is_valid)
-        if form.is_valid():
-            form.instance.author = request.user
-        else:
-            print(form.errors)
 
-
-    context = {'form': form, 'id':commentId}
-    return render(request, "postContent/createComment.html", context)
+    return render(request)
 
 # @login_required
 def deletePost(request):
