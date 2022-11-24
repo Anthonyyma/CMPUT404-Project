@@ -13,6 +13,9 @@ from html.parser import HTMLParser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
+import base64
+from io import BytesIO
+
 
 
 class PostList(LoginRequiredMixin, ListView):
@@ -34,12 +37,12 @@ def createPost(request):
     list(messages.get_messages(request))
     form = PostForm(request.POST or None, request.FILES or None)
     postId = request.GET.get('id')
-    type = request.GET.get('type')
+    postType = request.GET.get('type')
     notValid = False
     if postId != None:
         post = Post.objects.get(id=postId)
         form = PostForm(instance=post)
-        type = form.instance.content_type
+        postType = form.instance.content_type
 
     if request.method == "POST":
         if postId != None:
@@ -48,12 +51,15 @@ def createPost(request):
             form = PostForm(request.POST, request.FILES,)
         if form.is_valid():
             form.instance.author = request.user
-            form.instance.content_type = type
-            if type == "PNG" or type == "JPEG":
+            form.instance.content_type = postType
+            if postType == "PNG" or postType == "JPEG":
                 if not form.instance.image:
                     messages.info(request, "No Image")
                     notValid = True
-            elif type == "MD":
+            elif postType == "APP64":
+                uploadedFile = request.FILES["image"].read()
+                form.instance.content = base64.b64encode(uploadedFile).decode('ascii')
+            elif postType == "MD":
                 data = markdown.markdown(form.instance.content)
                 parser = MDParser()
                 parser.feed(data)
@@ -64,7 +70,7 @@ def createPost(request):
         else:
             print(form.errors)
 
-    context = {'form': form, 'type':type, 'id':postId}
+    context = {'form': form, 'type':postType, 'id':postId}
     return render(request, "createPost.html", context)
 
 # incomplete
@@ -117,6 +123,10 @@ def postContent(request):
         ownPost = True
     if post:
         profilePic = user.profile_image
+        if post.content_type == "APP64":
+            with open("media/temp.jpg", "wb") as f:
+                f.write(base64.decodebytes(post.content.encode()))
+            post.image = "temp.jpg"
     
     context = {'post':post, 'ownPost':ownPost, 'profilePic': profilePic, 'username': user.username, 'content': post.content, 'img': post.image}
     return render(request, "postContent/postContent.html", context)

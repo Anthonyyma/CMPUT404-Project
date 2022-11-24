@@ -28,7 +28,7 @@
             <div class="form-group" style="font-size: 1.5em;">
                 {{ form.content }}  
             </div>
-            {% if type == "PNG" or type == "JPEG" %}
+            {% if type == "PNG" or type == "JPEG" or type == "APP64" %}
                 <div class="form-group" name="image-field">
                     <label>Image</label>
                     {{ form.image }}  
