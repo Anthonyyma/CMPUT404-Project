@@ -9,8 +9,8 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}">
 </head>
-<a href="#" class="button">Followers</a>
-<a href="#" class="button">Following</a>
+<a href="{% url 'follower_view' %}" class="button">Followers</a>
+<a href="{% url 'following_view' %}" class="button">Following</a>
 <a href="{% url 'editUser' %}" class="button">Edit Profile</a>
 
 <div class="info-block">
