@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from .forms import EditUserForm
 from .forms import PostForm
-from .models import Post, User
+from .models import Post, User, Follow
+from .authors.serializers import AuthorSerializer
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
@@ -89,6 +90,34 @@ def postContent(request):
     
     context = {'post':post, 'ownPost':ownPost, 'profilePic': profilePic, 'username': user.username, 'content': post.content, 'img': post.image}
     return render(request, "postContent/postContent.html", context)
+
+def follower_view(request):
+    user = request.user
+    followers = []      #json array of followers
+    for follow in Follow.objects.filter(followee=user):
+        if follow.external_follower is not None:
+            data = request.get(follow.external_follower).data
+        else:
+            data = AuthorSerializer(follow.follower).data
+        followers.append(data)
+
+    context = {'followers': followers}
+    return render(request, "followers.html", context)
+
+def following_view(request):
+    user = request.user
+    following = []      #json array of following
+    for follow in Follow.objects.filter(follower=user):
+        if follow.external_follower is not None:
+            data = request.get(follow.external_follower).data
+        else:
+            data = AuthorSerializer(follow.follower).data
+        following.append(data)
+
+
+    context = {'following': following}
+    return render(request, "following.html", context)
+
 
 def viewUser(request, userID):
     # Displays the information of a user

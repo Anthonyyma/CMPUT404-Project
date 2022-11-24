@@ -43,3 +43,21 @@ button{
 .post-display a:hover {
     background-color: #ddd6f3;
 }
+
+.user-display {
+    width: 50%;
+    position: absolute;
+}
+.user-display a {
+    background-color: #ffffff;
+    color: black;
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    border-style: solid;
+    border-width: thin;
+    box-sizing: border-box;
+}
+.user-display a:hover {
+    background-color: #ddd6f3;
+}
