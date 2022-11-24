@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from .forms import PostForm, CommentForm
 from .models import Post, User, Like, Comment
+from .forms import EditUserForm
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib import messages
@@ -137,6 +138,31 @@ def viewUser(request, userID):
 def viewCurrentUser(request):
     userID = request.user.id
     return viewUser(request, userID)
+
+def editUser(request):
+    """
+    editUser function to provide a form for users to edit their profile
+
+    if POST request:
+        pass the form to display
+
+        check if the filled form is valid
+
+    return:
+        editUser form
+    """
+    # if the method is POST
+    if request.method == "POST":
+        # pass the request's body to the registeration form
+        form = EditUserForm(request.POST, request.FILES, instance=request.user)
+        # if the data is valid, save user in databse and redirect to homepage
+        if form.is_valid():
+            form.save()
+            return redirect('viewCurrentUser') # once registered redirect to a different page
+    else:
+        form = EditUserForm(instance=request.user)
+    # render the registeration html template
+    return render(request, "editUser.html", {"form": form})
 
 
 def login_user(request):

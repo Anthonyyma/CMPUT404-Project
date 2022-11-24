@@ -9,9 +9,10 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-# flake8: noqa # this file shouldn't be linted
-from pathlib import Path
 import os
+# flake8: noqa # this file shouldn't be linted
+# isort: skip_file
+from pathlib import Path
 
 # replacement for the auth.contrib.user model
 AUTH_USER_MODEL = "core.User"
@@ -38,7 +39,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "core",
+    "drf_yasg"
 ]
 
 MIDDLEWARE = [
@@ -131,8 +132,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = "/media/"
-# MEDIA_ROOT = BASE_DIR
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
@@ -140,4 +141,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_REDIRECT_URL = 'myPosts'
+LOGIN_REDIRECT_URL = "myPosts"
+
+API_HOST_PATH = "http://localhost:8000/api/"

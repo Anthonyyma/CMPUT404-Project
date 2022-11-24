@@ -1,5 +1,5 @@
 [tool.black]
-force-exclude = '^.*\b(migrations)\b.*$'
+force-exclude = '^.*\b(migrations)\b.*$|settings.py'
 
 [tool.isort]
 skip = 'migrations'

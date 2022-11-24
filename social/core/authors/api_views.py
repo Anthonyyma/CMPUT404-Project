@@ -1,6 +1,8 @@
 from core.authors.serializers import AuthorSerializer
+from core.posts.serializers import LikeSerializer
 from core.drf_utils import CustomPagination, labelled_pagination
-from core.models import Follow, User
+from core.models import Follow, User, Like, Post, Comment
+from django.db.models import Q
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -30,6 +32,14 @@ class AuthorViewSet(
         data = AuthorSerializer(followers, many=True, context={"request": request}).data
         paginator = CustomPagination()
         return paginator.get_paginated_response(data, type="followers")
+
+    @action(detail=True, methods=["get"])
+    def likes(self, request, **kwargs):
+        user = self.get_object()
+        queryset = Like.objects.order_by("-published").filter(user=user)
+        data = LikeSerializer(queryset, many=True, context={"request": request}).data
+        paginator = CustomPagination()
+        return paginator.get_paginated_response(data, type="like")
 
 
 @api_view(["GET", "PUT", "DELETE"])

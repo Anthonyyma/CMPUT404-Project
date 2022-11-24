@@ -1,7 +1,8 @@
-from core.drf_utils import labelled_pagination
-from core.models import Post, Comment
-from core.posts.serializers import PostSerializer, CommentSerializer
+from core.drf_utils import labelled_pagination, CustomPagination
+from core.models import Post, Comment, Like
+from core.posts.serializers import PostSerializer, CommentSerializer, LikeSerializer
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -25,6 +26,14 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = queryset.filter(author=author_id)
         return queryset
 
+    @action(detail=True, methods=["get"])
+    def likes(self, request, **kwargs):
+        post = self.get_object()
+        queryset = Like.objects.order_by("-published").filter(post=post)
+        data = LikeSerializer(queryset, many=True, context={"request": request}).data
+        paginator = CustomPagination()
+        return paginator.get_paginated_response(data, type="like")
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.order_by("id").all()
@@ -43,3 +52,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         author_id = self.request.data["author"]
         post_id = self.kwargs["post_pk"]
         return serializer.save(author_id=author_id, post_id=post_id)
+
+    @action(detail=True, methods=["get"])
+    def likes(self, request, **kwargs):
+        comment = self.get_object()
+        queryset = Like.objects.order_by("-published").filter(comment=comment)
+        data = LikeSerializer(queryset, many=True, context={"request": request}).data
+        paginator = CustomPagination()
+        return paginator.get_paginated_response(data, type="like")
