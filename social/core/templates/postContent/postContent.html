@@ -9,7 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>  
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/postContent/postContent.css' %}">
 </head>  
 <body>  
@@ -23,7 +22,7 @@
         <div class="userHeader">
             <div style="display:flex; align-items: center;">
                 <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-                <a href="#" id="username">{{ username }}</a>
+                <a href="#" id="username">{{ user.username }}</a>
             </div>
             {% if ownPost %}
                 <a href="{% url 'editPost' %}?id={{ post.id }}">
@@ -40,16 +39,18 @@
             <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
         </div>
     </div> 
-    <!-- Link needs to still be fixed -->
-    <a class="like-button" href="?id={{ post.id }}{% url 'likePost' %} ">
-        <i class="material-icons insert-comment-icon">thumb_up</i>
-    </a>
-    <!-- Link still needs to be fixed -->
+
     <input class="comment-box" id="comment-box" name="data-comment" type="text" placeholder="Write comment here">
-    <button class="comment-button" onclick="postComment()">
-        <i class="material-icons insert-comment-icon" >insert_comment</i>
-        Submit
-    </button>
+    <!-- No need for links because of the onclick function call -->
+    <div class="button-container">
+        <a class="like-button" onclick="likePost()">
+            <i class="material-icons insert-comment-icon">thumb_up</i>
+        </a>
+        <!-- Comment now works href val left blank so that the page automatically gets refreshed as you post your comment -->
+        <a class="comment-button" href="" onclick="postComment()">
+            <i class="material-icons insert-comment-icon" >insert_comment</i>
+        </a>
+    </div>
     <script>
         
         /* https://www.geekstrick.com/snippets/how-to-parse-cookies-in-javascript/ */
@@ -69,7 +70,6 @@
             let cookies = document.cookie
 
             cookies = parseCookie(cookies)
-            console.log("create comment is working!", authorId, postId)
             
             const data = {'author': authorId,
                 'post': postId,
@@ -85,9 +85,32 @@
                 body: JSON.stringify(data),
             })
         }
+        /* not fully functional yet */
+        likePost = () => {
+            let authorId = "{{ post.author.id }}"
+            let userId = "{{ user.id }}"
+            let postId = "{{ post.id }}"
+            let cookies = document.cookie
+
+            cookies = parseCookie(cookies)
+            
+            const data = {
+                'type': "Like",
+                'author': userId,
+                'post': postId,
+                'object': `/api/authors/${authorId}/posts/${postId}`};
+                
+            fetch(`/api/authors/${authorId}/inbox/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': cookies["csrftoken"]
+                },
+                body: JSON.stringify(data),
+            })
+        }
     </script>
-    {% comment %} id = "post-{{post.id}}"
-    data-author-id = "{{ post.author.id }}" {% endcomment %}
+    
     <div class="comments">
         <h3>Comments</h3>
         <div class="comment">
@@ -96,7 +119,7 @@
             {% else %}
                 {% for comment in post.comments.all %}
                     <a href="#"><strong>{{ comment.author }}</strong></a> on {{ comment.published }}
-                    <ul>
+                    <ul class="comments-list">
                         <li>
                             {{ comment.content }}
                         </li>
