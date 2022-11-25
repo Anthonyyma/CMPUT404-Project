@@ -15,8 +15,8 @@ Including another URLconf
 """
 
 import core.authors.api_views as author_views
-import core.posts.api_views as post_views
 import core.inbox.api_views as inbox_views
+import core.posts.api_views as post_views
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.staticfiles.urls import static

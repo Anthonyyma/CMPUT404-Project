@@ -1,4 +1,5 @@
 from html.parser import HTMLParser
+
 import markdown
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -6,6 +7,7 @@ from django.contrib.auth.decorators import login_required  # noqa
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views.generic import ListView
+
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Post, User
 
