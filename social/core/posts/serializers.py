@@ -43,8 +43,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     type = serializers.ReadOnlyField(default="post")
+    title = serializers.CharField()
     contentType = serializers.CharField(source="content_type")
-    # comments = serializers.HyperlinkedRelatedField()
     visibility = serializers.SerializerMethodField()
     author = AuthorSerializer()
     categories = serializers.SerializerMethodField()
@@ -64,6 +64,7 @@ class PostSerializer(serializers.ModelSerializer):
             "origin",
             "contentType",
             "content",
+            "title",
             "author",
             "categories",
             "count",

@@ -1,5 +1,13 @@
 # CMPUT404-Project
 
+## Connecting to our node
+
+Our node's api is available at https://c404-team8.herokuapp.com/api/
+
+You can find documentation for it at https://c404-team8.herokuapp.com/api/docs/
+
+The user interface can be found at https://c404-team8.herokuapp.com/
+
 ## Project Setup
 
 1. Create a virtual environment (optional).
