@@ -15,8 +15,8 @@ Including another URLconf
 """
 
 import core.authors.api_views as author_views
-import core.posts.api_views as post_views
 import core.inbox.api_views as inbox_views
+import core.posts.api_views as post_views
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.staticfiles.urls import static
@@ -41,7 +41,7 @@ urlpatterns = [
     path("", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
     path(r"api/authors/<author1>/followers/<author2>/", author_views.follow_view),
-    path(r"api/authors/<recipient_id>/inbox", inbox_views.InboxView.as_view()),
+    path(r"api/authors/<recipient_id>/inbox/", inbox_views.InboxView.as_view()),
     path("api/", include(router.urls)),
     path("api/", include(author_router.urls)),
     path("api/", include(post_router.urls)),
