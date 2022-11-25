@@ -1,3 +1,4 @@
+import base64
 from html.parser import HTMLParser
 
 import markdown
@@ -9,7 +10,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import ListView
 
 from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Post, User
+from .models import Inbox, Post, User
 
 
 class PostList(LoginRequiredMixin, ListView):
@@ -34,13 +35,13 @@ def createPost(request):
     list(messages.get_messages(request))
     form = PostForm(request.POST or None, request.FILES or None)
     postId = request.GET.get('id')
-    type = request.GET.get('type')
+    postType = request.GET.get('type')
     notValid = False
 
     if postId is not None:
         post = Post.objects.get(id=postId)
         form = PostForm(instance=post)
-        type = form.instance.content_type
+        postType = form.instance.content_type
 
     if request.method == "POST":
         if postId is not None:
@@ -49,23 +50,30 @@ def createPost(request):
             form = PostForm(request.POST, request.FILES,)
         if form.is_valid():
             form.instance.author = request.user
-            form.instance.content_type = type
-            if type == "PNG" or type == "JPEG":
+            form.instance.content_type = postType
+            if postType == "PNG" or postType == "JPEG":
                 if not form.instance.image:
                     messages.info(request, "No Image")
                     notValid = True
-            elif type == "MD":
+            elif postType == "APP64":
+                uploadedFile = request.FILES["image"].read()
+                form.instance.content = base64.b64encode(uploadedFile).decode('ascii')
+            elif postType == "MD":
                 data = markdown.markdown(form.instance.content)
                 parser = MDParser()
                 parser.feed(data)
                 form.instance.content = parser.md
             if not notValid:
-                form.save()
+                newPost = form.save()
+                newInbox = Inbox()
+                newInbox.user = request.user
+                newInbox.post = Post.objects.get(id=newPost.id)
+                newInbox.save()
                 return redirect("/")
         else:
             print(form.errors)
 
-    context = {'form': form, 'type': type, 'id': postId}
+    context = {'form': form, 'type': postType, 'id': postId}
     return render(request, "createPost.html", context)
 
 
@@ -91,9 +99,13 @@ def postContent(request):
         ownPost = True
     if post:
         profilePic = user.profile_image
-    # user returned so that we can get both user.id and user.username
+        if post.content_type == "APP64":
+            with open("media/temp.jpg", "wb") as f:
+                f.write(base64.decodebytes(post.content.encode()))
+            post.image = "temp.jpg"
+
     context = {'post': post, 'ownPost': ownPost, 'profilePic': profilePic,
-               'user': user, 'content': post.content, 'img': post.image}
+               'username': user.username, 'content': post.content, 'img': post.image}
     return render(request, "postContent/postContent.html", context)
 
 

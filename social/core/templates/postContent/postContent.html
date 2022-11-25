@@ -30,11 +30,13 @@
                 </a>
             {% endif %}
         </div>
+        {% if post.content_type != "APP64"%}
         <div class="mainContent">
             <p>
                 {{ content }}
             </p>
         </div>
+        {% endif %}
         <div class="imgContainer">
             <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
         </div>
