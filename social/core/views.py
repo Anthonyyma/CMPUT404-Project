@@ -10,7 +10,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import ListView
 
 from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Inbox, Post, User
+from .models import Inbox, Post, User, Follow
 
 
 class PostList(LoginRequiredMixin, ListView):
@@ -34,8 +34,8 @@ class MDParser(HTMLParser):
 def createPost(request):
     list(messages.get_messages(request))
     form = PostForm(request.POST or None, request.FILES or None)
-    postId = request.GET.get('id')
-    postType = request.GET.get('type')
+    postId = request.GET.get("id")
+    postType = request.GET.get("type")
     notValid = False
 
     if postId is not None:
@@ -47,7 +47,10 @@ def createPost(request):
         if postId is not None:
             form = PostForm(request.POST, instance=post)
         else:
-            form = PostForm(request.POST, request.FILES,)
+            form = PostForm(
+                request.POST,
+                request.FILES,
+            )
         if form.is_valid():
             form.instance.author = request.user
             form.instance.content_type = postType
@@ -57,7 +60,7 @@ def createPost(request):
                     notValid = True
             elif postType == "APP64":
                 uploadedFile = request.FILES["image"].read()
-                form.instance.content = base64.b64encode(uploadedFile).decode('ascii')
+                form.instance.content = base64.b64encode(uploadedFile).decode("ascii")
             elif postType == "MD":
                 data = markdown.markdown(form.instance.content)
                 parser = MDParser()
@@ -65,21 +68,23 @@ def createPost(request):
                 form.instance.content = parser.md
             if not notValid:
                 newPost = form.save()
-                newInbox = Inbox()
-                newInbox.user = request.user
-                newInbox.post = Post.objects.get(id=newPost.id)
-                newInbox.save()
+                for follow in Follow.objects.filter(followee=request.user):
+                    if follow.external_follower:
+                        # TODO: Send to external follower
+                        pass
+                    else:
+                        Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
         else:
             print(form.errors)
 
-    context = {'form': form, 'type': postType, 'id': postId}
+    context = {"form": form, "type": postType, "id": postId}
     return render(request, "createPost.html", context)
 
 
 # @login_required
 def deletePost(request):
-    postId = request.GET.get('id')
+    postId = request.GET.get("id")
     if postId != "None":
         Post.objects.filter(pk=postId).delete()
     return redirect("/")
@@ -91,7 +96,7 @@ def postType(request):
 
 
 def postContent(request):
-    postId = request.GET.get('id')
+    postId = request.GET.get("id")
     post = Post.objects.get(id=postId)
     user = request.user
     ownPost = False
@@ -104,8 +109,14 @@ def postContent(request):
                 f.write(base64.decodebytes(post.content.encode()))
             post.image = "temp.jpg"
 
-    context = {'post': post, 'ownPost': ownPost, 'profilePic': profilePic,
-               'username': user.username, 'content': post.content, 'img': post.image}
+    context = {
+        "post": post,
+        "ownPost": ownPost,
+        "profilePic": profilePic,
+        "username": user.username,
+        "content": post.content,
+        "img": post.image,
+    }
     return render(request, "postContent/postContent.html", context)
 
 
@@ -113,12 +124,12 @@ def viewUser(request, userID):
     # Displays the information of a user
     # User has both custom fields and base fields (see models.py)
 
-    if (userID is None):    # if a userID is not given default to current user
-        userID = request.user.id    # Currently logged in user
+    if userID is None:  # if a userID is not given default to current user
+        userID = request.user.id  # Currently logged in user
 
     user = User.objects.get(id=userID)  # this should get the user from the database
 
-    context = {"user": user}     # send the user to the template
+    context = {"user": user}  # send the user to the template
     print(userID)
 
     return render(request, "viewUser.html", context)
@@ -149,7 +160,7 @@ def editUser(request):
         if form.is_valid():
             form.save()
             # once registered redirect to a different page
-            return redirect('viewCurrentUser')
+            return redirect("viewCurrentUser")
     else:
         form = EditUserForm(instance=request.user)
     # render the registeration html template
@@ -158,16 +169,20 @@ def editUser(request):
 
 def login_user(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST["username"]
+        password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('myPosts')
+            return redirect("myPosts")
         else:
             messages.success(
-                request, ("Please double check that you are using the correct username and password")) # noqa
-            return redirect('login')
+                request,
+                (
+                    "Please double check that you are using the correct username and password"
+                ),
+            )  # noqa
+            return redirect("login")
     else:
         return render(request, "registration/login.html", {})
 
@@ -175,7 +190,7 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     messages.success(request, ("You have been succefully logged out"))
-    return redirect('login')
+    return redirect("login")
 
 
 def register_user(request):
@@ -197,11 +212,11 @@ def register_user(request):
         # if the data is valid, save user in databse and redirect to homepage
         if form.is_valid():
             form.save()
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password1']
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password1"]
             user = authenticate(request, username=username, password=password)
             login(request, user)
-            return redirect('myPosts')  # once registered redirect to a different page
+            return redirect("myPosts")  # once registered redirect to a different page
     else:
         form = RegisterForm()
     # render the registeration html template
