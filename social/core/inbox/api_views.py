@@ -78,4 +78,21 @@ class InboxView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
     def handle_comment(self, data):
-        pass
+        author_url = data["author"]["id"]
+        post_url = data["post"]
+        if API_HOST_PATH not in post_url:
+            return Response(
+                "You can only submit comments for posts on this node",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        post_id = path_utils.get_post_id_from_url(post_url)
+        post = Post.objects.filter(id=post_id).first()
+        if not post:
+            return Response("Post does not exist", status=status.HTTP_404_NOT_FOUND)
+        comment = Comment(
+            content=data["content"],
+            external_author=author_url,
+            content_type=data.get("contentType", "text/markdown"),
+            post=post,
+        )
+        comment.save()
