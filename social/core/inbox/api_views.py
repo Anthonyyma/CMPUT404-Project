@@ -62,6 +62,7 @@ class InboxView(APIView):
         post_url = data["id"]
         inbox = Inbox(user=recipient, external_post=post_url)
         inbox.save()
+        return Response(status=status.HTTP_201_CREATED)
 
     def handle_follow(self, data, recipient: User):
         follower_url = data["actor"]["id"]
