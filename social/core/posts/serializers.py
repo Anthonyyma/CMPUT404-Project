@@ -1,6 +1,6 @@
 from core.authors.serializers import AuthorSerializer
-from core.models import Comment, Post, Like
-from core.path_utils import get_post_url, get_comment_url
+from core.models import Comment, Like, Post
+from core.path_utils import get_comment_url, get_post_url
 from rest_framework import serializers
 
 
@@ -24,7 +24,7 @@ class CommentSerializer(serializers.ModelSerializer):
         )
 
     def get_id(self, obj: Comment):
-        return get_post_url(obj.post, self.context["request"]) + f"comments/{obj.id}/"
+        return get_post_url(obj.post) + f"comments/{obj.id}/"
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -78,10 +78,10 @@ class PostSerializer(serializers.ModelSerializer):
         return obj.comments.count()
 
     def get_id(self, obj: Post):
-        return get_post_url(obj, self.context["request"])
+        return get_post_url(obj)
 
     def get_comments(self, obj: Post):
-        return get_post_url(obj, self.context["request"]) + "comments/"
+        return get_post_url(obj) + "comments/"
 
     def get_commentsSrc(self, obj: Post):
         recent_comments = obj.comments.order_by("-published")[:5]
@@ -92,8 +92,8 @@ class PostSerializer(serializers.ModelSerializer):
             "type": "comments",
             "page": 1,
             "size": recent_comments.count(),
-            "post": get_post_url(obj, self.context["request"]),
-            "id": get_post_url(obj, self.context["request"]) + "comments/",
+            "post": get_post_url(obj),
+            "id": get_post_url(obj) + "comments/",
             "comments": comment_serializer.data,
         }
 
@@ -110,9 +110,9 @@ class LikeSerializer(serializers.Serializer):
 
     def get_object(self, like: Like):
         if like.post is not None:
-            return get_post_url(like.post, self.context["request"])
+            return get_post_url(like.post)
         elif like.comment is not None:
-            return get_comment_url(like.comment, self.context["request"])
+            return get_comment_url(like.comment)
 
     def get_summary(self, like: Like):
         type = "post" if like.post is not None else "comment"
