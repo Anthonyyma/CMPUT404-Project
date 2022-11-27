@@ -1,13 +1,14 @@
 import base64
 from html.parser import HTMLParser
 
-import markdown
+import markdown, requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views.generic import ListView
+from core.posts.serializers import PostSerializer
 
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Inbox, Post, User, Follow
@@ -70,8 +71,9 @@ def createPost(request):
                 newPost = form.save()
                 for follow in Follow.objects.filter(followee=request.user):
                     if follow.external_follower:
-                        # TODO: Send to external follower
-                        pass
+                        url = request.user.external_url + "/inbox/"
+                        msg = PostSerializer(newPost).data
+                        requests.post(url, json = msg)
                     else:
                         Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
