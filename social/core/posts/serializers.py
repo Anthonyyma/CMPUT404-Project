@@ -1,21 +1,7 @@
 from core.authors.serializers import AuthorSerializer
-from core.drf_utils import get_api_root_url
 from core.models import Comment, Post, Like
+from core.path_utils import get_post_url, get_comment_url
 from rest_framework import serializers
-
-
-def get_post_url(post: Post, request) -> str:
-    """
-    Returns the api url for a post
-    """
-    return f"{get_api_root_url(request)}authors/{post.author.id}/posts/{post.id}/"
-
-
-def get_comment_url(comment: Comment, request) -> str:
-    """
-    Returns the api url for a comment
-    """
-    return get_post_url(comment.post, request) + f"comments/{comment.id}/"
 
 
 class CommentSerializer(serializers.ModelSerializer):
