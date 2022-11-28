@@ -59,9 +59,6 @@ def createPost(request):
                 if not form.instance.image:
                     messages.info(request, "No Image")
                     notValid = True
-            elif postType == "APP64":
-                uploadedFile = request.FILES["image"].read()
-                form.instance.content = base64.b64encode(uploadedFile).decode("ascii")
             elif postType == "MD":
                 data = markdown.markdown(form.instance.content)
                 parser = MDParser()
@@ -108,8 +105,8 @@ def postContent(request):
         profilePic = user.profile_image
         if post.content_type == "APP64":
             with open("media/temp.jpg", "wb") as f:
-                f.write(base64.decodebytes(post.content.encode()))
-            post.image = "temp.jpg"
+                f.write(base64.b64decode(post.content))
+                post.image = "temp.jpg"
 
     context = {
         "post": post,
