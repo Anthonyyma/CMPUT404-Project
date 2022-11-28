@@ -26,6 +26,7 @@ urlpatterns = [
     path("register/", views.register_user, name="register"),
     path("user/followers/", views.follower_view, name="follower_view"),
     path("user/following/", views.following_view, name="following_view"),
+    path("allUsers", views.all_users_view, name="all_users_view"),
     path("logout", views.logout_user, name="logout"),
     path("user/<userID>", views.viewUser, name="viewUser"),
     path("user/", views.viewCurrentUser, name="viewCurrentUser"),

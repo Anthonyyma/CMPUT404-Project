@@ -11,7 +11,16 @@
 </head>
 <a href="{% url 'follower_view' %}" class="button">Followers</a>
 <a href="{% url 'following_view' %}" class="button">Following</a>
-<a href="{% url 'editUser' %}" class="button">Edit Profile</a>
+{% if ownProfile %}
+    <a href="{% url 'editUser' %}" class="button">Edit Profile</a>
+{% else %}
+    {% if not following %}
+        <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
+        <a href="/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Follow</a>
+    {% else %}
+        <a href="/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
+    {% endif %}
+{% endif %}
 
 <div class="info-block">
     <h1>UUID: {{user.username}}</h>

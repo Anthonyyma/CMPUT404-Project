@@ -133,6 +133,8 @@ def follower_view(request):
             data = AuthorSerializer(follow.follower).data
         followers.append(data)
 
+        print(data)
+
     context = {'followers': followers}
     return render(request, "followers.html", context)
 
@@ -150,6 +152,11 @@ def following_view(request):
     context = {'following': following}
     return render(request, "following.html", context)
 
+def all_users_view(request):
+    all_users = User.objects.all()
+    context = {'users': all_users}
+    return render(request, "all_users.html", context)
+
 
 def viewUser(request, userID):
     # Displays the information of a user
@@ -160,7 +167,23 @@ def viewUser(request, userID):
 
     user = User.objects.get(id=userID)  #this should get the user from the database
     
+    """
+    if user.external_user is not None:
+        data = request.get(user.external_user).data
+        user = User(**data) #add the data to the user (not sure if this is permanent)
+    """
+    
     context = {"user":user}     # send the user to the template
+
+    if (request.user.id == userID):     #if the user is viewing their own profile
+        context["ownProfile"] = True
+    else:
+        context["ownProfile"] = False
+        # check if the current user is following the user
+        if (Follow.objects.filter(follower=request.user, followee=user).exists()):
+            context["following"] = True
+        else:
+            context["following"] = False
 
     posts = Post.objects.filter(author=user)
     context["posts"] = posts
