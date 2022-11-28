@@ -1,21 +1,7 @@
 from core.authors.serializers import AuthorSerializer
-from core.drf_utils import get_api_root_url
-from core.models import Comment, Post, Like
+from core.models import Comment, Like, Post
+from core.path_utils import get_comment_url, get_post_url
 from rest_framework import serializers
-
-
-def get_post_url(post: Post, request) -> str:
-    """
-    Returns the api url for a post
-    """
-    return f"{get_api_root_url(request)}authors/{post.author.id}/posts/{post.id}/"
-
-
-def get_comment_url(comment: Comment, request) -> str:
-    """
-    Returns the api url for a comment
-    """
-    return get_post_url(comment.post, request) + f"comments/{comment.id}/"
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -38,13 +24,13 @@ class CommentSerializer(serializers.ModelSerializer):
         )
 
     def get_id(self, obj: Comment):
-        return get_post_url(obj.post, self.context["request"]) + f"comments/{obj.id}/"
+        return get_post_url(obj.post) + f"comments/{obj.id}/"
 
 
 class PostSerializer(serializers.ModelSerializer):
     type = serializers.ReadOnlyField(default="post")
+    title = serializers.CharField()
     contentType = serializers.CharField(source="content_type")
-    # comments = serializers.HyperlinkedRelatedField()
     visibility = serializers.SerializerMethodField()
     author = AuthorSerializer()
     categories = serializers.SerializerMethodField()
@@ -64,6 +50,7 @@ class PostSerializer(serializers.ModelSerializer):
             "origin",
             "contentType",
             "content",
+            "title",
             "author",
             "categories",
             "count",
@@ -91,10 +78,10 @@ class PostSerializer(serializers.ModelSerializer):
         return obj.comments.count()
 
     def get_id(self, obj: Post):
-        return get_post_url(obj, self.context["request"])
+        return get_post_url(obj)
 
     def get_comments(self, obj: Post):
-        return get_post_url(obj, self.context["request"]) + "comments/"
+        return get_post_url(obj) + "comments/"
 
     def get_commentsSrc(self, obj: Post):
         recent_comments = obj.comments.order_by("-published")[:5]
@@ -105,8 +92,8 @@ class PostSerializer(serializers.ModelSerializer):
             "type": "comments",
             "page": 1,
             "size": recent_comments.count(),
-            "post": get_post_url(obj, self.context["request"]),
-            "id": get_post_url(obj, self.context["request"]) + "comments/",
+            "post": get_post_url(obj),
+            "id": get_post_url(obj) + "comments/",
             "comments": comment_serializer.data,
         }
 
@@ -123,9 +110,9 @@ class LikeSerializer(serializers.Serializer):
 
     def get_object(self, like: Like):
         if like.post is not None:
-            return get_post_url(like.post, self.context["request"])
+            return get_post_url(like.post)
         elif like.comment is not None:
-            return get_comment_url(like.comment, self.context["request"])
+            return get_comment_url(like.comment)
 
     def get_summary(self, like: Like):
         type = "post" if like.post is not None else "comment"

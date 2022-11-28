@@ -1,6 +1,9 @@
 import re
 from typing import Union
 
+from core.models import Comment, Post, User
+from django.conf import settings
+
 
 def get_author_id_from_url(url: str) -> Union[str, None]:
     """
@@ -21,3 +24,24 @@ def get_comment_id_from_url(url: str) -> Union[str, None]:
     """
     match = re.search(r"comments/(\w)+", url)
     return match.group(1) if match else None
+
+
+def get_author_url(author: User) -> str:
+    """
+    Returns the api url for an author
+    """
+    return f"{settings.API_HOST_PATH}authors/{author.id}/"
+
+
+def get_post_url(post: Post) -> str:
+    """
+    Returns the api url for a post
+    """
+    return f"{settings.API_HOST_PATH}authors/{post.author.id}/posts/{post.id}/"
+
+
+def get_comment_url(comment: Comment) -> str:
+    """
+    Returns the api url for a comment
+    """
+    return get_post_url(comment.post) + f"comments/{comment.id}/"

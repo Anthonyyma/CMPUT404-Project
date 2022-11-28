@@ -63,6 +63,7 @@ class AuthorTest(APITestCase):
             path,
             {
                 "author": self.user1.id,
+                "title": "hello",
                 "content": "new post",
                 "visibility": "PUBLIC",
                 "contentType": "text/plain",

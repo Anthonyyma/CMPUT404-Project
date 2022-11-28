@@ -13,4 +13,10 @@ DATABASES = {
 
 API_HOST_PATH = "https://c404-team8.herokuapp.com/api/"
 
+
+ALLOWED_HOSTS = [
+    "c404-team8.herokuapp.com"
+]
+
+
 django_on_heroku.settings(locals())
