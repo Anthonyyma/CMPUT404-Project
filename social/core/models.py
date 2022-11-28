@@ -16,7 +16,8 @@ class ContentTypes(models.TextChoices):
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile_image = models.ImageField(default="defaultProPic.jpg", blank=True)
-    github = models.URLField(blank=True)
+    github = models.URLField(blank=True, null=True)
+    external_url = models.URLField(blank=True, null=True)
 
 
 class Follow(models.Model):
@@ -85,7 +86,7 @@ class Comment(models.Model):
     external_author = models.URLField(blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField()
-    #content_type = models.CharField(max_length=5, choices=ContentTypes.choices)
+    content_type = models.CharField(max_length=5, choices=ContentTypes.choices)
     published = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -115,7 +116,7 @@ class Like(models.Model):
 class Inbox(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="inbox")
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     external_post = models.URLField(
         blank=True, null=True
     )  # external post has been sent to the inbox
