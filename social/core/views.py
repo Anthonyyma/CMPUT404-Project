@@ -1,18 +1,19 @@
-from django.shortcuts import HttpResponseRedirect, get_object_or_404, render, redirect
-from django.http import Http404
-from django.contrib.auth import authenticate, login, logout
-from .forms import RegisterForm
-from .forms import PostForm, CommentForm
-from .models import Post, User, Like, Comment, Inbox
-from .forms import EditUserForm
-from django.contrib.auth.forms import UserCreationForm
-from django.views.generic import ListView, DetailView
-from django.contrib import messages
-import markdown
 from html.parser import HTMLParser
+
+import markdown
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
+from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
+                              redirect, render)
 from django.urls import reverse
+from django.views.generic import DetailView, ListView
+
+from .forms import CommentForm, EditUserForm, PostForm, RegisterForm
+from .models import Comment, Inbox, Like, Post, User
 
 
 class PostList(LoginRequiredMixin, ListView):
