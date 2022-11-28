@@ -34,12 +34,12 @@ class InboxView(APIView):
 
     def handle_like(self, data):
         like = Like()
-        if API_HOST_PATH in data["author"]["url"]:  # liker is local
+        if API_HOST_PATH in data["author"]["id"]:  # liker is local
             liker_id = path_utils.get_author_id_from_url(data["author"]["id"])
             liker = User.objects.get(id=liker_id)
             like.user = liker
         else:  # liker is external
-            like.external_user = data["author"]["url"]
+            like.external_user = data["author"]["id"]
 
         liked_url = data["object"]
         if "comments" in liked_url:
