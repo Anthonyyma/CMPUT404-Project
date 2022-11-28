@@ -16,9 +16,17 @@
 {% else %}
     {% if not following %}
         <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
-        <a href="/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Follow</a>
+        
+        <form
+            action="/api/authors/{{request.user.id}}/followers/{{user.id}}/"
+            method="POST"
+            style="display: inline"
+            id="followForm"
+        >{% csrf_token %}</form>
+        <button type="submit" form="followForm" class="button">Follow</button>
+
     {% else %}
-        <a href="/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
+        <a href="/api/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
     {% endif %}
 {% endif %}
 
