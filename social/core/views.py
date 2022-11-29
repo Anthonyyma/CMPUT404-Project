@@ -68,9 +68,9 @@ def createPost(request):
                 newPost = form.save()
                 for follow in Follow.objects.filter(followee=request.user):
                     if follow.external_follower:
-                        url = request.user.external_url + "/inbox/"
-                        msg = PostSerializer(newPost).data
-                        requests.post(url, json = msg)
+                        url = getattr(follow, "external_follower") + "/inbox"
+                        msg = PostSerializer(context={'request': newPost}).data
+                        requests.post(url, msg)
                     else:
                         Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
