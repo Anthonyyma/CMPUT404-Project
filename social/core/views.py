@@ -66,11 +66,19 @@ def createPost(request):
                 form.instance.content = parser.md
             if not notValid:
                 newPost = form.save()
+                if len(newPost.private_to) != 0:
+                    username = Follow.objects.filter(follower=newPost.private_to)
+                    if username:
+                        pass
+
+                # if newPost.private_to:
+
                 for follow in Follow.objects.filter(followee=request.user):
                     if follow.external_follower:
-                        url = getattr(follow, "external_follower") + "/inbox"
+                        url = getattr(follow, "external_follower") + "inbox"
                         msg = PostSerializer(context={'request': newPost}).data
-                        requests.post(url, msg)
+                        r = requests.post(url, msg)
+                        print("here", r.status_code)
                     else:
                         Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
