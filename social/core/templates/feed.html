@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load templatefunc %}
 
 {% block head %}
 <title>My feed</title>
@@ -13,10 +14,10 @@
         <!--Friends post only-->
         <div>
         {% for post in posts %} 
-        {% if post.content_type != "APP64"%}    
-        <a href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+        {% if post.content_type != "APP64"%}  
+        <a href="{% url 'postContent' %}?id={% urltoid post.id %}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
         {% else %}
-        <a href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>
+        <a href="{% url 'postContent' %}?id={% urltoid post.id %}"><b>{{ post.title }}</b><br>
         {% endif %}
             {% if post.image %}
                 <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
