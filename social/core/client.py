@@ -12,3 +12,11 @@ def fetch_github_feed(user: User):
     url = "https://api.github.com/users/" + handle + "/events"
     resp = requests.get(url)
     return resp.json()
+
+
+def fetch_external_post(post_url: str):
+    creds = None
+    if "cmsjmnet" in post_url:
+        creds = ("team8", "team8")
+    resp = requests.get(post_url, auth=creds)
+    return resp.json()
