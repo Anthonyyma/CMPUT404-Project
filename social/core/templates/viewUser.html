@@ -2,7 +2,40 @@
 {% extends 'base.html' %}
 
 
+
 {% block content %}
+<script>
+    /* https://www.geekstrick.com/snippets/how-to-parse-cookies-in-javascript/ */
+    const parseCookie = str =>
+        str
+        .split(';')
+        .map(v => v.split('='))
+        .reduce((acc, v) => {
+            acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+            return acc;
+        }, {});
+
+    //send a follow request to the server
+    sendFollowRequest(followerURL, followeeURL) {
+        let cookies = document.cookie;
+        cookies = parseCookie(cookies);
+
+        let data = {
+            "followee_url": followeeURL, 
+            "follower_url": followerURL
+        }
+        fetch("/api/follow-request", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": cookies["csrftoken"]
+            },
+            body: JSON.stringify(data)
+        })
+    }
+    followUser = () => sendFollowRequest("{{ requestUserURL }}", "{{ userURL }}")
+
+</script>
 <head>
     <title> {{user}} </title>
     {% load static %}
@@ -17,13 +50,8 @@
     {% if not following %}
         <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
         
-        <form
-            action="/api/authors/{{request.user.id}}/followers/{{user.id}}/"
-            method="POST"
-            style="display: inline"
-            id="followForm"
-        >{% csrf_token %}</form>
-        <button type="submit" form="followForm" class="button">Follow</button>
+        
+        <button type="submit" form="followForm" class="button" onclick="followUser()">Follow</button>
 
     {% else %}
         <a href="/api/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>

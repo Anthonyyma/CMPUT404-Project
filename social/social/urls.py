@@ -42,6 +42,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path(r"api/authors/<author1>/followers/<author2>/", author_views.follow_view),
     path(r"api/authors/<recipient_id>/inbox/", inbox_views.InboxView.as_view()),
+    path(r"api/follow-request", author_views.follow_request_view),
     path("api/", include(router.urls)),
     path("api/", include(author_router.urls)),
     path("api/", include(post_router.urls)),

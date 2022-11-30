@@ -12,6 +12,10 @@ from django.http import Http404
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
                               redirect, render)
 from django.views.generic import DetailView, ListView
+from django.shortcuts import redirect, render
+from django.views.generic import ListView
+from core.posts.serializers import PostSerializer
+from core.path_utils import get_author_url
 
 from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post, fetch_github_feed
@@ -179,7 +183,7 @@ def viewUser(request, userID):
         user = User(**data) #add the data to the user (not sure if this is permanent)
     """
     
-    context = {"user":user}     # send the user to the template
+    context = {"user":user, "userURL": get_author_url(user), "requestUserURL": get_author_url(request.user)}     # send the user to the template
 
     if (request.user.id == userID):     #if the user is viewing their own profile
         context["ownProfile"] = True
