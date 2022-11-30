@@ -74,7 +74,7 @@ def createPost(request):
                             url = getattr(follow, "external_follower") + "inbox"
                             msg = PostSerializer(context={'request': newPost}).data
                             r = requests.post(url, msg)
-                            print("here", r.status_code)
+                            print("her", r.reason)
                         else:
                             Inbox.objects.create(post=newPost, user=user)
                 elif newPost.friends_only:
@@ -85,7 +85,7 @@ def createPost(request):
                             url = getattr(follow, "external_follower") + "inbox"
                             msg = PostSerializer(context={'request': newPost}).data
                             r = requests.post(url, msg)
-                            print("here", r.status_code)
+                            print("here", r.text)
                         else:
                             Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
