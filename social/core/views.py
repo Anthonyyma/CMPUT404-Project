@@ -14,8 +14,8 @@ from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Follow, Inbox, Post, User
-from .path_utils import get_author_url
-
+from .path_utils import get_author_url, get_post_id_from_url
+from django.conf import settings
 
 @login_required
 def showFeed(request):
@@ -122,8 +122,19 @@ def postType(request):
 
 
 def postContent(request):
-    postId = request.GET.get("id")
-    post = Post.objects.get(id=postId)
+    post = None
+    if 'url' in request.GET:
+        url = request.GET['url']
+        if settings.API_HOST_PATH in url: # check if the url contains our own address
+            post = Post.objects.get(id=get_post_id_from_url(url))
+        else:
+            data = client.fetch_external_post(url)
+            serializer = PostSerializer(data=data)
+            if (serializer.is_valid()):
+                post = Post(**serializer.validated_data)
+    else:
+        return 404
+
     user = request.user
     ownPost = False
     if user == post.author:
