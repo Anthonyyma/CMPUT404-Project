@@ -94,10 +94,15 @@ def createPost(request):
                 elif not newPost.unlisted:
                     for follow in Follow.objects.filter(followee=request.user):
                         if follow.external_follower:
-                            url = getattr(follow, "external_follower") + "inbox"
+                            url = getattr(follow, "external_follower") + "inbox/"
                             msg = PostSerializer(context={'request': newPost}).data
+                            if "cmsjmnet" in url:
+                                msg = {"items":[msg]}
+                            print(msg)
                             r = requests.post(url, msg, auth=("team8", "team8"))
-                            print("here", r.text)
+                            print("here", r.status_code)
+                            with open("response.html", "w") as f:
+                                f.write(r.text)
                         else:
                             Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
