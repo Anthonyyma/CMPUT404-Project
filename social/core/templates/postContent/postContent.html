@@ -92,13 +92,14 @@
             let authorId = "{{ post.author.id }}"
             let userId = "{{ user.id }}"
             let postId = "{{ post.id }}"
+            let authorURL = "{{ authorurl }}"
             let cookies = document.cookie
 
             cookies = parseCookie(cookies)
             
             const data = {
                 'type': "Like",
-                'author': userId,
+                'author': {"id": authorURL},
                 'post': postId,
                 'object': `/api/authors/${authorId}/posts/${postId}`};
                 

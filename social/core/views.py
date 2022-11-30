@@ -1,17 +1,19 @@
 import base64
 from html.parser import HTMLParser
 
-import markdown, requests
+import markdown
+import requests
+from core.posts.serializers import PostSerializer
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views.generic import ListView
-from core.posts.serializers import PostSerializer
 
 from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Inbox, Post, User, Follow
+from .models import Follow, Inbox, Post, User
+from .path_utils import get_author_url
 
 
 class PostList(LoginRequiredMixin, ListView):
@@ -73,7 +75,7 @@ def createPost(request):
                     if follow.external_follower:
                         url = request.user.external_url + "/inbox/"
                         msg = PostSerializer(newPost).data
-                        requests.post(url, json = msg)
+                        requests.post(url, json=msg)
                     else:
                         Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
@@ -111,6 +113,7 @@ def postContent(request):
                 f.write(base64.decodebytes(post.content.encode()))
             post.image = "temp.jpg"
 
+    authorURL = get_author_url(user)
     context = {
         "post": post,
         "ownPost": ownPost,
@@ -118,6 +121,7 @@ def postContent(request):
         "username": user.username,
         "content": post.content,
         "img": post.image,
+        "authorurl": authorURL,
     }
     return render(request, "postContent/postContent.html", context)
 
@@ -180,10 +184,8 @@ def login_user(request):
         else:
             messages.success(
                 request,
-                (
-                    "Please double check that you are using the correct username and password"
-                ),
-            )  # noqa
+                ("Please double check that you are using the correct username and password"),   # noqa
+            )
             return redirect("login")
     else:
         return render(request, "registration/login.html", {})
