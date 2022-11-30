@@ -13,26 +13,35 @@ from core.posts.serializers import PostSerializer
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Inbox, Post, User, Follow
 
+from .feed.client import getExternPost
 
+# @login_required
 class PostList(LoginRequiredMixin, ListView):
     login_url = "/login/"
     template_name = "feed.html"
     model = Inbox
-    context_object_name = "friend_post_list"
+
+    def parseExtData(self) -> dict:
+        data: Inbox = super(PostList, self).get_queryset().filter(user=self.request.user)
+        postData = {}
+        for post in data:
+            if (post.values()["post"] is None):
+                # Get post from the external server
+                postData = getExternPost(post.values()["external_post"])
+            else:
+                postData = post.values()["post"].values()
+
+        return postData
+
 
     def get_context_data(self, **kwargs):
         context = super(ListView, self).get_context_data(**kwargs)
-        '''context.update({
-            "my_post_list": Post.objects.filter(author=self.request.user),  
-        })'''
+
+        # serialize the data (json)
+
         context["my_post_list"] = Post.objects.filter(author=self.request.user)
+        context["friend_post_list"] = self.parseExtData()
         return context
-
-    def get_queryset(self):
-        queryset = super(PostList, self).get_queryset()
-        return queryset.all()
-
-
 
 class MDParser(HTMLParser):
     md = ""
