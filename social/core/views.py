@@ -149,15 +149,16 @@ def follower_view(request):
     user = request.user
     followers = []      #json array of followers
     for follow in Follow.objects.filter(followee=user):
+        """
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
         else:
-            data = AuthorSerializer(follow.follower).data
+            data = AuthorSerializer(request, follow.follower).data
         followers.append(data)
+        """
+        followers.append(follow.follower)
 
-        print(data)
-
-    context = {'followers': followers}
+    context = {'followers': followers, 'request': request}
     return render(request, "followers.html", context)
 
 def following_view(request):
@@ -167,11 +168,11 @@ def following_view(request):
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
         else:
-            data = AuthorSerializer(follow.follower).data
+            data = AuthorSerializer(request, follow.follower).data
         following.append(data)
 
 
-    context = {'following': following}
+    context = {'following': following, 'request': request}
     return render(request, "following.html", context)
 
 def all_users_view(request):
