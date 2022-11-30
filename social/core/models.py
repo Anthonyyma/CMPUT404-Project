@@ -118,7 +118,7 @@ class Like(models.Model):
 class Inbox(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="inbox")
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
     external_post = models.URLField(
         blank=True, null=True
     )  # external post has been sent to the inbox

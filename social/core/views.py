@@ -14,38 +14,27 @@ from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
 from django.views.generic import DetailView, ListView
 
 from .authors.serializers import AuthorSerializer
-from .feed.client import getExternPost
+from .client import fetch_external_post, fetch_github_feed
 from .forms import CommentForm, EditUserForm, PostForm, RegisterForm
 from .models import Comment, Follow, Inbox, Like, Post, User
+from .posts.serializers import PostSerializer
 
 
 # @login_required
-class PostList(LoginRequiredMixin, ListView):
-    login_url = "/login/"
-    template_name = "feed.html"
-    model = Inbox
+def showFeed(request):
+    # My own posts
 
-    def parseExtData(self) -> dict:
-        data: Inbox = super(PostList, self).get_queryset().filter(user=self.request.user)
-        postData = {}
-        for post in data:
-            if (post.values()["post"] is None):
-                # Get post from the external server
-                postData = getExternPost(post.values()["external_post"])
-            else:
-                postData = post.values()["post"].values()
+    posts = Post.objects.filter(author=request.user)
+    srlizedPost = PostSerializer(posts, many=True, context={'request': request}).data
 
-        return postData
+    internPosts = Post.objects.filter(inbox__user=request.user)
+    srlizedPost = srlizedPost + PostSerializer(internPosts, many=True, context={'request': request}).data
 
+    externPosts = Inbox.objects.filter(user=request.user).exclude(external_post__isnull = True)
+    for externPost in externPosts:
+        srlizedPost.append(fetch_external_post(externPost.external_post))
 
-    def get_context_data(self, **kwargs):
-        context = super(ListView, self).get_context_data(**kwargs)
-
-        # serialize the data (json)
-
-        context["my_post_list"] = Post.objects.filter(author=self.request.user)
-        context["friend_post_list"] = self.parseExtData()
-        return context
+    return render(request, "feed.html", {"posts": srlizedPost})
 
 class MDParser(HTMLParser):
     md = ""
@@ -115,7 +104,6 @@ def deletePost(request):
 # @login_required
 def postType(request):
     return render(request, "postType.html")
-
 
 def postContent(request):
     postId = request.GET.get("id")
