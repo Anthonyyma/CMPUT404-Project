@@ -4,26 +4,52 @@
 
 {% block content %}
 <head>
-    <meta charset="utf-8">
     <title> {{user}} </title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href=" % static 'css/viewUser.css' %">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}">
 </head>
+<div class="profile">
+<a href="{% url 'follower_view' %}" class="button">Followers</a>
+<a href="{% url 'following_view' %}" class="button">Following</a>
+{% if ownProfile %}
+    <a href="{% url 'editUser' %}" class="button">Edit Profile</a>
+{% else %}
+    {% if not following %}
+        <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
+        
+        <form
+            action="/api/authors/{{request.user.id}}/followers/{{user.id}}/"
+            method="POST"
+            style="display: inline"
+            id="followForm"
+        >{% csrf_token %}</form>
+        <button type="submit" form="followForm" class="button">Follow</button>
+
+    {% else %}
+        <a href="/api/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
+    {% endif %}
+{% endif %}
+
 <div class="info-block">
-    <h1>UUID: {{user.username}}</h>
+    <h1>Username: {{user.username}}</h>
     <br>
     <h1>Github: {{user.github}}</h>
     <br>
     <img src="{{user.profile_image.url}}"/>
     
-    
+</div>
+
+<div class="post-display">
+    {% for post in posts %}
+        <a href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+            {% if post.image %}
+                <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+            {% endif %}
+        </a>
+    {% endfor %}
+</div>
 </div>
 
 
-<a href="#" class="button">Followers</a>
-<a href="#" class="button">Following</a>
-<a href="{% url 'editUser' %}" class="button">Edit Profile</a>
-
-
-</html>
 {% endblock %}
+</html>

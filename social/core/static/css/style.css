@@ -1,14 +1,11 @@
-html {
-  height: 100%;
-  width: 100%;
-}
 body {
-  background-color: #ffffff;
+  background-color: '#ffffff';
   font-family: 'Lato', sans-serif;
-  align-items: center;
-	justify-content: center;
-  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
 }
+
 #delete-button {
   color: red;
   text-decoration: none;
@@ -102,12 +99,6 @@ label {
   color: black;
 }
 
-body {
-  height: 100vh;
-  margin: 0;
-  display: grid;
-  place-items: center;
-}
 
 .multi-button {
   display: flex;

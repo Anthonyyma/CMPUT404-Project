@@ -37,9 +37,12 @@
             </p>
         </div>
         {% endif %}
+        {% if post.content_type != "TEXT" and post.content_type != "MD" %}
+        {{post.content_type}}
         <div class="imgContainer">
             <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
         </div>
+        {% endif %}
     </div> 
 
     <input class="comment-box" id="comment-box" name="data-comment" type="text" placeholder="Write comment here">

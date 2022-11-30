@@ -1,5 +1,5 @@
-from core.models import FollowRequest, User
-from core.path_utils import get_author_url
+from core.models import FollowRequest, User, Post
+from core.path_utils import get_author_url, get_post_url
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -7,6 +7,9 @@ from rest_framework.test import APITestCase
 class InboxText(APITestCase):
     def setUp(self):
         self.user1 = User.objects.create(username="test1")
+        self.post1 = Post.objects.create(
+            author=self.user1, content="post1", friends_only=False
+        )
 
     def test_external_follow_request(self):
         path = f"/api/authors/{self.user1.id}/inbox/"
@@ -64,3 +67,22 @@ class InboxText(APITestCase):
         self.assertEqual(self.user1.inbox.count(), 1)
         inbox = self.user1.inbox.filter(external_post=data["id"]).first()
         self.assertIsNotNone(inbox)
+
+    def test_external_like_on_local_post(self):
+        post_url = get_post_url(self.post1)
+        data = {
+            "type": "Like",
+            "author": {
+                "type": "author",
+                "id": "http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
+                "host": "http://127.0.0.1:5454/",
+                "displayName": "Lara Croft",
+                "url": "http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
+                "github": "http://github.com/laracroft",
+                "profileImage": "https://i.imgur.com/k7XVwpB.jpeg",
+            },
+            "object": post_url,
+        }
+        inbox_path = f"/api/authors/{self.user1.id}/inbox/"
+        resp = self.client.post(inbox_path, data, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
