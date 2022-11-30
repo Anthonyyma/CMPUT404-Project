@@ -88,10 +88,7 @@ def createPost(request):
                     messages.info(request, "No Image")
                     notValid = True
             elif postType == "MD":
-                data = markdown.markdown(form.instance.content)
-                parser = MDParser()
-                parser.feed(data)
-                form.instance.content = parser.md
+                pass
             if not notValid:
                 newPost = form.save()
                 if len(newPost.private_to) != 0:  #if private to someone
