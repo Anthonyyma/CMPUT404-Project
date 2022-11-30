@@ -20,7 +20,7 @@ from core.path_utils import get_author_url
 from .authors.serializers import AuthorSerializer
 from .feed.client import getExternPost
 from .forms import CommentForm, EditUserForm, PostForm, RegisterForm
-from .models import Comment, Follow, Inbox, Like, Post, User
+from .models import Comment, Follow, Inbox, Like, Post, User, FollowRequest
 
 
 # @login_required
@@ -199,6 +199,8 @@ def viewUser(request, userID):
 
     if (request.user.id == userID):     #if the user is viewing their own profile
         context["ownProfile"] = True
+        follow_requests = FollowRequest.objects.filter(followee=user)
+        context["follow_requests"] = follow_requests
     else:
         context["ownProfile"] = False
         # check if the current user is following the user

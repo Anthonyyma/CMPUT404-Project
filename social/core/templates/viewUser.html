@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 {% extends 'base.html' %}
 
-
+{% block head %}
+<head>
+    <title> {{user}} </title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}">
+</head>
+{% endblock %}
 
 {% block content %}
 <script>
@@ -36,46 +42,54 @@
     }
 
 </script>
-<head>
-    <title> {{user}} </title>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}">
-</head>
-<div class="profile">
-<a href="{% url 'follower_view' %}" class="button">Followers</a>
-<a href="{% url 'following_view' %}" class="button">Following</a>
-{% if ownProfile %}
-    <a href="{% url 'editUser' %}" class="button">Edit Profile</a>
-{% else %}
-    {% if not following %}
-        <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
-        
-        
-        <button type="submit" form="followForm" class="button" onclick="followUser()">Follow</button>
 
-    {% else %}
-        <a href="/api/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
-    {% endif %}
-{% endif %}
+<div>
+    <div class="info-block">
+        <div>
+            <a href="{% url 'follower_view' %}" class="button">Followers</a>
+            <a href="{% url 'following_view' %}" class="button">Following</a>
+            {% if ownProfile %}
+                <a href="{% url 'editUser' %}" class="button">Edit Profile</a>
+            {% else %}
+                {% if not following %}
+                <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
+            
+            
+                    <button type="submit" form="followForm" class="button" onclick="followUser()">Follow</button>
 
-<div class="info-block">
-    <h1>Username: {{user.username}}</h>
-    <br>
-    <h1>Github: {{user.github}}</h>
-    <br>
-    <img src="{{user.profile_image.url}}"/>
-    
-</div>
-
-<div class="post-display">
-    {% for post in posts %}
-        <a href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
-            {% if post.image %}
-                <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+                {% else %}
+                    <a href="/api/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
+                {% endif %}
             {% endif %}
-        </a>
-    {% endfor %}
-</div>
+        </div>
+
+        <div class="profile">
+            <h1>Username: {{user.username}}</h>
+            <br>
+            <h1>Github: {{user.github}}</h>
+            <br>
+            <img src="{{user.profile_image.url}}"/>
+        </div>
+    </div>
+
+
+
+    <div class="post-display" style="margin-bottom:50px">
+        {% for request in follow_requests %}
+        <div class="post">
+            <a href="/user/{{request.follower.id}}">{{request.follower.username}}</a>
+            <!--<p>{{user.first_name}} {{user.last_name}}</p>
+            <img src="{{user.profile_image.url}}" style="width: 100px; transform: translate(100%)">-->
+        </div>
+        {% endfor %}
+        {% for post in posts %}
+            <a  class ="post" href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
 </div>
 
 
