@@ -67,7 +67,7 @@
                 <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
             
             
-                    <button type="submit" form="followForm" class="button" onclick="followUser()">Follow</button>
+                    <button type="button" class="button" onclick="followUser()">Follow</button>
 
                 {% else %}
                     <a href="/api/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
@@ -93,10 +93,11 @@
                 {{request.follower.username}}<br>
                 {{request.follower.first_name}}<br>
                 {{request.follower.last_name}}<br>
-                <img src="{{request.follower.profile_image.url}}" style="width: 100px; transform: translate(100%)">
-                <button class="button" onclick="acceptRequest({{request.id}})">Accept</button>
-            
             </a>
+            <!--<img src="{{request.follower.profile_image.url}}" style="width: 100px; transform: translate(100%)">-->
+            <button type="button" class="button" onclick="acceptRequest({{request.id}})">Accept</button>
+            
+            
         </div>
         {% endfor %}
         {% for post in posts %}
