@@ -13,7 +13,7 @@ from django.shortcuts import redirect, render
 from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Follow, Inbox, Post, User
+from .models import Follow, Inbox, Post, User, FollowRequest
 from .path_utils import get_author_url, get_post_id_from_url
 from django.conf import settings
 
@@ -36,12 +36,28 @@ def showFeed(request):
     return render(request, "feed.html", {"posts": srlizedPost})
 
 
+def publicFeed(request):
+    posts = Post.objects.filter(
+        author=request.user, friends_only=False, unlisted=False, private_to='')
+    srlizedPost = PostSerializer(posts, many=True, context={'request': request}).data
+
+    internPosts = Post.objects.filter(inbox__user=request.user)
+    srlizedPost = srlizedPost + PostSerializer(
+        internPosts, many=True, context={'request': request}).data
+
+    externPosts = Inbox.objects.filter(user=request.user).exclude(
+        external_post__isnull=True)
+    for externPost in externPosts:
+        srlizedPost.append(fetch_external_post(externPost.external_post))
+
+    return render(request, "publicFeed.html", {"posts": srlizedPost})
+
+
 class MDParser(HTMLParser):
     md = ""
 
     def handle_data(self, data):
         self.md += data
-
 
 # @login_required
 def createPost(request):
@@ -79,14 +95,16 @@ def createPost(request):
             if not notValid:
                 newPost = form.save()
                 if len(newPost.private_to) != 0:  #if private to someone
-                    user = User.objects.filter(id=newPost.private_to)
+                    user = User.objects.filter(username=newPost.private_to).first()
                     if user:
-                        if user.external_url:  #if external user
+                        if user.external_url:  # if external user
                             follow = Follow.objects.filter(followee=user)
-                            url = getattr(follow, "external_follower") + "inbox"
-                            msg = PostSerializer(context={'request': newPost}).data
-                            r = requests.post(url, msg)
-                            print("her", r.reason)
+                            url = getattr(follow, "external_follower") + "inbox/"
+                            msg = PostSerializer(newPost, context={'request': request}).data
+                            msg["description"] = "test"
+                            if "cmsjmnet" in url:
+                                msg = {"items":[msg], "author":get_author_url(request.user)}
+                            r = requests.post(url, json = msg, auth=("team8", "team8"))
                         else:
                             Inbox.objects.create(post=newPost, user=user)
                 elif newPost.friends_only:
@@ -94,10 +112,17 @@ def createPost(request):
                 elif not newPost.unlisted:
                     for follow in Follow.objects.filter(followee=request.user):
                         if follow.external_follower:
-                            url = getattr(follow, "external_follower") + "inbox"
-                            msg = PostSerializer(context={'request': newPost}).data
-                            r = requests.post(url, msg)
-                            print("here", r.text)
+                            url = getattr(follow, "external_follower") + "inbox/"
+                            msg = PostSerializer(newPost, context={'request': request}).data
+                            msg["description"] = "test"
+                            if "cmsjmnet" in url:
+                                msg = {"items":[msg], "author":get_author_url(request.user)}
+                            print(msg)
+                            print(type(msg))
+                            r = requests.post(url, json = msg, auth=("team8", "team8"))
+                            print("here:", r.status_code)
+                            with open("response.html", "w") as f:
+                                f.write(r.text)
                         else:
                             Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
@@ -163,15 +188,16 @@ def follower_view(request):
     user = request.user
     followers = []      # json array of followers
     for follow in Follow.objects.filter(followee=user):
+        """
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
         else:
-            data = AuthorSerializer(follow.follower).data
+            data = AuthorSerializer(request, follow.follower).data
         followers.append(data)
+        """
+        followers.append(follow.follower)
 
-        print(data)
-
-    context = {'followers': followers}
+    context = {'followers': followers, 'request': request}
     return render(request, "followers.html", context)
 
 
@@ -179,13 +205,17 @@ def following_view(request):
     user = request.user
     following = []      # json array of following
     for follow in Follow.objects.filter(follower=user):
+        """
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
         else:
-            data = AuthorSerializer(follow.follower).data
+            data = AuthorSerializer(request, follow.follower).data
         following.append(data)
+        """
+        following.append(follow.followee)
 
-    context = {'following': following}
+
+    context = {'following': following, 'request': request}
     return render(request, "following.html", context)
 
 
@@ -228,6 +258,8 @@ def viewUser(request, userID):
 
     if (request.user == user):     # if the user is viewing their own profile
         context["ownProfile"] = True
+        follow_requests = FollowRequest.objects.filter(followee=user)
+        context["follow_requests"] = follow_requests
     else:
         context["ownProfile"] = False
         # check if the current user is following the user

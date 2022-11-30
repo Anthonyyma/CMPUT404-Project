@@ -1,3 +1,7 @@
+html {
+    height: 100%;
+    width: 100%;
+  }
 .info-block{
     background-color: black;
     display: flex;
@@ -15,7 +19,7 @@ img{
     border-radius: 50%;
 }
 
-button{
+.button{
     background-color: black;
     color: white;
     border: 1px solid white;
@@ -26,11 +30,24 @@ button{
     cursor: pointer;
 }
 
-.post-display {
+.post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 20px;
+    border-radius: 5px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  }
+
+  .post-title {
+    font-size: larger;
+    text-align: center;
+    width: 100%;
+  }
+  .post-display {
     width: 50%;
     position: absolute;
-}
-.post-display a {
+  }
+  .post-display a {
     background-color: #ffffff;
     color: black;
     display: block;
@@ -39,16 +56,16 @@ button{
     border-style: solid;
     border-width: thin;
     box-sizing: border-box;
-}
-.post-display a:hover {
+  }
+  .post-display a:hover {
     background-color: #ddd6f3;
-}
+  }
 
 .user-display {
     width: 50%;
     position: absolute;
 }
-.user-display a {
+.user-display div {
     background-color: #ffffff;
     color: black;
     display: block;
@@ -58,7 +75,7 @@ button{
     border-width: thin;
     box-sizing: border-box;
 }
-.user-display a:hover {
+.user-display div:hover {
     background-color: #ddd6f3;
 }
 
