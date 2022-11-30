@@ -22,7 +22,7 @@
         <div class="userHeader">
             <div style="display:flex; align-items: center;">
                 <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-                <a href="#" id="username">{{ user.username }}</a>
+                <a href="#" id="username">{{ post.author }}</a>
             </div>
             {% if ownPost %}
                 <a href="{% url 'editPost' %}?id={{ post.id }}">

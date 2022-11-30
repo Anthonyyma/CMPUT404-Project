@@ -1,5 +1,5 @@
-from django import template
 from core.path_utils import get_post_id_from_url
+from django import template
 
 register = template.Library()
 

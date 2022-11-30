@@ -113,7 +113,7 @@ def postContent(request):
     if user == post.author:
         ownPost = True
     if post:
-        profilePic = user.profile_image
+        profilePic = post.author.profile_image
         if post.content_type == "APP64":
             with open("media/temp.jpg", "wb") as f:
                 f.write(base64.b64decode(post.content))
