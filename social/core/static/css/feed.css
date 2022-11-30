@@ -24,6 +24,15 @@ html {
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
   }
 
+  .post:hover {
+    background-color: #ddd6f3;
+  }
+
+  .post a {
+    color: black;
+    text-decoration: none;
+  }
+
   .post-title {
     font-size: larger;
     text-align: center;
@@ -33,19 +42,16 @@ html {
     width: 50%;
     position: absolute;
   }
-  .post-display a {
-    background-color: #ffffff;
-    color: black;
-    display: block;
-    padding: 10px;
-    text-decoration: none;
-    border-style: solid;
-    border-width: thin;
-    box-sizing: border-box;
+
+  .action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    gap: 30px;
   }
-  .post-display a:hover {
-    background-color: #ddd6f3;
-  }
+
   label {
     font-weight: 500;
     display: block;

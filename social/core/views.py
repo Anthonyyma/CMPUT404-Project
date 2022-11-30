@@ -14,8 +14,8 @@ from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Follow, Inbox, Post, User
-from .path_utils import get_author_url
-
+from .path_utils import get_author_url, get_post_id_from_url
+from django.conf import settings
 
 @login_required
 def showFeed(request):
@@ -34,6 +34,23 @@ def showFeed(request):
         srlizedPost.append(fetch_external_post(externPost.external_post))
 
     return render(request, "feed.html", {"posts": srlizedPost})
+
+
+def publicFeed(request):
+    posts = Post.objects.filter(
+        author=request.user, friends_only=False, unlisted=False, private_to='')
+    srlizedPost = PostSerializer(posts, many=True, context={'request': request}).data
+
+    internPosts = Post.objects.filter(inbox__user=request.user)
+    srlizedPost = srlizedPost + PostSerializer(
+        internPosts, many=True, context={'request': request}).data
+
+    externPosts = Inbox.objects.filter(user=request.user).exclude(
+        external_post__isnull=True)
+    for externPost in externPosts:
+        srlizedPost.append(fetch_external_post(externPost.external_post))
+
+    return render(request, "publicFeed.html", {"posts": srlizedPost})
 
 
 class MDParser(HTMLParser):
@@ -80,7 +97,7 @@ def createPost(request):
                 if len(newPost.private_to) != 0:  #if private to someone
                     user = User.objects.filter(username=newPost.private_to).first()
                     if user:
-                        if user.external_url:  #if external user
+                        if user.external_url:  # if external user
                             follow = Follow.objects.filter(followee=user)
                             url = getattr(follow, "external_follower") + "inbox/"
                             msg = PostSerializer(newPost, context={'request': request}).data
@@ -130,8 +147,19 @@ def postType(request):
 
 
 def postContent(request):
-    postId = request.GET.get("id")
-    post = Post.objects.get(id=postId)
+    post = None
+    if 'url' in request.GET:
+        url = request.GET['url']
+        if settings.API_HOST_PATH in url: # check if the url contains our own address
+            post = Post.objects.get(id=get_post_id_from_url(url))
+        else:
+            data = client.fetch_external_post(url)
+            serializer = PostSerializer(data=data)
+            if (serializer.is_valid()):
+                post = Post(**serializer.validated_data)
+    else:
+        return 404
+
     user = request.user
     ownPost = False
     if user == post.author:

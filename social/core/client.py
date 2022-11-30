@@ -3,6 +3,7 @@ import re
 import requests
 from core.authors.serializers import AuthorSerializer
 from core.models import User
+from core.path_utils import get_author_url
 
 
 def get_creds(url: str):
@@ -43,7 +44,7 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
         },
     }
     if "cmsjmnet" in external_user_url:
-        data = {"items": [data]}
+        data = {"items": [data], "author": get_author_url(local_user)}
     return requests.post(
         external_user_url + "inbox/", json=data, auth=get_creds(external_user_url)
     )
