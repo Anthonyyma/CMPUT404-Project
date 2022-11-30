@@ -15,6 +15,18 @@ import markdown, requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
+from .forms import RegisterForm
+from .forms import PostForm, CommentForm
+from .models import Post, User, Like, Comment, Follow
+from .forms import EditUserForm
+from .forms import PostForm
+from .authors.serializers import AuthorSerializer
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import ListView, DetailView
+from django.contrib import messages
+import markdown
+from html.parser import HTMLParser
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views.generic import ListView
@@ -137,6 +149,40 @@ def postContent(request):
     }
     return render(request, "postContent/postContent.html", context)
 
+def follower_view(request):
+    user = request.user
+    followers = []      #json array of followers
+    for follow in Follow.objects.filter(followee=user):
+        if follow.external_follower is not None:
+            data = request.get(follow.external_follower).data
+        else:
+            data = AuthorSerializer(follow.follower).data
+        followers.append(data)
+
+        print(data)
+
+    context = {'followers': followers}
+    return render(request, "followers.html", context)
+
+def following_view(request):
+    user = request.user
+    following = []      #json array of following
+    for follow in Follow.objects.filter(follower=user):
+        if follow.external_follower is not None:
+            data = request.get(follow.external_follower).data
+        else:
+            data = AuthorSerializer(follow.follower).data
+        following.append(data)
+
+
+    context = {'following': following}
+    return render(request, "following.html", context)
+
+def all_users_view(request):
+    all_users = User.objects.all()
+    context = {'users': all_users}
+    return render(request, "all_users.html", context)
+
 
 def viewUser(request, userID):
     # Displays the information of a user
@@ -145,10 +191,28 @@ def viewUser(request, userID):
     if userID is None:  # if a userID is not given default to current user
         userID = request.user.id  # Currently logged in user
 
-    user = User.objects.get(id=userID)  # this should get the user from the database
+    user = User.objects.get(id=userID)  #this should get the user from the database
+    
+    """
+    if user.external_user is not None:
+        data = request.get(user.external_user).data
+        user = User(**data) #add the data to the user (not sure if this is permanent)
+    """
+    
+    context = {"user":user}     # send the user to the template
 
-    context = {"user": user}  # send the user to the template
-    print(userID)
+    if (request.user.id == userID):     #if the user is viewing their own profile
+        context["ownProfile"] = True
+    else:
+        context["ownProfile"] = False
+        # check if the current user is following the user
+        if (Follow.objects.filter(follower=request.user, followee=user).exists()):
+            context["following"] = True
+        else:
+            context["following"] = False
+
+    posts = Post.objects.filter(author=user)
+    context["posts"] = posts
 
     return render(request, "viewUser.html", context)
 
