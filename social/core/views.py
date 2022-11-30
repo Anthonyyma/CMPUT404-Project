@@ -1,28 +1,20 @@
+import base64
 from html.parser import HTMLParser
 
 import markdown
 import requests
+from core import client
 from core.posts.serializers import PostSerializer
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
-from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
-                              redirect, render)
-from django.views.generic import DetailView, ListView
 from django.shortcuts import redirect, render
-from django.views.generic import ListView
-from core.posts.serializers import PostSerializer
-from core.path_utils import get_author_url, get_author_id_from_url
 
 from .authors.serializers import AuthorSerializer
-from .client import fetch_external_post, fetch_github_feed
-from .forms import CommentForm, EditUserForm, PostForm, RegisterForm
-from .models import Comment, Follow, Inbox, Like, Post, User
-from .posts.serializers import PostSerializer
-from core import client
+from .client import fetch_external_post
+from .forms import EditUserForm, PostForm, RegisterForm
+from .models import Follow, Inbox, Post, User
+from .path_utils import get_author_url
 
 
 # @login_required
@@ -33,13 +25,16 @@ def showFeed(request):
     srlizedPost = PostSerializer(posts, many=True, context={'request': request}).data
 
     internPosts = Post.objects.filter(inbox__user=request.user)
-    srlizedPost = srlizedPost + PostSerializer(internPosts, many=True, context={'request': request}).data
+    srlizedPost = srlizedPost + PostSerializer(
+        internPosts, many=True, context={'request': request}).data
 
-    externPosts = Inbox.objects.filter(user=request.user).exclude(external_post__isnull = True)
+    externPosts = Inbox.objects.filter(user=request.user).exclude(
+        external_post__isnull=True)
     for externPost in externPosts:
         srlizedPost.append(fetch_external_post(externPost.external_post))
 
     return render(request, "feed.html", {"posts": srlizedPost})
+
 
 class MDParser(HTMLParser):
     md = ""
@@ -110,6 +105,7 @@ def deletePost(request):
 def postType(request):
     return render(request, "postType.html")
 
+
 def postContent(request):
     postId = request.GET.get("id")
     post = Post.objects.get(id=postId)
@@ -124,6 +120,7 @@ def postContent(request):
                 f.write(base64.b64decode(post.content))
                 post.image = "temp.jpg"
 
+    authorURL = get_author_url(user)
     context = {
         "post": post,
         "ownPost": ownPost,
@@ -131,12 +128,14 @@ def postContent(request):
         "username": user.username,
         "content": post.content,
         "img": post.image,
+        "authorurl": authorURL,
     }
     return render(request, "postContent/postContent.html", context)
 
+
 def follower_view(request):
     user = request.user
-    followers = []      #json array of followers
+    followers = []      # json array of followers
     for follow in Follow.objects.filter(followee=user):
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
@@ -149,9 +148,10 @@ def follower_view(request):
     context = {'followers': followers}
     return render(request, "followers.html", context)
 
+
 def following_view(request):
     user = request.user
-    following = []      #json array of following
+    following = []      # json array of following
     for follow in Follow.objects.filter(follower=user):
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
@@ -159,9 +159,9 @@ def following_view(request):
             data = AuthorSerializer(follow.follower).data
         following.append(data)
 
-
     context = {'following': following}
     return render(request, "following.html", context)
+
 
 def all_users_view(request):
     all_users = User.objects.all()
@@ -182,21 +182,22 @@ def viewUser(request, userID):
         existing = User.objects.filter(external_url=url).first()
         serializer = AuthorSerializer(existing, data=data)
         if serializer.is_valid():
-            user = serializer.save(external_url = url)
+            user = serializer.save(external_url=url)
         else:
             return 404
     else:
-        user = User.objects.get(id=userID)  #this should get the user from the database
-    
+        user = User.objects.get(id=userID)  # this should get the user from the database
+
     """
     if user.external_user is not None:
         data = request.get(user.external_user).data
         user = User(**data) #add the data to the user (not sure if this is permanent)
     """
-    
-    context = {"user":user, "userURL": get_author_url(user), "requestUserURL": get_author_url(request.user)}     # send the user to the template
+    # send the user to the template
+    context = {"user": user, "userURL": get_author_url(user),
+               "requestUserURL": get_author_url(request.user)}
 
-    if (request.user.id == userID):     #if the user is viewing their own profile
+    if (request.user.id == userID):     # if the user is viewing their own profile
         context["ownProfile"] = True
     else:
         context["ownProfile"] = False
@@ -255,10 +256,8 @@ def login_user(request):
         else:
             messages.success(
                 request,
-                (
-                    "Please double check that you are using the correct username and password"
-                ),
-            )  # noqa
+                ("Please double check that you are using the correct username and password"),   # noqa
+            )
             return redirect("login")
     else:
         return render(request, "registration/login.html", {})
