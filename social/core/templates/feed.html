@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load templatefunc %}
+
+{% block head %}
+<title>My feed</title>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="post-display">
+        <div style="margin-bottom: 50px"><a href="{% url 'createPost' %}">Create Post</a></div>
+        <div>
+        {% for post in posts %} 
+        {% if post.content_type != "APP64"%}  
+        <a href="{% url 'postContent' %}?id={% urltoid post.id %}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+        {% else %}
+        <a href="{% url 'postContent' %}?id={% urltoid post.id %}"><b>{{ post.title }}</b><br>
+        {% endif %}
+            {% if post.image %}
+                <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+            {% endif %}
+        </a>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}

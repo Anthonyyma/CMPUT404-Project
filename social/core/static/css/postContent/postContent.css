@@ -3,12 +3,6 @@ html {
     display: flex;
     justify-content: center;
 }
-body {
-    height: 100%;
-    max-width: 50%;
-    display: block;
-    justify-content: center;
-}
 .vertical-center {
   margin: 0;
   position: absolute;

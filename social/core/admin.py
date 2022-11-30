@@ -5,8 +5,8 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 class UserAdmin(BaseUserAdmin):
     # display the profile_image in the admin panel for users
-    fieldsets = ((None, {"fields": ("profile_image",)}), *BaseUserAdmin.fieldsets)
-
+    fieldsets = ((None, {"fields": ("profile_image", "external_url")}), *BaseUserAdmin.fieldsets)
+    
 
 class FollowAdmin(admin.ModelAdmin):
     list_display = ("follower", "followee")

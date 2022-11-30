@@ -63,11 +63,13 @@ class Post(models.Model):
         User, on_delete=models.CASCADE, related_name="posts", blank=True
     )
     title = models.TextField()
-    source = models.TextField()
-    origin = models.TextField()
+    source = models.TextField(blank=True, null=True)
+    origin = models.TextField(blank=True, null=True)
     # use .get_content_type_display()
     content_type = models.CharField(max_length=5, choices=CONTENT_TYPES, default="TEXT")
-    categories = models.TextField()  # just use space seperated strings for now lol
+    categories = models.TextField(
+        blank=True, null=True
+    )  # just use space seperated strings for now lol
     content = models.TextField()
     # image = models.ImageField(blank=True, upload_to="media/")
     image = models.ImageField(blank=True)
@@ -116,7 +118,7 @@ class Like(models.Model):
 class Inbox(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="inbox")
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
     external_post = models.URLField(
         blank=True, null=True
     )  # external post has been sent to the inbox

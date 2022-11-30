@@ -39,6 +39,7 @@ class InboxView(APIView):
             liker = User.objects.get(id=liker_id)
             like.user = liker
         else:  # liker is external
+            like.user = self.create_update_external_user(data["author"])
             like.external_user = data["author"]["id"]
 
         liked_url = data["object"]
@@ -55,7 +56,7 @@ class InboxView(APIView):
             )
 
         like.save()
-        serializer = LikeSerializer(like)
+        serializer = LikeSerializer(like, context={"request": self.request})
         return Response(status=status.HTTP_201_CREATED, data=serializer.data)
 
     def handle_post(self, data, recipient: User):
