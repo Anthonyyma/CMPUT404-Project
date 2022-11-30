@@ -27,13 +27,13 @@
         <!--My posts-->
         <div>
         {% for post in my_post_list %}
-        {% for post in object_list %}
             {% if post.content_type != "APP64"%}
             <a class="post" href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
                 {% if post.image %}
                     <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
                 {% endif %}
             </a>
+            {% endif %}
         {% endfor %}
         </div>
     </div>
