@@ -41,6 +41,7 @@ class PostSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     commentsSrc = serializers.SerializerMethodField()
     contentType = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -60,6 +61,7 @@ class PostSerializer(serializers.ModelSerializer):
             "visibility",
             "published",
             "unlisted",
+            "image"
         ]
 
     def get_visibility(self, obj: Post) -> str:
@@ -97,6 +99,9 @@ class PostSerializer(serializers.ModelSerializer):
             "id": get_post_url(obj) + "comments/",
             "comments": comment_serializer.data,
         }
+
+    def get_image(self, obj: Post):
+        return obj.image
 
     def get_contentType(self, obj: Post):
         return obj.get_content_type_display()
