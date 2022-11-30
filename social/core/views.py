@@ -1,59 +1,51 @@
-from django.shortcuts import HttpResponseRedirect, get_object_or_404, render, redirect
-from django.http import Http404
-from django.contrib.auth import authenticate, login, logout
-from .forms import RegisterForm
-from .forms import PostForm, CommentForm
-from .models import Post, User, Like, Comment, Inbox
-from .forms import EditUserForm
-from django.contrib.auth.forms import UserCreationForm
-from django.views.generic import ListView, DetailView
-from django.contrib import messages
-import markdown
 from html.parser import HTMLParser
 
-import markdown, requests
+import markdown
+import requests
+from core.posts.serializers import PostSerializer
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
-from .forms import RegisterForm
-from .forms import PostForm, CommentForm
-from .models import Post, User, Like, Comment, Follow
-from .forms import EditUserForm
-from .forms import PostForm
-from .authors.serializers import AuthorSerializer
 from django.contrib.auth.forms import UserCreationForm
-from django.views.generic import ListView, DetailView
-from django.contrib import messages
-import markdown
-from html.parser import HTMLParser
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
-from django.views.generic import ListView
-from core.posts.serializers import PostSerializer
+from django.http import Http404
+from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
+                              redirect, render)
+from django.views.generic import DetailView, ListView
 
-from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Inbox, Post, User, Follow
+from .authors.serializers import AuthorSerializer
+from .feed.client import getExternPost
+from .forms import CommentForm, EditUserForm, PostForm, RegisterForm
+from .models import Comment, Follow, Inbox, Like, Post, User
 
 
+# @login_required
 class PostList(LoginRequiredMixin, ListView):
     login_url = "/login/"
     template_name = "feed.html"
     model = Inbox
-    context_object_name = "friend_post_list"
+
+    def parseExtData(self) -> dict:
+        data: Inbox = super(PostList, self).get_queryset().filter(user=self.request.user)
+        postData = {}
+        for post in data:
+            if (post.values()["post"] is None):
+                # Get post from the external server
+                postData = getExternPost(post.values()["external_post"])
+            else:
+                postData = post.values()["post"].values()
+
+        return postData
+
 
     def get_context_data(self, **kwargs):
         context = super(ListView, self).get_context_data(**kwargs)
-        """context.update({
-            "my_post_list": Post.objects.filter(author=self.request.user),  
-        })"""
+
+        # serialize the data (json)
+
         context["my_post_list"] = Post.objects.filter(author=self.request.user)
+        context["friend_post_list"] = self.parseExtData()
         return context
-
-    def get_queryset(self):
-        queryset = super(PostList, self).get_queryset()
-        return queryset.all()
-
 
 class MDParser(HTMLParser):
     md = ""
