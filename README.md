@@ -8,6 +8,12 @@ You can find documentation for it at https://c404-team8.herokuapp.com/api/docs/
 
 The user interface can be found at https://c404-team8.herokuapp.com/
 
+External node basic authentication credentials:
+
+username: node
+
+password: cmput404
+
 ## Project Setup
 
 1. Create a virtual environment (optional).

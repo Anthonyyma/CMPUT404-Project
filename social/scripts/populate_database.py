@@ -4,8 +4,10 @@ from core.models import Comment, ContentTypes, Follow, Post, User
 # User.objects.all().delete()
 user1 = User.objects.create(username="user1")
 user1.set_password("pass1")
+user1.save()
 user2 = User.objects.create(username="user2")
 user2.set_password("pass2")
+user2.save()
 
 Follow.objects.create(followee=user1, follower=user2)  # user2 follows user1
 

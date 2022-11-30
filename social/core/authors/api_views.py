@@ -1,8 +1,8 @@
 from core.authors.serializers import AuthorSerializer
-from core.posts.serializers import LikeSerializer
 from core.drf_utils import CustomPagination, labelled_pagination
-from core.models import Follow, User, Like, Post, Comment
-from django.db.models import Q
+from core.models import Follow, FollowRequest, Like, User
+from core.path_utils import get_author_id_from_url
+from core.posts.serializers import LikeSerializer
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -72,3 +72,16 @@ def follow_view(request, author1: str = "", author2: str = ""):
         if is_following:
             Follow.objects.filter(follower=author2, followee=author1).delete()
         return Response(status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def follow_request_view(request):
+    follower_url = request.data.get("follower_url")
+    followee_url = request.data.get("followee_url")
+    follower_id = get_author_id_from_url(follower_url)
+    followee_id = get_author_id_from_url(followee_url)
+
+    follower = User.objects.filter(id=follower_id).first()
+    followee = User.objects.filter(id=followee_id).first()
+    if follower and followee:
+        FollowRequest.objects.create(follower=follower, followee=followee)

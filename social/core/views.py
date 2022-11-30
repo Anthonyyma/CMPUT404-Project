@@ -1,41 +1,55 @@
-import base64
 from html.parser import HTMLParser
 
-import markdown, requests
+import markdown
+import requests
+from core.posts.serializers import PostSerializer
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
-from .forms import RegisterForm
-from .forms import PostForm, CommentForm
-from .models import Post, User, Like, Comment, Follow
-from .forms import EditUserForm
-from .forms import PostForm
-from .authors.serializers import AuthorSerializer
 from django.contrib.auth.forms import UserCreationForm
-from django.views.generic import ListView, DetailView
-from django.contrib import messages
-import markdown
-from html.parser import HTMLParser
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
+from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
+                              redirect, render)
+from django.views.generic import DetailView, ListView
 from django.shortcuts import redirect, render
 from django.views.generic import ListView
 from core.posts.serializers import PostSerializer
 from core.path_utils import get_author_url
 
-from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Inbox, Post, User, Follow
+from .authors.serializers import AuthorSerializer
+from .feed.client import getExternPost
+from .forms import CommentForm, EditUserForm, PostForm, RegisterForm
+from .models import Comment, Follow, Inbox, Like, Post, User
 
 
+# @login_required
 class PostList(LoginRequiredMixin, ListView):
     login_url = "/login/"
-    template_name = "myPosts.html"
-    model = Post
+    template_name = "feed.html"
+    model = Inbox
 
-    def get_queryset(self):
-        queryset = super(PostList, self).get_queryset()
-        return queryset.filter(author=self.request.user)
+    def parseExtData(self) -> dict:
+        data: Inbox = super(PostList, self).get_queryset().filter(user=self.request.user)
+        postData = {}
+        for post in data:
+            if (post.values()["post"] is None):
+                # Get post from the external server
+                postData = getExternPost(post.values()["external_post"])
+            else:
+                postData = post.values()["post"].values()
 
+        return postData
+
+
+    def get_context_data(self, **kwargs):
+        context = super(ListView, self).get_context_data(**kwargs)
+
+        # serialize the data (json)
+
+        context["my_post_list"] = Post.objects.filter(author=self.request.user)
+        context["friend_post_list"] = self.parseExtData()
+        return context
 
 class MDParser(HTMLParser):
     md = ""
@@ -72,9 +86,6 @@ def createPost(request):
                 if not form.instance.image:
                     messages.info(request, "No Image")
                     notValid = True
-            elif postType == "APP64":
-                uploadedFile = request.FILES["image"].read()
-                form.instance.content = base64.b64encode(uploadedFile).decode("ascii")
             elif postType == "MD":
                 data = markdown.markdown(form.instance.content)
                 parser = MDParser()
@@ -86,7 +97,7 @@ def createPost(request):
                     if follow.external_follower:
                         url = request.user.external_url + "/inbox/"
                         msg = PostSerializer(newPost).data
-                        requests.post(url, json = msg)
+                        requests.post(url, json=msg)
                     else:
                         Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
@@ -121,8 +132,8 @@ def postContent(request):
         profilePic = user.profile_image
         if post.content_type == "APP64":
             with open("media/temp.jpg", "wb") as f:
-                f.write(base64.decodebytes(post.content.encode()))
-            post.image = "temp.jpg"
+                f.write(base64.b64decode(post.content))
+                post.image = "temp.jpg"
 
     context = {
         "post": post,
@@ -241,7 +252,7 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("myPosts")
+            return redirect("feed")
         else:
             messages.success(
                 request,

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<title>My feed</title>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="post-display">
+        <div style="margin-bottom: 50px"><a href="{% url 'createPost' %}">Create Post</a></div>
+        <!--Friends post only-->
+        <div>
+        {% for post in friend_post_list %} 
+        {% if post.content_type != "APP64"%}    
+        <a href="{% url 'postContent' %}?id={{ inbox.post.id }}"><b>{{ inbox.post.title }}</b><br>{{ inbox.post.content }}<br>
+        {% else %}
+        <a href="{% url 'postContent' %}?id={{ inbox.post.id }}"><b>{{ inbox.post.title }}</b><br>
+        {% endif %}
+            {% if inbox.post.image %}
+                <img src="{{ inbox.post.image.url }}" style="width: 100px; transform: translate(100%)">
+            {% endif %}
+        </a>
+        {% endfor %}
+        </div>
+        <!--My posts-->
+        <div>
+        {% for post in my_post_list %}
+            {% if post.content_type != "APP64"%}
+            <a class="post" href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+                {% endif %}
+            </a>
+            {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}

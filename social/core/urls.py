@@ -15,7 +15,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path("", views.PostList.as_view(), name="myPosts"),
+    path("", views.PostList.as_view(), name="feed"),
     path("editPost/", views.createPost, name="editPost"),
     path("createPost/", views.postType, name="createPost"),
     path("deletePost/", views.deletePost, name="deletePost"),

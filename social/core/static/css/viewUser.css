@@ -61,3 +61,8 @@ button{
 .user-display a:hover {
     background-color: #ddd6f3;
 }
+
+.profile{
+    display: flex;
+    flex-direction: column;
+}
