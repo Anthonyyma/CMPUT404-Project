@@ -16,6 +16,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("", views.showFeed, name="feed"),
+    path("publicFeed/", views.publicFeed, name="publicFeed"),
     path("editPost/", views.createPost, name="editPost"),
     path("createPost/", views.postType, name="createPost"),
     path("deletePost/", views.deletePost, name="deletePost"),
