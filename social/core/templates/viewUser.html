@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 {% extends 'base.html' %}
 
+
+
+{% block content %}
 <script>
     /* https://www.geekstrick.com/snippets/how-to-parse-cookies-in-javascript/ */
     const parseCookie = str =>
@@ -13,13 +16,13 @@
         }, {});
 
     //send a follow request to the server
-    function followUser() {
+    followUser = () =>{
         
         let cookies = document.cookie;
         cookies = parseCookie(cookies);
 
         let data = {
-            "followee_url": "{{ userUrl }}", 
+            "followee_url": "{{ userURL }}", 
             "follower_url": "{{ requestUserURL }}"
         }
         fetch("/api/follow-request", {
@@ -33,8 +36,6 @@
     }
 
 </script>
-
-{% block content %}
 <head>
     <title> {{user}} </title>
     {% load static %}

@@ -85,3 +85,4 @@ def follow_request_view(request):
     followee = User.objects.filter(id=followee_id).first()
     if follower and followee:
         FollowRequest.objects.create(follower=follower, followee=followee)
+        return Response(status=status.HTTP_201_CREATED)
