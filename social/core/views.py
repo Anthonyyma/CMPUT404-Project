@@ -42,7 +42,6 @@ class MDParser(HTMLParser):
     def handle_data(self, data):
         self.md += data
 
-
 # @login_required
 def createPost(request):
     list(messages.get_messages(request))
@@ -79,14 +78,16 @@ def createPost(request):
             if not notValid:
                 newPost = form.save()
                 if len(newPost.private_to) != 0:  #if private to someone
-                    user = User.objects.filter(id=newPost.private_to)
+                    user = User.objects.filter(username=newPost.private_to).first()
                     if user:
                         if user.external_url:  #if external user
                             follow = Follow.objects.filter(followee=user)
-                            url = getattr(follow, "external_follower") + "inbox"
-                            msg = PostSerializer(context={'request': newPost}).data
-                            r = requests.post(url, msg)
-                            print("her", r.reason)
+                            url = getattr(follow, "external_follower") + "inbox/"
+                            msg = PostSerializer(newPost, context={'request': request}).data
+                            msg["description"] = "test"
+                            if "cmsjmnet" in url:
+                                msg = {"items":[msg], "author":get_author_url(request.user)}
+                            r = requests.post(url, json = msg, auth=("team8", "team8"))
                         else:
                             Inbox.objects.create(post=newPost, user=user)
                 elif newPost.friends_only:
@@ -98,7 +99,7 @@ def createPost(request):
                             msg = PostSerializer(newPost, context={'request': request}).data
                             msg["description"] = "test"
                             if "cmsjmnet" in url:
-                                msg = {"items":[msg]}
+                                msg = {"items":[msg], "author":get_author_url(request.user)}
                             print(msg)
                             print(type(msg))
                             r = requests.post(url, json = msg, auth=("team8", "team8"))
