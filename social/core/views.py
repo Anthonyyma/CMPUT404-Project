@@ -13,7 +13,7 @@ from django.shortcuts import redirect, render
 from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Follow, Inbox, Post, User
+from .models import Follow, Inbox, Post, User, FollowRequest
 from .path_utils import get_author_url, get_post_id_from_url
 from django.conf import settings
 
@@ -188,15 +188,16 @@ def follower_view(request):
     user = request.user
     followers = []      # json array of followers
     for follow in Follow.objects.filter(followee=user):
+        """
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
         else:
-            data = AuthorSerializer(follow.follower).data
+            data = AuthorSerializer(request, follow.follower).data
         followers.append(data)
+        """
+        followers.append(follow.follower)
 
-        print(data)
-
-    context = {'followers': followers}
+    context = {'followers': followers, 'request': request}
     return render(request, "followers.html", context)
 
 
@@ -204,13 +205,17 @@ def following_view(request):
     user = request.user
     following = []      # json array of following
     for follow in Follow.objects.filter(follower=user):
+        """
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
         else:
-            data = AuthorSerializer(follow.follower).data
+            data = AuthorSerializer(request, follow.follower).data
         following.append(data)
+        """
+        following.append(follow.followee)
 
-    context = {'following': following}
+
+    context = {'following': following, 'request': request}
     return render(request, "following.html", context)
 
 
@@ -253,6 +258,8 @@ def viewUser(request, userID):
 
     if (request.user == user):     # if the user is viewing their own profile
         context["ownProfile"] = True
+        follow_requests = FollowRequest.objects.filter(followee=user)
+        context["follow_requests"] = follow_requests
     else:
         context["ownProfile"] = False
         # check if the current user is following the user
