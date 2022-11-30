@@ -42,6 +42,8 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
             "id": external_user_url,
         },
     }
-    requests.post(
-        external_user_url + "/inbox", json=data, auth=get_creds(external_user_url)
+    if "cmsjmnet" in external_user_url:
+        data = {"items": [data]}
+    return requests.post(
+        external_user_url + "inbox/", json=data, auth=get_creds(external_user_url)
     )

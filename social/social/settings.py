@@ -147,4 +147,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "myPosts"
 
+LOGIN_URL = "login"
+
 API_HOST_PATH = "http://localhost:8000/api/"

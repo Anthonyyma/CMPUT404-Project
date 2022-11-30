@@ -7,6 +7,7 @@ from core.posts.serializers import LikeSerializer
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
+from django.conf import settings
 
 
 class AuthorViewSet(
@@ -87,12 +88,11 @@ def follow_request_view(request):
 
     follower = User.objects.filter(id=follower_id).first()
     followee = User.objects.filter(id=followee_id).first()
-    if follower and followee:
+    if settings.API_HOST_PATH in followee_url:
         FollowRequest.objects.create(follower=follower, followee=followee)
         return Response(
             "Created follow request locally", status=status.HTTP_201_CREATED
         )
 
-    elif follower and not followee:
-        resp = client.send_external_follow_request(follower, followee_url, request)
-        return Response(resp.json(), status=resp.status_code)
+    resp = client.send_external_follow_request(follower, followee_url, request)
+    return Response(resp.json(), status=resp.status_code)
