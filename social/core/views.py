@@ -95,12 +95,14 @@ def createPost(request):
                     for follow in Follow.objects.filter(followee=request.user):
                         if follow.external_follower:
                             url = getattr(follow, "external_follower") + "inbox/"
-                            msg = PostSerializer(context={'request': newPost}).data
+                            msg = PostSerializer(newPost, context={'request': request}).data
+                            msg["description"] = "test"
                             if "cmsjmnet" in url:
                                 msg = {"items":[msg]}
                             print(msg)
-                            r = requests.post(url, msg, auth=("team8", "team8"))
-                            print("here", r.status_code)
+                            print(type(msg))
+                            r = requests.post(url, json = msg, auth=("team8", "team8"))
+                            print("here:", r.status_code)
                             with open("response.html", "w") as f:
                                 f.write(r.text)
                         else:
