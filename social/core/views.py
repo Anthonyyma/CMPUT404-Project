@@ -17,7 +17,7 @@ from .models import Follow, Inbox, Post, User
 from .path_utils import get_author_url
 
 
-# @login_required
+@login_required
 def showFeed(request):
     # My own posts
 
