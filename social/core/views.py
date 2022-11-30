@@ -15,7 +15,8 @@ from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Follow, Inbox, Post, User
-from .path_utils import get_author_url, get_post_id_from_url, get_author_id_from_url
+from .path_utils import (get_author_id_from_url, get_author_url,
+                         get_post_id_from_url)
 
 
 @login_required
@@ -215,6 +216,8 @@ def viewUser(request, userID):
                 user = serializer.save(external_url=url)
             else:
                 return 404
+    else: 
+        user = User.objects.get(id=userID)
 
     """
     if user.external_user is not None:
