@@ -212,6 +212,9 @@ def viewUser(request, userID):
     context = {"user": user, "userURL": get_author_url(user),
                "requestUserURL": get_author_url(request.user)}
 
+    if user.external_url is not None:
+        context["userURL"] = user.external_url
+
     if (request.user == user):     # if the user is viewing their own profile
         context["ownProfile"] = True
     else:
