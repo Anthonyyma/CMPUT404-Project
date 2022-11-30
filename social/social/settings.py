@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "core",
-    "drf_yasg"
+    "drf_yasg",
+    "core.templatetags"
 ]
 
 MIDDLEWARE = [

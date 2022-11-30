@@ -22,7 +22,7 @@
         <div class="userHeader">
             <div style="display:flex; align-items: center;">
                 <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-                <a href="#" id="username">{{ user.username }}</a>
+                <a href="#" id="username">{{ post.author }}</a>
             </div>
             {% if ownPost %}
                 <a href="{% url 'editPost' %}?id={{ post.id }}">
@@ -95,13 +95,14 @@
             let authorId = "{{ post.author.id }}"
             let userId = "{{ user.id }}"
             let postId = "{{ post.id }}"
+            let authorURL = "{{ authorurl }}"
             let cookies = document.cookie
 
             cookies = parseCookie(cookies)
             
             const data = {
                 'type': "Like",
-                'author': userId,
+                'author': {"id": authorURL},
                 'post': postId,
                 'object': `/api/authors/${authorId}/posts/${postId}`};
                 

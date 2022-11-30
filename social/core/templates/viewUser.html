@@ -2,28 +2,82 @@
 {% extends 'base.html' %}
 
 
+
 {% block content %}
+<script>
+    /* https://www.geekstrick.com/snippets/how-to-parse-cookies-in-javascript/ */
+    const parseCookie = str =>
+        str
+        .split(';')
+        .map(v => v.split('='))
+        .reduce((acc, v) => {
+            acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+            return acc;
+        }, {});
+
+    //send a follow request to the server
+    sendFollowRequest(followerURL, followeeURL) {
+        let cookies = document.cookie;
+        cookies = parseCookie(cookies);
+
+        let data = {
+            "followee_url": followeeURL, 
+            "follower_url": followerURL
+        }
+        fetch("/api/follow-request", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": cookies["csrftoken"]
+            },
+            body: JSON.stringify(data)
+        })
+    }
+    followUser = () => sendFollowRequest("{{ requestUserURL }}", "{{ userURL }}")
+
+</script>
 <head>
-    <meta charset="utf-8">
     <title> {{user}} </title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href=" % static 'css/viewUser.css' %">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}">
 </head>
+<div class="profile">
+<a href="{% url 'follower_view' %}" class="button">Followers</a>
+<a href="{% url 'following_view' %}" class="button">Following</a>
+{% if ownProfile %}
+    <a href="{% url 'editUser' %}" class="button">Edit Profile</a>
+{% else %}
+    {% if not following %}
+        <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
+        
+        
+        <button type="submit" form="followForm" class="button" onclick="followUser()">Follow</button>
+
+    {% else %}
+        <a href="/api/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
+    {% endif %}
+{% endif %}
+
 <div class="info-block">
-    <h1>UUID: {{user.username}}</h>
+    <h1>Username: {{user.username}}</h>
     <br>
     <h1>Github: {{user.github}}</h>
     <br>
     <img src="{{user.profile_image.url}}"/>
     
-    
+</div>
+
+<div class="post-display">
+    {% for post in posts %}
+        <a href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+            {% if post.image %}
+                <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+            {% endif %}
+        </a>
+    {% endfor %}
+</div>
 </div>
 
 
-<a href="#" class="button">Followers</a>
-<a href="#" class="button">Following</a>
-<a href="{% url 'editUser' %}" class="button">Edit Profile</a>
-
-
-</html>
 {% endblock %}
+</html>

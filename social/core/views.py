@@ -1,27 +1,39 @@
 import base64
 from html.parser import HTMLParser
 
-import markdown, requests
+import markdown
+import requests
+from core import client
+from core.posts.serializers import PostSerializer
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
-from django.views.generic import ListView
-from core.posts.serializers import PostSerializer
 
+from .authors.serializers import AuthorSerializer
+from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Inbox, Post, User, Follow
+from .models import Follow, Inbox, Post, User
+from .path_utils import get_author_url
 
 
-class PostList(LoginRequiredMixin, ListView):
-    login_url = "/login/"
-    template_name = "myPosts.html"
-    model = Post
+# @login_required
+def showFeed(request):
+    # My own posts
 
-    def get_queryset(self):
-        queryset = super(PostList, self).get_queryset()
-        return queryset.filter(author=self.request.user)
+    posts = Post.objects.filter(author=request.user)
+    srlizedPost = PostSerializer(posts, many=True, context={'request': request}).data
+
+    internPosts = Post.objects.filter(inbox__user=request.user)
+    srlizedPost = srlizedPost + PostSerializer(
+        internPosts, many=True, context={'request': request}).data
+
+    externPosts = Inbox.objects.filter(user=request.user).exclude(
+        external_post__isnull=True)
+    for externPost in externPosts:
+        srlizedPost.append(fetch_external_post(externPost.external_post))
+
+    return render(request, "feed.html", {"posts": srlizedPost})
 
 
 class MDParser(HTMLParser):
@@ -117,12 +129,13 @@ def postContent(request):
     if user == post.author:
         ownPost = True
     if post:
-        profilePic = user.profile_image
+        profilePic = post.author.profile_image
         if post.content_type == "APP64":
             with open("media/temp.jpg", "wb") as f:
                 f.write(base64.b64decode(post.content))
                 post.image = "temp.jpg"
 
+    authorURL = get_author_url(user)
     context = {
         "post": post,
         "ownPost": ownPost,
@@ -130,8 +143,45 @@ def postContent(request):
         "username": user.username,
         "content": post.content,
         "img": post.image,
+        "authorurl": authorURL,
     }
     return render(request, "postContent/postContent.html", context)
+
+
+def follower_view(request):
+    user = request.user
+    followers = []      # json array of followers
+    for follow in Follow.objects.filter(followee=user):
+        if follow.external_follower is not None:
+            data = request.get(follow.external_follower).data
+        else:
+            data = AuthorSerializer(follow.follower).data
+        followers.append(data)
+
+        print(data)
+
+    context = {'followers': followers}
+    return render(request, "followers.html", context)
+
+
+def following_view(request):
+    user = request.user
+    following = []      # json array of following
+    for follow in Follow.objects.filter(follower=user):
+        if follow.external_follower is not None:
+            data = request.get(follow.external_follower).data
+        else:
+            data = AuthorSerializer(follow.follower).data
+        following.append(data)
+
+    context = {'following': following}
+    return render(request, "following.html", context)
+
+
+def all_users_view(request):
+    all_users = User.objects.all()
+    context = {'users': all_users}
+    return render(request, "all_users.html", context)
 
 
 def viewUser(request, userID):
@@ -141,10 +191,39 @@ def viewUser(request, userID):
     if userID is None:  # if a userID is not given default to current user
         userID = request.user.id  # Currently logged in user
 
-    user = User.objects.get(id=userID)  # this should get the user from the database
+    if 'url' in request.GET:
+        url = request.GET['url']
+        data = client.fetch_external_user(url)
+        existing = User.objects.filter(external_url=url).first()
+        serializer = AuthorSerializer(existing, data=data)
+        if serializer.is_valid():
+            user = serializer.save(external_url=url)
+        else:
+            return 404
+    else:
+        user = User.objects.get(id=userID)  # this should get the user from the database
 
-    context = {"user": user}  # send the user to the template
-    print(userID)
+    """
+    if user.external_user is not None:
+        data = request.get(user.external_user).data
+        user = User(**data) #add the data to the user (not sure if this is permanent)
+    """
+    # send the user to the template
+    context = {"user": user, "userURL": get_author_url(user),
+               "requestUserURL": get_author_url(request.user)}
+
+    if (request.user.id == userID):     # if the user is viewing their own profile
+        context["ownProfile"] = True
+    else:
+        context["ownProfile"] = False
+        # check if the current user is following the user
+        if (Follow.objects.filter(follower=request.user, followee=user).exists()):
+            context["following"] = True
+        else:
+            context["following"] = False
+
+    posts = Post.objects.filter(author=user)
+    context["posts"] = posts
 
     return render(request, "viewUser.html", context)
 
@@ -188,14 +267,12 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("myPosts")
+            return redirect("feed")
         else:
             messages.success(
                 request,
-                (
-                    "Please double check that you are using the correct username and password"
-                ),
-            )  # noqa
+                ("Please double check that you are using the correct username and password"),   # noqa
+            )
             return redirect("login")
     else:
         return render(request, "registration/login.html", {})

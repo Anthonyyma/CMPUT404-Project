@@ -1,8 +1,9 @@
+from core import client
 from core.authors.serializers import AuthorSerializer
-from core.posts.serializers import LikeSerializer
 from core.drf_utils import CustomPagination, labelled_pagination
-from core.models import Follow, User, Like, Post, Comment
-from django.db.models import Q
+from core.models import Follow, FollowRequest, Like, User
+from core.path_utils import get_author_id_from_url
+from core.posts.serializers import LikeSerializer
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -66,9 +67,32 @@ def follow_view(request, author1: str = "", author2: str = ""):
         ).exists()
         if not is_following:
             Follow.objects.create(follower_id=author2, followee_id=author1).save()
+            FollowRequest.objects.filter(
+                follower_id=author2, followee_id=author1
+            ).delete()
         return Response(status=status.HTTP_201_CREATED)
 
     elif request.method == "DELETE":
         if is_following:
             Follow.objects.filter(follower=author2, followee=author1).delete()
         return Response(status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def follow_request_view(request):
+    follower_url = request.data.get("follower_url")
+    followee_url = request.data.get("followee_url")
+    follower_id = get_author_id_from_url(follower_url)
+    followee_id = get_author_id_from_url(followee_url)
+
+    follower = User.objects.filter(id=follower_id).first()
+    followee = User.objects.filter(id=followee_id).first()
+    if follower and followee:
+        FollowRequest.objects.create(follower=follower, followee=followee)
+        return Response(
+            "Created follow request locally", status=status.HTTP_201_CREATED
+        )
+
+    elif follower and not followee:
+        resp = client.send_external_follow_request(follower, followee_url, request)
+        return Response(resp.json(), status=resp.status_code)

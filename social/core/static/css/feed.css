@@ -1,0 +1,172 @@
+html {
+    height: 100%;
+    width: 100%;
+  }
+  #delete-button {
+    color: red;
+    text-decoration: none;
+    display: inline;
+  }
+  form {
+    min-width: 300px;
+    /* width: 50%; */
+    margin: 0 auto;
+  }
+  .box {
+    width: 50px;
+  }
+
+  .post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 20px;
+    border-radius: 5px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  }
+
+  .post-title {
+    font-size: larger;
+    text-align: center;
+    width: 100%;
+  }
+  .post-display {
+    width: 50%;
+    position: absolute;
+  }
+  .post-display a {
+    background-color: #ffffff;
+    color: black;
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    border-style: solid;
+    border-width: thin;
+    box-sizing: border-box;
+  }
+  .post-display a:hover {
+    background-color: #ddd6f3;
+  }
+  label {
+    font-weight: 500;
+    display: block;
+    margin: 4px 0;
+    text-transform: uppercase;
+    font-size: 13px;
+    overflow: hidden;
+  }
+  .form {
+    display: block;
+    padding: 5px;
+    width: 100%;
+    font-size: 1em;
+    background-color: rgba(78, 77, 77, 0.2);
+    color: black;
+    font-weight: 200;
+    border-radius: 20px;  
+  }
+  .form:focus {
+    outline: -webkit-focus-ring-color auto 5px;
+  }
+  .form-group {
+    margin: auto;
+    margin-bottom: 30px;
+  }
+  .post-type a{
+      width: 300px;
+      height: 65px;
+    border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #7f5a83;
+      background-image: linear-gradient(315deg, #ddd6f3 0%, #faaca8 74%);
+      background-size: 200% 100%;
+    background-position: left;
+      transition: 500ms;
+    text-decoration: None;
+    margin: 10px;
+    color: black;
+  }
+  .post-type a:before {
+      color: rgba(255,255,255,0.5);
+      font-size: 16px;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 140px;
+      height: 40px;
+      background-color: #1b2845;
+      background-image: linear-gradient(315deg, #1b2845 0%, #274060 74%);
+      transition: 500ms;
+  }
+  .post-type a:hover {
+      background-position: right;
+  }
+  .post-type a:visited {
+    text-decoration: None;
+    color: black;
+  }
+  
+  .multi-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .multi-button button {
+    flex: 1;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    padding: 1rem 2rem;
+    border: 2px solid #f2f2f2;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 1.5em;
+    letter-spacing: 1px;
+    box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.1);
+    color: black;
+    background: transparent;
+    overflow: hidden;
+  }
+  .multi-button button::before, .multi-button button::after {
+    position: absolute;
+    content: "";
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  .multi-button button::after {
+    height: 0;
+    background-color: #5ce5fb;
+    transition: height 0.5s ease;
+    z-index: -1;
+  }
+  .multi-button button::before {
+    background-color: #fff;
+    height: 100%;
+    z-index: -2;
+  }
+  .multi-button button:hover {
+    color: #006377;
+    transition: 0.1s ease;
+  }
+  .multi-button button:hover::after {
+    height: 100%;
+  }
+  .multi-button button:nth-of-type(1) {
+    border-radius: 6px 0 0 6px;
+  }
+  .multi-button button:nth-of-type(3) {
+    border-radius: 0 6px 6px 0;
+  }
+  
+  @keyframes towhite {
+    0% {
+      color: inherit;
+    }
+    100% {
+      color: white;
+    }
+  }
