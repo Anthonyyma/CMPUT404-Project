@@ -212,7 +212,7 @@ def viewUser(request, userID):
     context = {"user": user, "userURL": get_author_url(user),
                "requestUserURL": get_author_url(request.user)}
 
-    if (request.user.id == userID):     # if the user is viewing their own profile
+    if (request.user == user):     # if the user is viewing their own profile
         context["ownProfile"] = True
     else:
         context["ownProfile"] = False
