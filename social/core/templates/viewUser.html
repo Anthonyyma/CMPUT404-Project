@@ -16,7 +16,7 @@
         }, {});
 
     //send a follow request to the server
-    sendFollowRequest(followerURL, followeeURL) {
+    function sendFollowRequest(followerURL, followeeURL) {
         let cookies = document.cookie;
         cookies = parseCookie(cookies);
 
