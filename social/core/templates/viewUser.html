@@ -41,6 +41,18 @@
         })
     }
 
+    acceptRequest = (followRequest) =>{
+        let cookies = document.cookie;
+        cookies = parseCookie(cookies);
+
+        fetch("/api/authors/{{followRequest.followee.id}}/followers/{{followRequest.follower.id}}", {
+            method: "PUT",
+            headers: {
+                "X-CSRFToken": cookies["csrftoken"]
+            }
+        })
+    }
+
 </script>
 
 <div>
@@ -77,9 +89,14 @@
     <div class="post-display" style="margin-bottom:50px">
         {% for request in follow_requests %}
         <div class="post">
-            <a href="/user/{{request.follower.id}}">{{request.follower.username}}</a>
-            <!--<p>{{user.first_name}} {{user.last_name}}</p>
-            <img src="{{user.profile_image.url}}" style="width: 100px; transform: translate(100%)">-->
+            <a href="/user/{{request.follower.id}}">
+                {{request.follower.username}}<br>
+                {{request.follower.first_name}}<br>
+                {{request.follower.last_name}}<br>
+                <img src="{{request.follower.profile_image.url}}" style="width: 100px; transform: translate(100%)">
+                <button class="button" onclick="acceptRequest({{request.id}})">Accept</button>
+            
+            </a>
         </div>
         {% endfor %}
         {% for post in posts %}
