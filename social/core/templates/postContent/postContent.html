@@ -22,10 +22,10 @@
         <div class="userHeader">
             <div style="display:flex; align-items: center;">
                 <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-                <a href="{% url 'viewCurrentUser' %}?url={{ authorurl }}" id="username">{{ post.author }}</a>
+                <a href="{% url 'viewUser' userID=username %}?url={{ authorurl }}" id="username">{{ post.author }}</a>
             </div>
             {% if ownPost %}
-                <a href="{% url 'viewCurrentUser' %}?url={{ authorurl }}">
+                <a href="{% url 'viewUser' userID=username %}?url={{ authorurl }}">
                     <i style="font-size: 2em" class="material-icons">create</i>
                 </a>
             {% endif %}

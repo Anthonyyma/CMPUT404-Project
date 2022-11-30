@@ -5,6 +5,7 @@ import markdown
 import requests
 from core import client
 from core.posts.serializers import PostSerializer
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
@@ -14,8 +15,8 @@ from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Follow, Inbox, Post, User
-from .path_utils import get_author_url, get_post_id_from_url
-from django.conf import settings
+from .path_utils import get_author_url, get_post_id_from_url, get_author_id_from_url
+
 
 @login_required
 def showFeed(request):
@@ -146,7 +147,7 @@ def postContent(request):
                 f.write(base64.b64decode(post.content))
                 post.image = "temp.jpg"
 
-    authorURL = get_author_url(user)
+    authorURL = get_author_url(post.author)
     context = {
         "post": post,
         "ownPost": ownPost,
@@ -204,15 +205,16 @@ def viewUser(request, userID):
 
     if 'url' in request.GET:
         url = request.GET['url']
-        data = client.fetch_external_user(url)
-        existing = User.objects.filter(external_url=url).first()
-        serializer = AuthorSerializer(existing, data=data)
-        if serializer.is_valid():
-            user = serializer.save(external_url=url)
+        if settings.API_HOST_PATH in url: # check if the url contains our own address
+            user = User.objects.get(id=get_author_id_from_url(url))  # this should get the user from the database
         else:
-            return 404
-    else:
-        user = User.objects.get(id=userID)  # this should get the user from the database
+            data = client.fetch_external_user(url)
+            existing = User.objects.filter(external_url=url).first()
+            serializer = AuthorSerializer(existing, data=data)
+            if serializer.is_valid():
+                user = serializer.save(external_url=url)
+            else:
+                return 404
 
     """
     if user.external_user is not None:
