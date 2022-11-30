@@ -36,6 +36,23 @@ def showFeed(request):
     return render(request, "feed.html", {"posts": srlizedPost})
 
 
+def publicFeed(request):
+    posts = Post.objects.filter(
+        author=request.user, friends_only=False, unlisted=False, private_to='')
+    srlizedPost = PostSerializer(posts, many=True, context={'request': request}).data
+
+    internPosts = Post.objects.filter(inbox__user=request.user)
+    srlizedPost = srlizedPost + PostSerializer(
+        internPosts, many=True, context={'request': request}).data
+
+    externPosts = Inbox.objects.filter(user=request.user).exclude(
+        external_post__isnull=True)
+    for externPost in externPosts:
+        srlizedPost.append(fetch_external_post(externPost.external_post))
+
+    return render(request, "publicFeed.html", {"posts": srlizedPost})
+
+
 class MDParser(HTMLParser):
     md = ""
 
@@ -78,10 +95,10 @@ def createPost(request):
                 form.instance.content = parser.md
             if not notValid:
                 newPost = form.save()
-                if len(newPost.private_to) != 0:  #if private to someone
+                if len(newPost.private_to) != 0:  # if private to someone
                     user = User.objects.filter(id=newPost.private_to)
                     if user:
-                        if user.external_url:  #if external user
+                        if user.external_url:  # if external user
                             follow = Follow.objects.filter(followee=user)
                             url = getattr(follow, "external_follower") + "inbox"
                             msg = PostSerializer(context={'request': newPost}).data
