@@ -20,10 +20,12 @@
             <h1 style="display: inline-block; padding-left: 1em;">Post</h1>
         </div>
         <div class="userHeader">
-            <div style="display:flex; align-items: center;">
-                <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-                <a href="#" id="username">{{ user.username }}</a>
-            </div>
+            <a href="/user/{{ user.id }}">
+                <div style="display:flex; align-items: center;">
+                    <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
+                    <p id="username">{{ user.username }}</a>
+                </div>
+            </a>
             {% if ownPost %}
                 <a href="{% url 'editPost' %}?id={{ post.id }}">
                     <i style="font-size: 2em" class="material-icons">create</i>
