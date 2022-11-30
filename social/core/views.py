@@ -96,7 +96,7 @@ def createPost(request):
                         if follow.external_follower:
                             url = getattr(follow, "external_follower") + "inbox"
                             msg = PostSerializer(context={'request': newPost}).data
-                            r = requests.post(url, msg)
+                            r = requests.post(url, msg, auth=("team8", "team8"))
                             print("here", r.text)
                         else:
                             Inbox.objects.create(post=newPost, user=follow.follower)
