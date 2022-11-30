@@ -180,11 +180,14 @@ def following_view(request):
     user = request.user
     following = []      # json array of following
     for follow in Follow.objects.filter(follower=user):
+        """
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
         else:
             data = AuthorSerializer(request, follow.follower).data
         following.append(data)
+        """
+        following.append(follow.followee)
 
 
     context = {'following': following, 'request': request}

@@ -1,23 +1,24 @@
-<!DOCTYPE html>
 {% extends 'base.html' %}
 
-{% block content %}
+{% block head %}
 <head>
-    <meta charset="utf-8">
     <title> {{user}} </title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}"> 
-</head>
-<h style="margin-top: 30px; text-align: center; font-size: 30px">Followers</h>
-<div class="post-display">
-    {% for follower in followers %}
-        <a href="{% url 'viewUser' %}?id={{ follower.id }}"><b>{{ follower.username }}</b><br>
-            {% if follower.profile_image %}
-                <img src="{{ follower.profile_image.url }}" style="width: 100px; transform: translate(100%)">
-            {% endif %}
-        </a>
-    {% endfor %}
+{% endblock %}
+
+{% block content %}
+<div>
+    <h style="margin-top: 30px; text-align: center; font-size: 30px">Followers</h>
+    <div class="post-display">
+        {% for follower in followers %}
+            <a href="/user/{{follower.id}}"><b>{{ follower.username }}</b><br>
+                {% if follower.profile_image %}
+                    <img src="{{ follower.profile_image.url }}" style="width: 100px; transform: translate(100%)">
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
 </div>
     
-    {% endblock %}
-</html>
+{% endblock %}
