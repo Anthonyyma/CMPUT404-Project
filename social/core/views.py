@@ -78,13 +78,28 @@ def createPost(request):
                 form.instance.content = parser.md
             if not notValid:
                 newPost = form.save()
-                for follow in Follow.objects.filter(followee=request.user):
-                    if follow.external_follower:
-                        url = request.user.external_url + "/inbox/"
-                        msg = PostSerializer(newPost).data
-                        requests.post(url, json=msg)
-                    else:
-                        Inbox.objects.create(post=newPost, user=follow.follower)
+                if len(newPost.private_to) != 0:  #if private to someone
+                    user = User.objects.filter(id=newPost.private_to)
+                    if user:
+                        if user.external_url:  #if external user
+                            follow = Follow.objects.filter(followee=user)
+                            url = getattr(follow, "external_follower") + "inbox"
+                            msg = PostSerializer(context={'request': newPost}).data
+                            r = requests.post(url, msg)
+                            print("her", r.reason)
+                        else:
+                            Inbox.objects.create(post=newPost, user=user)
+                elif newPost.friends_only:
+                    pass
+                elif not newPost.unlisted:
+                    for follow in Follow.objects.filter(followee=request.user):
+                        if follow.external_follower:
+                            url = getattr(follow, "external_follower") + "inbox"
+                            msg = PostSerializer(context={'request': newPost}).data
+                            r = requests.post(url, msg)
+                            print("here", r.text)
+                        else:
+                            Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
         else:
             print(form.errors)
