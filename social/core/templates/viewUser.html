@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 {% extends 'base.html' %}
 
 {% block head %}
@@ -6,7 +5,7 @@
     <title> {{user}} </title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/viewUser.css' %}">
-</head>
+
 {% endblock %}
 
 {% block content %}
@@ -38,19 +37,19 @@
                 "X-CSRFToken": cookies["csrftoken"]
             },
             body: JSON.stringify(data)
-        })
+        });
     }
 
-    acceptRequest = (followRequest) =>{
+    acceptRequest = (follower_id) =>{
         let cookies = document.cookie;
         cookies = parseCookie(cookies);
 
-        fetch("/api/authors/{{followRequest.followee.id}}/followers/{{followRequest.follower.id}}", {
+        fetch(`/api/authors/{{user.id}}/followers/${follower_id}/`, {
             method: "PUT",
             headers: {
                 "X-CSRFToken": cookies["csrftoken"]
             }
-        })
+        });
     }
 
 </script>
@@ -87,15 +86,15 @@
 
 
     <div class="post-display" style="margin-bottom:50px">
-        {% for request in follow_requests %}
+        {% for follow_request in follow_requests %}
         <div class="post">
             <a href="/user/{{request.follower.id}}">
-                {{request.follower.username}}<br>
-                {{request.follower.first_name}}<br>
-                {{request.follower.last_name}}<br>
+                {{follow_request.follower.username}}<br>
+                {{follow_request.follower.first_name}}<br>
+                {{follow_request.follower.last_name}}<br>
             </a>
             <!--<img src="{{request.follower.profile_image.url}}" style="width: 100px; transform: translate(100%)">-->
-            <button type="button" class="button" onclick="acceptRequest({{request.id}})">Accept</button>
+            <button type="button" class="button" onclick="acceptRequest('{{follow_request.follower.id}}')">Accept</button>
             
             
         </div>
