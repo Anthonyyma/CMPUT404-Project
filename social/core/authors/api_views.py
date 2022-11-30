@@ -1,3 +1,4 @@
+from core import client
 from core.authors.serializers import AuthorSerializer
 from core.drf_utils import CustomPagination, labelled_pagination
 from core.models import Follow, FollowRequest, Like, User
@@ -85,4 +86,10 @@ def follow_request_view(request):
     followee = User.objects.filter(id=followee_id).first()
     if follower and followee:
         FollowRequest.objects.create(follower=follower, followee=followee)
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(
+            "Created follow request locally", status=status.HTTP_201_CREATED
+        )
+
+    elif follower and not followee:
+        resp = client.send_external_follow_request(follower, followee_url, request)
+        return Response(resp.json(), status=resp.status_code)
