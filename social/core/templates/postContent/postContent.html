@@ -1,5 +1,6 @@
 {% extends 'postContent/base.html' %}
 {% load static %}
+{% load markdownify %}
 
 {% block content %}
 <html>  
@@ -30,14 +31,19 @@
                 </a>
             {% endif %}
         </div>
-        {% if post.content_type != "APP64"%}
+        {% if post.content_type == "TEXT"%}
         <div class="mainContent">
             <p>
                 {{ content }}
             </p>
         </div>
-        {% endif %}
-        {% if post.content_type != "TEXT" and post.content_type != "MD" %}
+        {% elif post.content_type == 'MD' %}
+        <div class="mainContent">
+            <p>
+                {{ content | markdownify }}
+            </p>
+            </div>
+        {% else %}
         {{post.content_type}}
         <div class="imgContainer">
             <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
