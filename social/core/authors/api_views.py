@@ -67,6 +67,9 @@ def follow_view(request, author1: str = "", author2: str = ""):
         ).exists()
         if not is_following:
             Follow.objects.create(follower_id=author2, followee_id=author1).save()
+            FollowRequest.objects.filter(
+                follower_id=author2, followee_id=author1
+            ).delete()
         return Response(status=status.HTTP_201_CREATED)
 
     elif request.method == "DELETE":
