@@ -95,4 +95,4 @@ def follow_request_view(request):
         )
 
     resp = client.send_external_follow_request(follower, followee_url, request)
-    return Response(resp.json(), status=resp.status_code)
+    return Response(resp.text, status=resp.status_code)

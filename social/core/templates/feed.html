@@ -10,9 +10,18 @@
 
 {% block content %}
     <div class="post-display">
-        <div style="margin-bottom: 50px"><a href="{% url 'createPost' %}">Create Post</a></div>
+        <div class="action-bar">
+            <a class="btn btn-primary btn-lg" href="{% url 'createPost' %}">Create Post</a>
+            <form action="/user/">
+                <p class="text-center">View External User</p>
+                <input type="text" name="url" placeholder="http://node.com/user">
+                <button class='btn btn-primary' type="submit">Open</button>
+            </form>
+        </div>
         <div>
+        <h2 class="text-center">Your Feed</h2>
         {% for post in posts %} 
+        <div class="post">
         {% if post.content_type != "APP64"%}  
         <a href="{% url 'postContent' %}?id={% urltoid post.id %}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
         {% else %}
@@ -22,6 +31,7 @@
                 <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
             {% endif %}
         </a>
+        </div>
         {% endfor %}
         </div>
     </div>
