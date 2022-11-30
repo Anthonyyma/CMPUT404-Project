@@ -236,7 +236,7 @@ def viewUser(request, userID):
         data = client.fetch_external_user(url)
         existing = User.objects.filter(external_url=url).first()
         serializer = AuthorSerializer(existing, data=data)
-        if serializer.is_valid():
+        if serializer.is_valid() and existing is None:
             user = serializer.save(external_url=url)
         else:
             return 404
