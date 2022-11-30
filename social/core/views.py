@@ -104,7 +104,9 @@ def createPost(request):
                             msg["description"] = "test"
                             if "cmsjmnet" in url:
                                 msg = {"items":[msg], "author":get_author_url(request.user)}
-                            r = requests.post(url, json = msg, auth=("team8", "team8"))
+                                r = requests.post(url, json = msg, auth=("team8", "team8"))
+                            else:
+                                r = requests.post(url, json = msg, auth=("", ""))
                         else:
                             Inbox.objects.create(post=newPost, user=user)
                 elif newPost.friends_only:
