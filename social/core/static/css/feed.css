@@ -15,6 +15,20 @@ html {
   .box {
     width: 50px;
   }
+
+  .post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 20px;
+    border-radius: 5px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  }
+
+  .post-title {
+    font-size: larger;
+    text-align: center;
+    width: 100%;
+  }
   .post-display {
     width: 50%;
     position: absolute;
