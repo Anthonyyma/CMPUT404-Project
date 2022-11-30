@@ -1,5 +1,7 @@
-from requests import request
 from json import load
+
+from requests import request
+
 
 def getExternPost(self, url: str) -> dict:
     """

@@ -1,19 +1,20 @@
 import base64
 from html.parser import HTMLParser
 
-import markdown, requests
+import markdown
+import requests
+from core.posts.serializers import PostSerializer
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views.generic import ListView
-from core.posts.serializers import PostSerializer
-
-from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Inbox, Post, User, Follow
 
 from .feed.client import getExternPost
+from .forms import EditUserForm, PostForm, RegisterForm
+from .models import Follow, Inbox, Post, User
+
 
 # @login_required
 class PostList(LoginRequiredMixin, ListView):
