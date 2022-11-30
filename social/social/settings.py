@@ -51,9 +51,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'markdownify.apps.MarkdownifyConfig',
     "rest_framework",
     "core",
-    "drf_yasg"
+    "drf_yasg",
+    "core.templatetags"
 ]
 
 MIDDLEWARE = [
@@ -145,5 +147,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "myPosts"
+
+LOGIN_URL = "login"
 
 API_HOST_PATH = "http://localhost:8000/api/"

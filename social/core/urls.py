@@ -15,7 +15,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path("", views.PostList.as_view(), name="feed"),
+    path("", views.showFeed, name="feed"),
     path("editPost/", views.createPost, name="editPost"),
     path("createPost/", views.postType, name="createPost"),
     path("deletePost/", views.deletePost, name="deletePost"),
@@ -34,7 +34,6 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("user/edit/", views.editUser, name="editUser"),
-
     # path('info/', views.info, name='info'),
     # path('info/', views.info, name='info'),
     # path('favicon.ico/',

@@ -20,14 +20,12 @@
             <h1 style="display: inline-block; padding-left: 1em;">Post</h1>
         </div>
         <div class="userHeader">
-            <a href="/user/{{ user.id }}">
-                <div style="display:flex; align-items: center;">
-                    <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-                    <p id="username">{{ user.username }}</a>
-                </div>
-            </a>
+            <div style="display:flex; align-items: center;">
+                <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
+                <a href="{% url 'viewCurrentUser' %}?url={{ authorurl }}" id="username">{{ post.author }}</a>
+            </div>
             {% if ownPost %}
-                <a href="{% url 'editPost' %}?id={{ post.id }}">
+                <a href="{% url 'viewCurrentUser' %}?url={{ authorurl }}">
                     <i style="font-size: 2em" class="material-icons">create</i>
                 </a>
             {% endif %}
@@ -97,13 +95,14 @@
             let authorId = "{{ post.author.id }}"
             let userId = "{{ user.id }}"
             let postId = "{{ post.id }}"
+            let authorURL = "{{ authorurl }}"
             let cookies = document.cookie
 
             cookies = parseCookie(cookies)
             
             const data = {
                 'type': "Like",
-                'author': userId,
+                'author': {"id": authorURL},
                 'post': postId,
                 'object': `/api/authors/${authorId}/posts/${postId}`};
                 

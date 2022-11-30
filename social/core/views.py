@@ -1,55 +1,40 @@
+import base64
 from html.parser import HTMLParser
 
 import markdown
 import requests
+from core import client
 from core.posts.serializers import PostSerializer
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required  # noqa
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
-from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
-                              redirect, render)
-from django.views.generic import DetailView, ListView
 from django.shortcuts import redirect, render
-from django.views.generic import ListView
-from core.posts.serializers import PostSerializer
-from core.path_utils import get_author_url
 
 from .authors.serializers import AuthorSerializer
-from .feed.client import getExternPost
-from .forms import CommentForm, EditUserForm, PostForm, RegisterForm
-from .models import Comment, Follow, Inbox, Like, Post, User, FollowRequest
+from .client import fetch_external_post
+from .forms import EditUserForm, PostForm, RegisterForm
+from .models import Follow, Inbox, Post, User, FollowRequest
+from .path_utils import get_author_url, get_post_id_from_url
+from django.conf import settings
 
+@login_required
+def showFeed(request):
+    # My own posts
 
-# @login_required
-class PostList(LoginRequiredMixin, ListView):
-    login_url = "/login/"
-    template_name = "feed.html"
-    model = Inbox
+    posts = Post.objects.filter(author=request.user)
+    srlizedPost = PostSerializer(posts, many=True, context={'request': request}).data
 
-    def parseExtData(self) -> dict:
-        data: Inbox = super(PostList, self).get_queryset().filter(user=self.request.user)
-        postData = {}
-        for post in data:
-            if (post.values()["post"] is None):
-                # Get post from the external server
-                postData = getExternPost(post.values()["external_post"])
-            else:
-                postData = post.values()["post"].values()
+    internPosts = Post.objects.filter(inbox__user=request.user)
+    srlizedPost = srlizedPost + PostSerializer(
+        internPosts, many=True, context={'request': request}).data
 
-        return postData
+    externPosts = Inbox.objects.filter(user=request.user).exclude(
+        external_post__isnull=True)
+    for externPost in externPosts:
+        srlizedPost.append(fetch_external_post(externPost.external_post))
 
+    return render(request, "feed.html", {"posts": srlizedPost})
 
-    def get_context_data(self, **kwargs):
-        context = super(ListView, self).get_context_data(**kwargs)
-
-        # serialize the data (json)
-
-        context["my_post_list"] = Post.objects.filter(author=self.request.user)
-        context["friend_post_list"] = self.parseExtData()
-        return context
 
 class MDParser(HTMLParser):
     md = ""
@@ -93,13 +78,28 @@ def createPost(request):
                 form.instance.content = parser.md
             if not notValid:
                 newPost = form.save()
-                for follow in Follow.objects.filter(followee=request.user):
-                    if follow.external_follower:
-                        url = request.user.external_url + "/inbox/"
-                        msg = PostSerializer(newPost).data
-                        requests.post(url, json=msg)
-                    else:
-                        Inbox.objects.create(post=newPost, user=follow.follower)
+                if len(newPost.private_to) != 0:  #if private to someone
+                    user = User.objects.filter(id=newPost.private_to)
+                    if user:
+                        if user.external_url:  #if external user
+                            follow = Follow.objects.filter(followee=user)
+                            url = getattr(follow, "external_follower") + "inbox"
+                            msg = PostSerializer(context={'request': newPost}).data
+                            r = requests.post(url, msg)
+                            print("her", r.reason)
+                        else:
+                            Inbox.objects.create(post=newPost, user=user)
+                elif newPost.friends_only:
+                    pass
+                elif not newPost.unlisted:
+                    for follow in Follow.objects.filter(followee=request.user):
+                        if follow.external_follower:
+                            url = getattr(follow, "external_follower") + "inbox"
+                            msg = PostSerializer(context={'request': newPost}).data
+                            r = requests.post(url, msg)
+                            print("here", r.text)
+                        else:
+                            Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
         else:
             print(form.errors)
@@ -122,19 +122,31 @@ def postType(request):
 
 
 def postContent(request):
-    postId = request.GET.get("id")
-    post = Post.objects.get(id=postId)
+    post = None
+    if 'url' in request.GET:
+        url = request.GET['url']
+        if settings.API_HOST_PATH in url: # check if the url contains our own address
+            post = Post.objects.get(id=get_post_id_from_url(url))
+        else:
+            data = client.fetch_external_post(url)
+            serializer = PostSerializer(data=data)
+            if (serializer.is_valid()):
+                post = Post(**serializer.validated_data)
+    else:
+        return 404
+
     user = request.user
     ownPost = False
     if user == post.author:
         ownPost = True
     if post:
-        profilePic = user.profile_image
-        if post.content_type == "APP64":
+        profilePic = post.author.profile_image
+        if post.content_type == "application/base64":
             with open("media/temp.jpg", "wb") as f:
                 f.write(base64.b64decode(post.content))
                 post.image = "temp.jpg"
 
+    authorURL = get_author_url(user)
     context = {
         "post": post,
         "ownPost": ownPost,
@@ -142,12 +154,14 @@ def postContent(request):
         "username": user.username,
         "content": post.content,
         "img": post.image,
+        "authorurl": authorURL,
     }
     return render(request, "postContent/postContent.html", context)
 
+
 def follower_view(request):
     user = request.user
-    followers = []      #json array of followers
+    followers = []      # json array of followers
     for follow in Follow.objects.filter(followee=user):
         """
         if follow.external_follower is not None:
@@ -161,9 +175,10 @@ def follower_view(request):
     context = {'followers': followers, 'request': request}
     return render(request, "followers.html", context)
 
+
 def following_view(request):
     user = request.user
-    following = []      #json array of following
+    following = []      # json array of following
     for follow in Follow.objects.filter(follower=user):
         if follow.external_follower is not None:
             data = request.get(follow.external_follower).data
@@ -174,6 +189,7 @@ def following_view(request):
 
     context = {'following': following, 'request': request}
     return render(request, "following.html", context)
+
 
 def all_users_view(request):
     all_users = User.objects.all()
@@ -188,17 +204,31 @@ def viewUser(request, userID):
     if userID is None:  # if a userID is not given default to current user
         userID = request.user.id  # Currently logged in user
 
-    user = User.objects.get(id=userID)  #this should get the user from the database
-    
+    if 'url' in request.GET:
+        url = request.GET['url']
+        data = client.fetch_external_user(url)
+        existing = User.objects.filter(external_url=url).first()
+        serializer = AuthorSerializer(existing, data=data)
+        if serializer.is_valid():
+            user = serializer.save(external_url=url)
+        else:
+            return 404
+    else:
+        user = User.objects.get(id=userID)  # this should get the user from the database
+
     """
     if user.external_user is not None:
         data = request.get(user.external_user).data
         user = User(**data) #add the data to the user (not sure if this is permanent)
     """
-    
-    context = {"user":user, "userURL": get_author_url(user), "requestUserURL": get_author_url(request.user)}     # send the user to the template
+    # send the user to the template
+    context = {"user": user, "userURL": get_author_url(user),
+               "requestUserURL": get_author_url(request.user)}
 
-    if (request.user.id == userID):     #if the user is viewing their own profile
+    if user.external_url is not None:
+        context["userURL"] = user.external_url
+
+    if (request.user == user):     # if the user is viewing their own profile
         context["ownProfile"] = True
         follow_requests = FollowRequest.objects.filter(followee=user)
         context["follow_requests"] = follow_requests
@@ -259,10 +289,8 @@ def login_user(request):
         else:
             messages.success(
                 request,
-                (
-                    "Please double check that you are using the correct username and password"
-                ),
-            )  # noqa
+                ("Please double check that you are using the correct username and password"),   # noqa
+            )
             return redirect("login")
     else:
         return render(request, "registration/login.html", {})

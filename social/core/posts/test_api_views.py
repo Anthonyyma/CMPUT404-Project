@@ -28,6 +28,7 @@ class AuthorTest(APITestCase):
         self.assertEqual(post["content"], self.post1.content)
         self.assertEqual(post["visibility"], "PUBLIC")
         self.assertEqual(post["author"]["displayName"], self.user1.username)
+        self.assertEqual(post["contentType"], "text/plain")
 
     def test_get_posts_returns_comments_correctly(self):
         # create one comment on each post

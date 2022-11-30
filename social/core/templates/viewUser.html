@@ -21,14 +21,13 @@
         }, {});
 
     //send a follow request to the server
-    followUser = () =>{
-        
+    function sendFollowRequest(followerURL, followeeURL) {
         let cookies = document.cookie;
         cookies = parseCookie(cookies);
 
         let data = {
-            "followee_url": "{{ userURL }}", 
-            "follower_url": "{{ requestUserURL }}"
+            "followee_url": followeeURL, 
+            "follower_url": followerURL
         }
         fetch("/api/follow-request", {
             method: "POST",
@@ -51,6 +50,7 @@
             }
         });
     }
+    followUser = () => sendFollowRequest("{{ requestUserURL }}", "{{ userURL }}")
 
 </script>
 

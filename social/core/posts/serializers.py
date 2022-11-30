@@ -40,6 +40,7 @@ class PostSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     commentsSrc = serializers.SerializerMethodField()
+    contentType = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -68,7 +69,7 @@ class PostSerializer(serializers.ModelSerializer):
             return "PUBLIC"
 
     def get_categories(self, obj: Post) -> list[str]:
-        raw_string = obj.categories
+        raw_string = obj.categories or ""
         return [token.strip() for token in raw_string.split(",")]
 
     def get_published(self, obj: Post) -> str:
@@ -96,6 +97,9 @@ class PostSerializer(serializers.ModelSerializer):
             "id": get_post_url(obj) + "comments/",
             "comments": comment_serializer.data,
         }
+
+    def get_contentType(self, obj: Post):
+        return obj.get_content_type_display()
 
 
 class LikeSerializer(serializers.Serializer):
