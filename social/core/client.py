@@ -29,6 +29,11 @@ def fetch_external_post(post_url: str):
     return resp.json()
 
 
+def fetch_external_user(user_url: str):
+    resp = requests.get(user_url, auth=get_creds(user_url))
+    return resp.json()
+
+
 def send_external_follow_request(local_user: User, external_user_url: str, request):
     data = {
         "type": "follow",

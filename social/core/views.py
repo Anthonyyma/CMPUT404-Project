@@ -15,13 +15,14 @@ from django.views.generic import DetailView, ListView
 from django.shortcuts import redirect, render
 from django.views.generic import ListView
 from core.posts.serializers import PostSerializer
-from core.path_utils import get_author_url
+from core.path_utils import get_author_url, get_author_id_from_url
 
 from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post, fetch_github_feed
 from .forms import CommentForm, EditUserForm, PostForm, RegisterForm
 from .models import Comment, Follow, Inbox, Like, Post, User
 from .posts.serializers import PostSerializer
+from core import client
 
 
 # @login_required
@@ -175,7 +176,17 @@ def viewUser(request, userID):
     if userID is None:  # if a userID is not given default to current user
         userID = request.user.id  # Currently logged in user
 
-    user = User.objects.get(id=userID)  #this should get the user from the database
+    if 'url' in request.GET:
+        url = request.GET['url']
+        data = client.fetch_external_user(url)
+        existing = User.objects.filter(external_url=url).first()
+        serializer = AuthorSerializer(existing, data=data)
+        if serializer.is_valid():
+            user = serializer.save(external_url = url)
+        else:
+            return 404
+    else:
+        user = User.objects.get(id=userID)  #this should get the user from the database
     
     """
     if user.external_user is not None:
