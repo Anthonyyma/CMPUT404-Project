@@ -43,7 +43,7 @@ def showFeed(request):
 
 def publicFeed(request):
     posts = Post.objects.filter(
-        author=request.user, friends_only=False, unlisted=False, private_to='')
+        friends_only=False, unlisted=False, private_to='')
     srlizedPost = PostSerializer(posts, many=True, context={'request': request}).data
 
     internPosts = Post.objects.filter(inbox__user=request.user)
