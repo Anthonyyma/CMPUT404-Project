@@ -270,7 +270,7 @@ def viewUser(request, userID):
         else:
             context["following"] = False
 
-    posts = Post.objects.filter(author=user)
+    posts = Post.objects.filter(author=user).first()
     context["posts"] = posts
     context["postURL"] = get_post_url(posts);
 
