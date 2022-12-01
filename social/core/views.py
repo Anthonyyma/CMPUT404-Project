@@ -124,12 +124,7 @@ def createPost(request):
                             msg["description"] = "test"
                             if "cmsjmnet" in url:
                                 msg = {"items":[msg], "author":get_author_url(request.user)}
-                            print(msg)
-                            print(type(msg))
                             r = requests.post(url, json = msg, auth=("team8", "team8"))
-                            print("here:", r.status_code)
-                            with open("response.html", "w") as f:
-                                f.write(r.text)
                         else:
                             Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
