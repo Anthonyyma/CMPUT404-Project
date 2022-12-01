@@ -19,7 +19,7 @@ from .path_utils import (get_author_id_from_url, get_author_url,
                          get_post_id_from_url)
 
 from .models import Follow, Inbox, Post, User, FollowRequest
-from .path_utils import get_author_url, get_post_id_from_url
+from .path_utils import get_author_url, get_post_id_from_url, get_post_url
 from django.conf import settings
 
 @login_required
@@ -272,6 +272,7 @@ def viewUser(request, userID):
 
     posts = Post.objects.filter(author=user)
     context["posts"] = posts
+    context["postURL"] = get_post_url(posts);
 
     return render(request, "viewUser.html", context)
 

@@ -100,7 +100,7 @@
         </div>
         {% endfor %}
         {% for post in posts %}
-            <a  class ="post" href="{% url 'postContent' %}?id={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+            <a  class ="post" href="{% url 'postContent' %}url={{ postURL }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
                 {% if post.image %}
                     <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
                 {% endif %}
