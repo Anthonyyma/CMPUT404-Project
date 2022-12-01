@@ -124,12 +124,7 @@ def createPost(request):
                             msg["description"] = "test"
                             if "cmsjmnet" in url:
                                 msg = {"items":[msg], "author":get_author_url(request.user)}
-                            print(msg)
-                            print(type(msg))
                             r = requests.post(url, json = msg, auth=("team8", "team8"))
-                            print("here:", r.status_code)
-                            with open("response.html", "w") as f:
-                                f.write(r.text)
                         else:
                             Inbox.objects.create(post=newPost, user=follow.follower)
                 return redirect("/")
@@ -363,7 +358,7 @@ def register_user(request):
             password = form.cleaned_data["password1"]
             user = authenticate(request, username=username, password=password)
             login(request, user)
-            return redirect("myPosts")  # once registered redirect to a different page
+            return redirect("feed")  # once registered redirect to a different page
     else:
         form = RegisterForm()
     # render the registeration html template
