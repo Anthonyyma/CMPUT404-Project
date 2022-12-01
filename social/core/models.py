@@ -88,7 +88,6 @@ class Comment(models.Model):
     external_author = models.URLField(blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField()
-    content_type = models.CharField(max_length=5, choices=ContentTypes.choices)
     published = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

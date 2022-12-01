@@ -85,7 +85,7 @@
             const data = {'author': authorId,
                 'post': postId,
                 'comment': comment,
-                'content_type': "text/plain"};
+                };
             
             fetch(`/api/authors/${authorId}/posts/${postId}/comments/`, {
                 method: 'POST',
