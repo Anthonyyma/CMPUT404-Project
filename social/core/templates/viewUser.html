@@ -90,8 +90,6 @@
         <div class="post">
             <a href="/user/{{request.follower.id}}">
                 {{follow_request.follower.username}}<br>
-                {{follow_request.follower.first_name}}<br>
-                {{follow_request.follower.last_name}}<br>
             </a>
             <!--<img src="{{request.follower.profile_image.url}}" style="width: 100px; transform: translate(100%)">-->
             <button type="button" class="button" onclick="acceptRequest('{{follow_request.follower.id}}')">Accept</button>
