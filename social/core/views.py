@@ -14,16 +14,13 @@ from django.shortcuts import redirect, render
 from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
-<<<<<<< HEAD
 from .models import Follow, Inbox, Post, User
 from .path_utils import (get_author_id_from_url, get_author_url,
                          get_post_id_from_url)
 
-=======
 from .models import Follow, Inbox, Post, User, FollowRequest
 from .path_utils import get_author_url, get_post_id_from_url
 from django.conf import settings
->>>>>>> eef8af2f40c721a5fc8dba45040d5bcc2e082647
 
 @login_required
 def showFeed(request):
