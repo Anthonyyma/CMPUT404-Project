@@ -111,8 +111,6 @@ def createPost(request):
                                 r = requests.post(url, json = msg, auth=("", ""))
                         else:
                             Inbox.objects.create(post=newPost, user=user)
-                elif newPost.friends_only:
-                    pass
                 elif not newPost.unlisted:
                     for follow in Follow.objects.filter(followee=request.user):
                         if follow.external_follower:
