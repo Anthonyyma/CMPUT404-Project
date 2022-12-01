@@ -366,7 +366,7 @@ def register_user(request):
             password = form.cleaned_data["password1"]
             user = authenticate(request, username=username, password=password)
             login(request, user)
-            return redirect("myPosts")  # once registered redirect to a different page
+            return redirect("feed")  # once registered redirect to a different page
     else:
         form = RegisterForm()
     # render the registeration html template
