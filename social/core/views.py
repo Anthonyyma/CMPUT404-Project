@@ -241,21 +241,13 @@ def viewUser(request, userID):
 
     if 'url' in request.GET:
         url = request.GET['url']
-<<<<<<< HEAD
         if settings.API_HOST_PATH in url: # check if the url contains our own address
             user = User.objects.get(id=get_author_id_from_url(url))  # this should get the user from the database
-=======
-        data = client.fetch_external_user(url)
-        existing = User.objects.filter(external_url=url).first()
-        serializer = AuthorSerializer(existing, data=data)
-        if serializer.is_valid() and existing is None:
-            user = serializer.save(external_url=url)
->>>>>>> eef8af2f40c721a5fc8dba45040d5bcc2e082647
         else:
             data = client.fetch_external_user(url)
             existing = User.objects.filter(external_url=url).first()
             serializer = AuthorSerializer(existing, data=data)
-            if serializer.is_valid():
+            if serializer.is_valid() and existing is None:
                 user = serializer.save(external_url=url)
             else:
                 return 404
