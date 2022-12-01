@@ -230,7 +230,7 @@ def viewUser(request, userID):
 
     if userID is None:  # if a userID is not given default to current user
         userID = request.user.id  # Currently logged in user
-
+    user = None
     if 'url' in request.GET:
         url = request.GET['url']
         if settings.API_HOST_PATH in url: # check if the url contains our own address
@@ -238,11 +238,14 @@ def viewUser(request, userID):
         else:
             data = client.fetch_external_user(url)
             existing = User.objects.filter(external_url=url).first()
-            serializer = AuthorSerializer(existing, data=data)
-            if serializer.is_valid() and existing is None:
-                user = serializer.save(external_url=url)
+            if existing:
+                serializer = AuthorSerializer(existing, data=data)
+                if serializer.is_valid():
+                    user = serializer.save(external_url=url)
+                else:
+                    raise Exception("Invalid user data", serializer.errors)
             else:
-                return 404
+                user = existing
     else: 
         user = User.objects.get(id=userID)
 
@@ -270,10 +273,8 @@ def viewUser(request, userID):
         else:
             context["following"] = False
 
-    posts = Post.objects.filter(author=user).first()
+    posts = Post.objects.filter(author=user).all()
     context["posts"] = posts
-    context["postURL"] = get_post_url(posts);
-
     return render(request, "viewUser.html", context)
 
 

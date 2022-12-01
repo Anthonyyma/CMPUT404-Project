@@ -23,7 +23,7 @@
         <div class="userHeader">
             <div style="display:flex; align-items: center;">
                 <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-                <a href="{% url 'viewUser' userID=username %}?url={{ authorurl }}" id="username">{{ post.author }}</a>
+                <a href="/user/?url={{ authorurl }}" id="username">{{ post.author }}</a>
             </div>
             {% if ownPost %}
                 <a href="{% url 'editPost' %}?id={{ post.id }}">
