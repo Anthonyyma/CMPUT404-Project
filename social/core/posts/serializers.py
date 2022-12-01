@@ -7,7 +7,6 @@ from rest_framework import serializers
 class CommentSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     comment = serializers.CharField(source="content")
-    contentType = serializers.CharField(source="content_type", default="text/markdown")
     type = serializers.ReadOnlyField(default="comment")
     id = serializers.SerializerMethodField()
 
@@ -17,7 +16,6 @@ class CommentSerializer(serializers.ModelSerializer):
             "type",
             "author",
             "comment",
-            "contentType",
             "published",
             "comment",
             "id",
@@ -61,7 +59,7 @@ class PostSerializer(serializers.ModelSerializer):
             "visibility",
             "published",
             "unlisted",
-            "image"
+            "image",
         ]
 
     def get_visibility(self, obj: Post) -> str:
