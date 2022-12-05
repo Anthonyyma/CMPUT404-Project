@@ -1,4 +1,5 @@
 # from django.contrib.staticfiles.storage import staticfiles_storage
+import core.posts.views as post_views
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -20,7 +21,7 @@ urlpatterns = [
     path("editPost/", views.createPost, name="editPost"),
     path("createPost/", views.postType, name="createPost"),
     path("deletePost/", views.deletePost, name="deletePost"),
-    path("postContent/", views.postContent, name="postContent"),
+    path("postContent/", post_views.post_detail, name="postContent"),
     path("login/", views.login_user, name="login"),
     path("register/", views.register_user, name="register"),
     path("user/followers/", views.follower_view, name="follower_view"),

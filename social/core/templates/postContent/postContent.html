@@ -125,17 +125,17 @@
     <div class="comments">
         <h3>Comments</h3>
         <div class="comment">
-            {% if not post.comments.all %}
+            {% if not comments %}
                 <p>No comments yet</p>
             {% else %}
-                {% for comment in post.comments.all %}
-                    <a href="#"><strong>{{ comment.author }}</strong></a> on {{ comment.published }}
-                    <ul class="comments-list">
-                        <li>
-                            {{ comment.content }}
-                        </li>
-                    </ul>
+            <ul class="comment-list">
+                {% for comment in comments %}
+                    <a href="#"><strong>{{ comment.author.displayName }}</strong></a> on {{ comment.published }}
+                    <li>
+                        {{ comment.comment }}
+                    </li>
                 {% endfor %}
+            </ul>
             {% endif %}
         </div>
     </div>

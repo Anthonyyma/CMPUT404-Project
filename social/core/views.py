@@ -184,6 +184,7 @@ def postContent(request):
     comment_data = CommentSerializer(
         comments, many=True, context={"request": request}
     ).data
+    print(comment_data[0])
     context = {
         "post": post,
         "ownPost": ownPost,
