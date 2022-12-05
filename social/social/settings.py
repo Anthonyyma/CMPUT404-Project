@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "core",
     "drf_yasg",
-    "core.templatetags"
+    "core.templatetags",
+    "corsheaders"
 ]
 
 MIDDLEWARE = [
@@ -65,8 +66,10 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = "social.urls"
 
 TEMPLATES = [
