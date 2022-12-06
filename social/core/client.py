@@ -1,9 +1,12 @@
+import random
 import re
 
 import requests
 from core.authors.serializers import AuthorSerializer
 from core.models import User
 from core.path_utils import get_author_url
+from rest_framework import status
+from rest_framework.response import Response
 
 
 def get_creds(url: str):
@@ -48,3 +51,40 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
     return requests.post(
         external_user_url + "inbox/", json=data, auth=get_creds(external_user_url)
     )
+
+
+def sync_external_authors():
+    team11_url = "https://cmsjmnet.herokuapp.com/authors/"
+    team9_url = "https://team9-socialdistribution.herokuapp.com/service/authors/"
+
+    team11_authors = requests.get(team11_url, auth=get_creds(team11_url)).json()
+    # no need for auth for team9
+    team9_authors = requests.get(team9_url).json()
+
+    all_authors = []
+
+    all_authors.extend(team11_authors["results"])
+    all_authors.extend(team9_authors)
+
+    for author in all_authors:
+
+        from_database_url = User.objects.filter(
+            external_url=author["url"]).first()
+        from_database_username = User.objects.filter(
+            username=author["displayName"]).first()
+
+        if from_database_username is not None:
+            # https://stackoverflow.com/questions/59318332/generate-random-6-digit-id-in-python
+            random_id = ' '.join(
+                [str(random.randint(0, 999)).zfill(3) for _ in range(2)])
+
+            author["displayName"] = author["displayName"], random_id
+
+        if from_database_url is not None:
+            continue
+        else:
+            serializer = AuthorSerializer(data=author)
+            if not serializer.is_valid():
+                return Response(
+                    serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return serializer.save(external_url=author["id"])
