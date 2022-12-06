@@ -13,10 +13,18 @@
 <div class="post-display">
     <ul>
     {% for user in users %}
-        <li><a href="user/{{ user.id }}"><b>@{{ user.username }}</b> {{ user.first_name}} {{ user.last_name }}</a>
-            
-            <a>+ Follow</a>
-                <a>- Unfollow</a>
+        <li>
+        {% if user.external_url != None %}
+            <a href="/user/?url={{ user.external_url }}" id="username">
+            <b>@{{ user.username }}</b>
+            </a>            
+        {% else %}
+            <a href="/user/?id={{ user.id }}" id="username">
+            <b>@{{ user.username }}</b>
+            </a>
+        {% endif %}
+        <a>+ Follow</a>
+        <a>- Unfollow</a>
         </li>
     {% endfor %}
     </ul>
