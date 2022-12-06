@@ -109,6 +109,10 @@ def createPost(request):
     postType = request.GET.get("type")
     notValid = False
 
+    # check if id has url and get id if it does
+    if settings.API_HOST_PATH in postId:
+        postId = get_post_id_from_url(postId)
+
     if postId is not None:
         post = Post.objects.get(id=postId)
         form = PostForm(instance=post)
