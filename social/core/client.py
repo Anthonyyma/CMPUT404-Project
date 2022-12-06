@@ -56,15 +56,18 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
 def sync_external_authors():
     team11_url = "https://cmsjmnet.herokuapp.com/authors/"
     team9_url = "https://team9-socialdistribution.herokuapp.com/service/authors/"
+    team6_url = "https://socialdistribution-cmput404.herokuapp.com/authors/"
 
     team11_authors = requests.get(team11_url, auth=get_creds(team11_url)).json()
     # no need for auth for team9
     team9_authors = requests.get(team9_url).json()
+    team6_authors = requests.get(team6_url).json()
 
     all_authors = []
 
     all_authors.extend(team11_authors["results"])
     all_authors.extend(team9_authors["items"])
+    all_authors.extend(team6_authors["items"])
 
     for author in all_authors:
         create_update_external_authors(author)
