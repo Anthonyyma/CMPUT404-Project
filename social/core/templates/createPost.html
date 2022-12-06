@@ -20,9 +20,13 @@
         <div class="form-group">
             {{ form.categories }}  
         </div>
+        {% if type != "PNG" %}
         <div class="form-group" style="font-size: 1.5em;">
             {{ form.content }}  
         </div>
+        {% else %}
+            <div style="display: block;">
+        {% endif %}
         {% if type == "PNG" or type == "JPEG" %}
             <div class="form-group" name="image-field">
                 <label>Image</label>
