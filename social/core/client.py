@@ -12,6 +12,8 @@ from rest_framework.response import Response
 def get_creds(url: str):
     if "cmsjmnet" in url:
         return ("team8", "team8")
+    if "team9" in url:
+        return ("admin", "admin")
     return None
 
 
@@ -36,6 +38,28 @@ def fetch_external_post(post_url: str):
 def fetch_external_user(user_url: str):
     resp = requests.get(user_url, auth=get_creds(user_url))
     return resp.json()
+
+
+def fetch_posts_from_external_author(user: User):
+    if user.external_url is None:
+        return []
+    path = (
+        user.external_url + "posts/"
+        if user.external_url.endswith("/")
+        else user.external_url + "/posts/"
+    )
+    resp = requests.get(path, auth=get_creds(path))
+    if not resp.ok:
+        print(f"Error getting posts from {path}")
+        print(resp.text)
+        return []
+    data = resp.json()
+    if "items" in data:
+        return data["items"]
+    if "results" in data:
+        return data["results"]
+    print(f"Couldn't find posts in response", data)
+    return []
 
 
 def send_external_follow_request(local_user: User, external_user_url: str, request):
@@ -71,19 +95,18 @@ def sync_external_authors():
 
 
 def create_update_external_authors(author):
-    '''Take argument of the author in json format
+    """Take argument of the author in json format
     and add it to the database.
 
     If duplicate usernames are found then generate
-    a random 6 digit number and append it to the end'''
+    a random 6 digit number and append it to the end"""
 
     from_database_url = User.objects.filter(external_url=author["url"]).first()
     from_database_username = User.objects.filter(username=author["displayName"]).first()
 
     if from_database_username is not None:
         # https://stackoverflow.com/questions/59318332/generate-random-6-digit-id-in-python
-        random_id = ' '.join(
-            [str(random.randint(0, 999)).zfill(3) for _ in range(2)])
+        random_id = " ".join([str(random.randint(0, 999)).zfill(3) for _ in range(2)])
 
         author["displayName"] = author["displayName"], random_id
 
@@ -92,8 +115,7 @@ def create_update_external_authors(author):
     else:
         serializer = AuthorSerializer(data=author)
         if not serializer.is_valid():
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return serializer.save(external_url=author["id"])
 
 

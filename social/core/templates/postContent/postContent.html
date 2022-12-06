@@ -37,7 +37,7 @@
         </div>
         <div class="mainContent">
         {% if post.contentType == 'image/png;base64' or post.contentType == 'image/jpeg;base64' %}
-            <img src="{{post.id}}/image" alt="mainImage" style="width: 100%;">
+            <img src="{{post.content}}" alt="mainImage" style="width: 100%;">
         {% endif %}
         {% if post.contentType == 'text/markdown' %}
             <p>
