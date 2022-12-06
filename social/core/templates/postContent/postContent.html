@@ -15,51 +15,55 @@
 <body>  
     <div class="mainPost">
         <div>
-            <a href="../" style="color: black;">
+            <a class='btn' href="../" style="color: black;">
                 <i style="font-size: 2em" class="material-icons">arrow_back</i>
             </a>
-            <h1 style="display: inline-block; padding-left: 1em;">Post</h1>
+            <h1 style="display: inline-block; padding-left: 1em;">{{ post.title }}</h1>
         </div>
         <div class="userHeader">
             <div style="display:flex; align-items: center;">
-                <img id="profilePicture" src="/media/{{ profilePic }}" alt="profilePic">
-                <a href="/user/?url={{ authorurl }}" id="username">{{ post.author }}</a>
+                {% if post.author.profileImage %}
+                <img id="profilePicture" src="{{ post.author.profileImage }}" >
+                {% else %}
+                <img id="profilePicture" src="https://riverlegacy.org/wp-content/uploads/2021/07/blank-profile-photo.jpeg">
+                {% endif %}
+                <a href="/user/?url={{ post.author.id }}" id="username">{{ post.author.displayName }}</a>
             </div>
-            {% if ownPost %}
+            {% if own_post %}
                 <a href="{% url 'editPost' %}?id={{ post.id }}">
                     <i style="font-size: 2em" class="material-icons">create</i>
                 </a>
             {% endif %}
         </div>
-        {% if post.content_type == "TEXT"%}
+        {% if post.contentType == "text/plain"%}
         <div class="mainContent">
             <p>
-                {{ content }}
+                {{ post.content }}
             </p>
         </div>
-        {% elif post.content_type == 'MD' %}
+        {% elif post.contentType == 'text/markdown' %}
         <div class="mainContent">
             <p>
-                {{ content | markdownify }}
+                {{ post.content | markdownify }}
             </p>
             </div>
         {% else %}
-        <div class="imgContainer">
+        <!-- <div class="imgContainer">
             <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
-        </div>
+        </div> -->
         {% endif %}
     </div> 
 
     <input class="comment-box" id="comment-box" name="data-comment" type="text" placeholder="Write comment here">
     <!-- No need for links because of the onclick function call -->
     <div class="button-container">
-        <a class="like-button" onclick="likePost()">
+        <button class="btn" onclick="likePost()">
             <i class="material-icons insert-comment-icon">thumb_up</i>
-        </a>
+        </button>
         <!-- Comment now works href val left blank so that the page automatically gets refreshed as you post your comment -->
-        <a class="comment-button" href="" onclick="postComment()">
+        <button class="btn" onclick="postComment()">
             <i class="material-icons insert-comment-icon" >insert_comment</i>
-        </a>
+        </button>
     </div>
     <script>
         
@@ -73,34 +77,41 @@
                 return acc;
             }, {});
 
+        // We don't want a double slash, or to miss a slash
+        getInboxUrl = (authorUrl) => 
+            authorUrl.endsWith('/') ? authorUrl + 'inbox/' : authorUrl + '/inbox/';
+
         postComment = () => {
             let comment = document.getElementById('comment-box').value
-            let authorId = "{{ post.author.id }}"
+            let authorId = "{{ post.author.id }}" // author of the post
+            let userId = "{{ user.id }}" // user making the comment
             let postId = "{{ post.id }}"
             let cookies = document.cookie
 
             cookies = parseCookie(cookies)
             
-            const data = {'author': authorId,
-                'post': postId,
-                'comment': comment,
+            const data = {
+                type: 'comment',
+                author: { id: userId},
+                post: postId,
+                comment: comment,
                 };
             
-            fetch(`/api/authors/${authorId}/posts/${postId}/comments/`, {
+            fetch(getInboxUrl(authorId), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': cookies["csrftoken"]
                 },
                 body: JSON.stringify(data),
-            })
+            }).then(() => location.reload())
         }
         /* not fully functional yet */
         likePost = () => {
             let authorId = "{{ post.author.id }}"
             let userId = "{{ user.id }}"
             let postId = "{{ post.id }}"
-            let authorURL = "{{ authorurl }}"
+            let authorURL = "{{ post.author.id }}"
             let cookies = document.cookie
 
             cookies = parseCookie(cookies)
@@ -109,16 +120,16 @@
                 'type': "Like",
                 'author': {"id": authorURL},
                 'post': postId,
-                'object': `/api/authors/${authorId}/posts/${postId}`};
+            };
                 
-            fetch(`/api/authors/${authorId}/inbox/`, {
+            fetch(getInboxUrl(authorURL), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': cookies["csrftoken"]
                 },
                 body: JSON.stringify(data),
-            })
+            }).then(() => location.reload())
         }
     </script>
     

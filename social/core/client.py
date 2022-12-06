@@ -48,3 +48,8 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
     return requests.post(
         external_user_url + "inbox/", json=data, auth=get_creds(external_user_url)
     )
+
+
+def get_comments(comments_url: str):
+    resp = requests.get(comments_url)
+    return resp.json()["items"]
