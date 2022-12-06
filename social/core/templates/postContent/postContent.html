@@ -35,23 +35,20 @@
                 </a>
             {% endif %}
         </div>
-        {% if post.contentType == "text/plain"%}
         <div class="mainContent">
-            <p>
-                {{ post.content }}
-            </p>
-        </div>
-        {% elif post.contentType == 'text/markdown' %}
-        <div class="mainContent">
+        {% if post.contentType == 'image/png;base64' or post.contentType == 'image/jpeg;base64' %}
+            <img src="{{post.id}}/image" alt="mainImage" style="width: 100%;">
+        {% endif %}
+        {% if post.contentType == 'text/markdown' %}
             <p>
                 {{ post.content | markdownify }}
             </p>
-            </div>
         {% else %}
-        <!-- <div class="imgContainer">
-            <img src="/media/{{ img }}" alt="mainImage" style="width: 100%;">
-        </div> -->
+            <p>
+                {{ post.content }}
+            </p>
         {% endif %}
+        </div>
     </div> 
 
     <input class="comment-box" id="comment-box" name="data-comment" type="text" placeholder="Write comment here">
