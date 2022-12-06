@@ -95,3 +95,12 @@ def create_update_external_authors(author):
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return serializer.save(external_url=author["id"])
+
+
+def get_comments(comments_url: str):
+    resp = requests.get(comments_url)
+    if resp.ok:
+        return resp.json()["items"]
+    print(f"Error getting comments from {comments_url}")
+    print(resp)
+    return []

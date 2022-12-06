@@ -31,6 +31,8 @@ class InboxView(APIView):
             return self.handle_post(data, recipient)
         elif type == "follow":
             return self.handle_follow(data, recipient)
+        elif type == "comment":
+            return self.handle_comment(data)
 
     def handle_like(self, data):
         like = Like()
@@ -84,7 +86,6 @@ class InboxView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
     def handle_comment(self, data):
-        author_url = data["author"]["id"]
         post_url = data["post"]
         if API_HOST_PATH not in post_url:
             return Response(
@@ -95,16 +96,24 @@ class InboxView(APIView):
         post = Post.objects.filter(id=post_id).first()
         if not post:
             return Response("Post does not exist", status=status.HTTP_404_NOT_FOUND)
+        commenter = self.get_author(data["author"])
         comment = Comment(
-            content=data["content"],
-            external_author=author_url,
-            content_type=data.get("contentType", "text/markdown"),
+            content=data["comment"],
             post=post,
+            author=commenter,
         )
         comment.save()
+        return Response(status=status.HTTP_201_CREATED)
 
     def create_update_external_user(self, author_data: Dict) -> User:
         serializer = AuthorSerializer(data=author_data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return serializer.save(external_url=author_data["id"])
+
+    def get_author(self, author_data: Dict) -> User:
+        author_url = author_data["id"]
+        if API_HOST_PATH in author_url:
+            author_id = path_utils.get_author_id_from_url(author_url)
+            return User.objects.get(id=author_id)
+        return self.create_update_external_user(author_data)

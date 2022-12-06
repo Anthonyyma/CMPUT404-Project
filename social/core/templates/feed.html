@@ -29,7 +29,7 @@
             <a href="{% url 'postContent' %}?url={{ post.id }}">{{ post.title }}</a>
             {{ post.content | markdownify }}
         </div>
-        {% elif post.content_type != "APP64"%}  
+        {% elif post.contentType != "image/png"%}  
         <a href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
         </a>
         {% else %}

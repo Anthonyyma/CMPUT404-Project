@@ -17,6 +17,9 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    # path(
+    # 'authors/<str:author_id>/posts/<str:post_id>/image/',
+    # views.ImagePostView.as_view()),
     path("", views.showFeed, name="feed"),
     path("publicFeed/", views.publicFeed, name="publicFeed"),
     path("editPost/", views.createPost, name="editPost"),
