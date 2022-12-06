@@ -30,6 +30,8 @@ def get_author_url(author: User) -> str:
     """
     Returns the api url for an author
     """
+    if author.external_url is not None:
+        return author.external_url
     return f"{settings.API_HOST_PATH}authors/{author.id}/"
 
 

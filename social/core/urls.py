@@ -32,8 +32,7 @@ urlpatterns = [
     path("user/following/", views.following_view, name="following_view"),
     path("allUsers/", author_views.all_users_view, name="all_users_view"),
     path("logout", views.logout_user, name="logout"),
-    path("user/<userID>", views.viewUser, name="viewUser"),
-    path("user/", views.viewCurrentUser, name="viewCurrentUser"),
+    path("user/", author_views.user_detail, name="viewUser"),
     path(
         "api/docs",
         schema_view.with_ui("swagger", cache_timeout=0),

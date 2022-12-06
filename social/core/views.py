@@ -2,8 +2,7 @@ import base64
 from html.parser import HTMLParser
 
 import requests
-from core import client
-from core.posts.serializers import CommentSerializer, PostSerializer
+from core.posts.serializers import PostSerializer
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -13,44 +12,50 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .authors.serializers import AuthorSerializer
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
-from .models import Comment, Follow, FollowRequest, Inbox, Post, User
-from .path_utils import (get_author_id_from_url, get_author_url,
-                         get_post_id_from_url)
+from .models import Follow, Inbox, Post, User
+from .path_utils import get_author_url, get_post_id_from_url
 
 
 class ImagePostView(APIView):
     def get(self, request, author_id, post_id):
         try:
             post = Post.objects.get(id=post_id, author_id=author_id)
-            if 'image' not in post.content_type:
+            if "image" not in post.content_type:
                 return Response(
-                    {'message': 'Post is not an image post'},
-                    status=status.HTTP_404_NOT_FOUND)
+                    {"message": "Post is not an image post"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
             # Known issue: Remote followers cannot view friends-only image posts
             # because this is an architectural limitation
             # that is caused by a BS project specification
             # (polling based system vs webhooks)
-            unauthorized = post.visibility != 'PUBLIC'\
-                and post.author.id != request.user.id\
+            unauthorized = (
+                post.visibility != "PUBLIC"
+                and post.author.id != request.user.id
                 and Follow.objects.filter(
-                    follower=request.user.id, followee=post.author.id).count() == 0
+                    follower=request.user.id, followee=post.author.id
+                ).count()
+                == 0
+            )
             if unauthorized:
                 return Response(
-                    {'message': 'You are not authorized to view this post'},
-                    status=status.HTTP_400_BAD_REQUEST)
+                    {"message": "You are not authorized to view this post"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            response_content_type = post.content_type.split(';')[0]
+            response_content_type = post.content_type.split(";")[0]
             image = base64.b64decode(post.content.strip("b'").strip("'"))
             return Response(
-                image, content_type=response_content_type, status=status.HTTP_200_OK)
+                image, content_type=response_content_type, status=status.HTTP_200_OK
+            )
         except Post.DoesNotExist:
             # TODO: might exist remotely
             return Response(
-                {'message': 'Image post not found'}, status=status.HTTP_404_NOT_FOUND)
+                {"message": "Image post not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 @login_required
@@ -140,7 +145,7 @@ def createPost(request):
                 newPost = form.save()
                 # convert to b64
                 with open(form.instance.image.url[1:], "rb") as image_file:
-                    newPost.content = base64.b64encode(image_file.read())
+                    newPost.content = base64.b64encode(image_file.read()).decode()
                     newPost.save()
 
                 if len(newPost.private_to) != 0:  # if private to someone
@@ -200,50 +205,6 @@ def postType(request):
     return render(request, "postType.html")
 
 
-def postContent(request):
-    post = None
-    if "url" in request.GET:
-        url = request.GET["url"]
-        if settings.API_HOST_PATH in url:  # check if the url contains our own address
-            post = Post.objects.get(id=get_post_id_from_url(url))
-        else:
-            data = client.fetch_external_post(url)
-            serializer = PostSerializer(data=data)
-            if serializer.is_valid():
-                post = Post(**serializer.validated_data)
-    else:
-        return 404
-
-    user = request.user
-    ownPost = False
-    if user == post.author:
-        ownPost = True
-    if post:
-        profilePic = post.author.profile_image
-        if post.content_type == "APP64":
-            with open("media/temp.jpg", "wb") as f:
-                f.write(base64.b64decode(post.content))
-                post.image = "temp.jpg"
-
-    authorURL = get_author_url(post.author)
-    comments = Comment.objects.filter(post=post)
-    comment_data = CommentSerializer(
-        comments, many=True, context={"request": request}
-    ).data
-    print(comment_data[0])
-    context = {
-        "post": post,
-        "ownPost": ownPost,
-        "profilePic": profilePic,
-        "username": user.username,
-        "content": post.content,
-        "img": post.image,
-        "authorurl": authorURL,
-        "comments": comment_data,
-    }
-    return render(request, "postContent/postContent.html", context)
-
-
 def follower_view(request):
     user = request.user
     followers = []  # json array of followers
@@ -276,70 +237,6 @@ def following_view(request):
 
     context = {"following": following, "request": request}
     return render(request, "following.html", context)
-
-
-def viewUser(request, userID):
-    # Displays the information of a user
-    # User has both custom fields and base fields (see models.py)
-
-    if userID is None:  # if a userID is not given default to current user
-        userID = request.user.id  # Currently logged in user
-    user = None
-    if "url" in request.GET:
-        url = request.GET["url"]
-        if settings.API_HOST_PATH in url:  # check if the url contains our own address
-            user = User.objects.get(
-                id=get_author_id_from_url(url)
-            )  # this should get the user from the database
-        else:
-            data = client.fetch_external_user(url)
-            existing = User.objects.filter(external_url=url).first()
-            if existing:
-                serializer = AuthorSerializer(existing, data=data)
-                if serializer.is_valid():
-                    user = serializer.save(external_url=url)
-                else:
-                    raise Exception("Invalid user data", serializer.errors)
-            else:
-                user = existing
-    else:
-        user = User.objects.get(id=userID)
-
-    """
-    if user.external_user is not None:
-        data = request.get(user.external_user).data
-        user = User(**data) #add the data to the user (not sure if this is permanent)
-    """
-    # send the user to the template
-    context = {
-        "user": user,
-        "userURL": get_author_url(user),
-        "requestUserURL": get_author_url(request.user),
-    }
-
-    if user.external_url is not None:
-        context["userURL"] = user.external_url
-
-    if request.user == user:  # if the user is viewing their own profile
-        context["ownProfile"] = True
-        follow_requests = FollowRequest.objects.filter(followee=user)
-        context["follow_requests"] = follow_requests
-    else:
-        context["ownProfile"] = False
-        # check if the current user is following the user
-        if Follow.objects.filter(follower=request.user, followee=user).exists():
-            context["following"] = True
-        else:
-            context["following"] = False
-
-    posts = Post.objects.filter(author=user).all()
-    context["posts"] = posts
-    return render(request, "viewUser.html", context)
-
-
-def viewCurrentUser(request):
-    userID = request.user.id
-    return viewUser(request, userID)
 
 
 def editUser(request):
