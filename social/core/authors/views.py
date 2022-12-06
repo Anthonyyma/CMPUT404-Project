@@ -8,4 +8,4 @@ def all_users_view(request):
 
     all_users = User.objects.order_by("username")
     context = {"users": all_users}
-    return render(request, "all_users.html", context)
+    return render(request, "allUsers.html", context)

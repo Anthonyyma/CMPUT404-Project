@@ -64,27 +64,34 @@ def sync_external_authors():
     all_authors = []
 
     all_authors.extend(team11_authors["results"])
-    all_authors.extend(team9_authors)
+    all_authors.extend(team9_authors["items"])
 
     for author in all_authors:
+        create_update_external_authors(author)
 
-        from_database_url = User.objects.filter(
-            external_url=author["url"]).first()
-        from_database_username = User.objects.filter(
-            username=author["displayName"]).first()
 
-        if from_database_username is not None:
-            # https://stackoverflow.com/questions/59318332/generate-random-6-digit-id-in-python
-            random_id = ' '.join(
-                [str(random.randint(0, 999)).zfill(3) for _ in range(2)])
+def create_update_external_authors(author):
+    '''Take argument of the author in json format
+    and add it to the database.
 
-            author["displayName"] = author["displayName"], random_id
+    If duplicate usernames are found then generate
+    a random 6 digit number and append it to the end'''
 
-        if from_database_url is not None:
-            continue
-        else:
-            serializer = AuthorSerializer(data=author)
-            if not serializer.is_valid():
-                return Response(
-                    serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return serializer.save(external_url=author["id"])
+    from_database_url = User.objects.filter(external_url=author["url"]).first()
+    from_database_username = User.objects.filter(username=author["displayName"]).first()
+
+    if from_database_username is not None:
+        # https://stackoverflow.com/questions/59318332/generate-random-6-digit-id-in-python
+        random_id = ' '.join(
+            [str(random.randint(0, 999)).zfill(3) for _ in range(2)])
+
+        author["displayName"] = author["displayName"], random_id
+
+    if from_database_url is not None:
+        pass
+    else:
+        serializer = AuthorSerializer(data=author)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return serializer.save(external_url=author["id"])
