@@ -27,7 +27,7 @@ def post_detail(request):
     #         with open("media/temp.jpg", "wb") as f:
     #             f.write(base64.b64decode(post.content))
     #             post.image = "temp.jpg"
-    print(post)
+    # print(post)
     comments = client.get_comments(post["comments"])
     context = {
         "post": post,

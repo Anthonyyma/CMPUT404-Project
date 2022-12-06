@@ -36,14 +36,15 @@
             {% endif %}
         </div>
         <div class="mainContent">
-        {% if post.contentType == 'image/png;base64' or post.contentType == 'image/jpeg;base64' %}
-            <img src="{{post.content}}" alt="mainImage" style="width: 100%;">
+        {% if post.contentType == 'image/png' or post.contentType == 'image/jpeg;base64' %}
+            <img src="data:image/png;base64, {{ post.content }}" alt="mainImage" style="width: 100%;">
         {% endif %}
         {% if post.contentType == 'text/markdown' %}
             <p>
                 {{ post.content | markdownify }}
             </p>
-        {% else %}
+        {% endif %}
+        {% if post.contentType != 'image/png' %}
             <p>
                 {{ post.content }}
             </p>
