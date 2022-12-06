@@ -52,13 +52,6 @@ html {
 .button-container {
     margin-top: 0.5ex;
 }
-.like-button {
-    padding: auto;
-    padding-right: 1ex;
-}
-.comment-button {
-    padding: auto;
-}
 .comments-list {
     margin: auto;
 }
