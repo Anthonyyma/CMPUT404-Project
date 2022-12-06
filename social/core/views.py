@@ -140,7 +140,7 @@ def createPost(request):
                 newPost = form.save()
                 # convert to b64
                 with open(form.instance.image.url[1:], "rb") as image_file:
-                    newPost.content = base64.b64encode(image_file.read())
+                    newPost.content = base64.b64encode(image_file.read()).decode()
                     newPost.save()
 
                 if len(newPost.private_to) != 0:  # if private to someone
