@@ -1,4 +1,5 @@
 # from django.contrib.staticfiles.storage import staticfiles_storage
+import core.authors.views as author_views
 import core.posts.views as post_views
 from django.urls import path
 from drf_yasg import openapi
@@ -16,6 +17,9 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    # path(
+    # 'authors/<str:author_id>/posts/<str:post_id>/image/',
+    # views.ImagePostView.as_view()),
     path("", views.showFeed, name="feed"),
     path("publicFeed/", views.publicFeed, name="publicFeed"),
     path("editPost/", views.createPost, name="editPost"),
@@ -26,7 +30,7 @@ urlpatterns = [
     path("register/", views.register_user, name="register"),
     path("user/followers/", views.follower_view, name="follower_view"),
     path("user/following/", views.following_view, name="following_view"),
-    path("allUsers", views.all_users_view, name="all_users_view"),
+    path("allUsers/", author_views.all_users_view, name="all_users_view"),
     path("logout", views.logout_user, name="logout"),
     path("user/<userID>", views.viewUser, name="viewUser"),
     path("user/", views.viewCurrentUser, name="viewCurrentUser"),

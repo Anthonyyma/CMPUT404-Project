@@ -70,7 +70,7 @@ class Post(models.Model):
     categories = models.TextField(
         blank=True, null=True
     )  # just use space seperated strings for now lol
-    content = models.TextField()
+    content = models.TextField(blank=True)
     # image = models.ImageField(blank=True, upload_to="media/")
     image = models.ImageField(blank=True)
     published = models.DateTimeField(auto_now_add=True)

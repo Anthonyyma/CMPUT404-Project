@@ -14,17 +14,17 @@
         {% csrf_token %} 
         <button type='submit'>Markdown</button>
     </form>
-    <form method="post" action="{% url 'editPost' %}?type=APP64" style="width: auto; min-width: auto">
+    <form method="post" action="{% url 'editPost' %}?type=PNG" style="width: auto; min-width: auto">
+        {% csrf_token %} 
+        <button type='submit'>Image</button>
+    </form>
+    <!-- <form method="post" action="{% url 'editPost' %}?type=APP64" style="width: auto; min-width: auto">
         {% csrf_token %} 
         <button type='submit'>Application64</button>
     </form>
-    <form method="post" action="{% url 'editPost' %}?type=PNG" style="width: auto; min-width: auto">
-        {% csrf_token %} 
-        <button type='submit'>PNG</button>
-    </form>
     <form method="get" action="{% url 'editPost' %}?type=JPEG" style="width: auto; min-width: auto">
         <button type='submit'>JPEG</button>
-    </form>
+    </form> -->
 </div>
 
 {% endblock %}
