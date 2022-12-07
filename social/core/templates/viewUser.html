@@ -69,7 +69,7 @@
         let cookies = document.cookie;
         cookies = parseCookie(cookies);
 
-        fetch(`/api/authors/{{request.user.id}}/followers/{{user.id}}/`, {
+        fetch(`/api/authors/{{user.id}}/followers/{{request.user.id}}/`, {
             method: "DELETE",
             headers: {
                 "X-CSRFToken": cookies["csrftoken"]
@@ -90,13 +90,11 @@
                 <a href="{% url 'editUser' %}" class="button">Edit Profile</a>
             {% else %}
                 {% if not following %}
-                <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
-            
-            
                     <button id="follow_button" type="button" class="button" onclick="followUser()">Follow</button>
 
                 {% else %}
                     <button id="follow_button" type="button" class="button" onclick="unfollowUser()">Unfollow</button>
+
                 {% endif %}
             {% endif %}
         </div>
