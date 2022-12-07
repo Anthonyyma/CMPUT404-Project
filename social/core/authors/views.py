@@ -59,4 +59,5 @@ def user_detail(request):
         context["ownProfile"] = False
     context["user"] = user
     context["posts"] = posts
+    print(context)
     return render(request, "viewUser.html", context)
