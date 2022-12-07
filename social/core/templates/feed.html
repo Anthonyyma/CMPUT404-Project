@@ -12,26 +12,18 @@
 
 {% block content %}
     <div class="post-display">
-        <div class="action-bar">
-            <a class="btn btn-primary btn-lg" href="{% url 'createPost' %}">Create Post</a>
-            <form action="/user/">
-                <p class="text-center">View External User</p>
-                <input type="text" name="url" placeholder="http://node.com/user">
-                <button class='btn btn-primary' type="submit">Open</button>
-            </form>
-        </div>
-        <div>
-        <h2 class="text-center">Your Feed</h2>
+        <h2 class="text-center">Create Post</h2>
         <div class="multi-button">
             <button onClick="createPost('TEXT')">Plain Text</button>
             <button onClick="createPost('MD')">Markdown</button>
             <button onClick="createPost('PNG')">Image</button>
         </div>
-
+        <br>
+        <h2 class="text-center">Your Feed</h2>
         {% for post in posts %} 
         <div class="post">
             <div class="authorInfo">
-                <a href="/user/?url={{ post.author.id }}"><img class="profilePic" src="{{user.profile_image.url}}"/></a>
+                <a href="/user/?url={{ post.author.id }}"><img class="profilePic" src="{{ post.author.profile_image.url }}"/></a>
                 <a class="postAuthor" href="/user/?url={{ post.author.id }}">{{post.author.displayName}}</a>
             </div>
             <br>
@@ -53,6 +45,11 @@
             <a class="commentInfo" href="{% url 'postContent' %}?url={{ post.id }}">{{post.count}} comments</a>
         </div>
         {% endfor %}
-        </div>
     </div>
+    <script>
+        const createPost = (type) => {
+            let path = '/editPost/?type=' + type
+            location.href = path
+        }
+        </script>
 {% endblock %}
