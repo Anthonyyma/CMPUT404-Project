@@ -38,6 +38,9 @@
             },
             body: JSON.stringify(data)
         });
+
+        Document.getElementById("follow_button").innerHTML = "Follow Request Sent";
+        Document.getElementById("follow_button").disabled = true;
     }
 
     acceptRequest = (follower_id) =>{
@@ -50,8 +53,32 @@
                 "X-CSRFToken": cookies["csrftoken"]
             }
         });
+
+        // Send the server that has the user confirmation of the acceptance
     }
     followUser = () => sendFollowRequest("{{ requestUserURL }}", "{{ userURL }}")
+
+    unfollowUser = () => {
+        // double check that this is the correct way to do this
+
+        // popup to confirm unfollow
+        
+        if(window.confirm("Are you sure you want to unfollow this user?") == false) {return;}
+
+
+
+        let cookies = document.cookie;
+        cookies = parseCookie(cookies);
+
+        fetch(`/api/authors/{{request.user.id}}/followers/{{user.id}}/`, {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": cookies["csrftoken"]
+            }
+        });
+
+        // send the server that has the user confirmation of the unfollow
+    }
 
 </script>
 
@@ -67,10 +94,10 @@
                 <!-- Need to turn this into 2 forms, this doesn't post shit lmao-->
             
             
-                    <button type="button" class="button" onclick="followUser()">Follow</button>
+                    <button id="follow_button" type="button" class="button" onclick="followUser()">Follow</button>
 
                 {% else %}
-                    <a href="/api/authors/{{request.user.id}}/followers/{{user.id}}/" class="button">Unfollow</a>
+                    <button id="follow_button" type="button" class="button" onclick="unfollowUser()">Unfollow</button>
                 {% endif %}
             {% endif %}
         </div>

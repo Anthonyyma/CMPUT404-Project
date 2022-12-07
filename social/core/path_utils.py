@@ -47,3 +47,11 @@ def get_comment_url(comment: Comment) -> str:
     Returns the api url for a comment
     """
     return get_post_url(comment.post) + f"comments/{comment.id}/"
+
+
+def get_external_user_inbox_url(user: User) -> str:
+    """
+    Returns the api url for a user's inbox
+    """
+    suffix = "inbox/" if user.external_url.endswith("/") else "/inbox/"
+    return user.external_url + suffix

@@ -1,7 +1,7 @@
 import base64
 from html.parser import HTMLParser
 
-import requests
+from core import client
 from core.posts.serializers import PostSerializer
 from django.conf import settings
 from django.contrib import messages
@@ -15,47 +15,46 @@ from rest_framework.views import APIView
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Follow, Inbox, Post, User
-from .path_utils import get_author_url, get_post_id_from_url
+from .path_utils import get_post_id_from_url
 
+# class ImagePostView(APIView):
+#     def get(self, request, author_id, post_id):
+#         try:
+#             post = Post.objects.get(id=post_id, author_id=author_id)
+#             if "image" not in post.content_type:
+#                 return Response(
+#                     {"message": "Post is not an image post"},
+#                     status=status.HTTP_404_NOT_FOUND,
+#                 )
 
-class ImagePostView(APIView):
-    def get(self, request, author_id, post_id):
-        try:
-            post = Post.objects.get(id=post_id, author_id=author_id)
-            if "image" not in post.content_type:
-                return Response(
-                    {"message": "Post is not an image post"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
+#             # Known issue: Remote followers cannot view friends-only image posts
+#             # because this is an architectural limitation
+#             # that is caused by a BS project specification
+#             # (polling based system vs webhooks)
+#             unauthorized = (
+#                 post.visibility != "PUBLIC"
+#                 and post.author.id != request.user.id
+#                 and Follow.objects.filter(
+#                     follower=request.user.id, followee=post.author.id
+#                 ).count()
+#                 == 0
+#             )
+#             if unauthorized:
+#                 return Response(
+#                     {"message": "You are not authorized to view this post"},
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
 
-            # Known issue: Remote followers cannot view friends-only image posts
-            # because this is an architectural limitation
-            # that is caused by a BS project specification
-            # (polling based system vs webhooks)
-            unauthorized = (
-                post.visibility != "PUBLIC"
-                and post.author.id != request.user.id
-                and Follow.objects.filter(
-                    follower=request.user.id, followee=post.author.id
-                ).count()
-                == 0
-            )
-            if unauthorized:
-                return Response(
-                    {"message": "You are not authorized to view this post"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            response_content_type = post.content_type.split(";")[0]
-            image = base64.b64decode(post.content.strip("b'").strip("'"))
-            return Response(
-                image, content_type=response_content_type, status=status.HTTP_200_OK
-            )
-        except Post.DoesNotExist:
-            # TODO: might exist remotely
-            return Response(
-                {"message": "Image post not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+#             response_content_type = post.content_type.split(";")[0]
+#             image = base64.b64decode(post.content.strip("b'").strip("'"))
+#             return Response(
+#                 image, content_type=response_content_type, status=status.HTTP_200_OK
+#             )
+#         except Post.DoesNotExist:
+#             # TODO: might exist remotely
+#             return Response(
+#                 {"message": "Image post not found"}, status=status.HTTP_404_NOT_FOUND
+#             )
 
 
 @login_required
@@ -109,89 +108,58 @@ class MDParser(HTMLParser):
 # @login_required
 def createPost(request):
     list(messages.get_messages(request))
-    form = PostForm(request.POST or None, request.FILES or None)
-    postId = request.GET.get("id")
+    postId = request.GET.get("id", "")
     postType = request.GET.get("type")
-    notValid = False
-
+    post = None
     # check if id has url and get id if it does
-    if postId is not None and settings.API_HOST_PATH in postId:
+    if settings.API_HOST_PATH in postId:
         postId = get_post_id_from_url(postId)
-
-    if postId is not None:
         post = Post.objects.get(id=postId)
+        postType = post.content_type
+
+    if request.method == "GET":
         form = PostForm(instance=post)
-        postType = form.instance.content_type
+        context = {"form": form, "type": postType, "id": postId}
+        return render(request, "createPost.html", context)
 
-    if request.method == "POST":
-        if postId is not None:
-            form = PostForm(request.POST, instance=post)
-        else:
-            form = PostForm(
-                request.POST,
-                request.FILES,
+    if post is None:
+        form = PostForm(request.POST, request.FILES)
+    else:
+        form = PostForm(request.POST, instance=post)
+
+    if not form.is_valid():
+        print(form.errors)
+        return render(request, "createPost.html", {"form": form, "type": postType})
+
+    form.instance.author = request.user
+    form.instance.content_type = postType
+    newPost = form.save()
+    if postType == "PNG":
+        if not form.instance.image:
+            messages.info(request, "No Image")
+        with open(form.instance.image.url[1:], "rb") as image_file:
+            newPost.content = (
+                "data:image/png;base64," + base64.b64encode(image_file.read()).decode()
             )
-        if form.is_valid():
-            form.instance.author = request.user
-            form.instance.content_type = postType
-            breakpoint()
-            # if postType == "PNG" or postType == "JPEG":
-            if postType == "PNG":
-                if not form.instance.image:
-                    messages.info(request, "No Image")
-                    notValid = True
-            elif postType == "MD":
-                pass
-            if not notValid:
-                newPost = form.save()
-                # convert to b64
-                with open(form.instance.image.url[1:], "rb") as image_file:
-                    breakpoint()
-                    newPost.content = base64.b64encode(image_file.read()).decode()
-                    newPost.save()
+            newPost.save()
 
-                if len(newPost.private_to) != 0:  # if private to someone
-                    user = User.objects.filter(username=newPost.private_to).first()
-                    if user:
-                        if user.external_url:  # if external user
-                            follow = Follow.objects.filter(followee=user)
-                            url = getattr(follow, "external_follower") + "inbox/"
-                            msg = PostSerializer(
-                                newPost, context={"request": request}
-                            ).data
-                            msg["description"] = "test"
-                            if "cmsjmnet" in url:
-                                msg = {
-                                    "items": [msg],
-                                    "author": get_author_url(request.user),
-                                }
-                                requests.post(url, json=msg, auth=("team8", "team8"))
-                            else:
-                                requests.post(url, json=msg, auth=("", ""))
-                        else:
-                            Inbox.objects.create(post=newPost, user=user)
-                elif not newPost.unlisted:
-                    for follow in Follow.objects.filter(followee=request.user):
-                        if follow.external_follower:
-                            url = getattr(follow, "external_follower") + "inbox/"
-                            msg = PostSerializer(
-                                newPost, context={"request": request}
-                            ).data
-                            msg["description"] = "test"
-                            if "cmsjmnet" in url:
-                                msg = {
-                                    "items": [msg],
-                                    "author": get_author_url(request.user),
-                                }
-                            requests.post(url, json=msg, auth=("team8", "team8"))
-                        else:
-                            Inbox.objects.create(post=newPost, user=follow.follower)
-                return redirect("/")
-        else:
-            print(form.errors)
-
-    context = {"form": form, "type": postType, "id": postId}
-    return render(request, "createPost.html", context)
+    if len(newPost.private_to) != 0:  # if private to someone
+        user = User.objects.filter(username=newPost.private_to).first()
+        if user:
+            if user.external_url:  # if external user
+                msg = PostSerializer(newPost, context={"request": request}).data
+                client.send_post_to_external_user(msg, user)
+            else:
+                Inbox.objects.create(post=newPost, user=user)
+    elif not newPost.unlisted:
+        for follow in Follow.objects.filter(followee=request.user):
+            follower = follow.user
+            if follower.external_url:
+                msg = PostSerializer(newPost, context={"request": request}).data
+                client.send_post_to_external_user(msg, follower)
+            else:
+                Inbox.objects.create(post=newPost, user=follow.follower)
+    return redirect("/")
 
 
 # @login_required
