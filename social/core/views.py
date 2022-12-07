@@ -109,28 +109,26 @@ class MDParser(HTMLParser):
 # @login_required
 def createPost(request):
     list(messages.get_messages(request))
-    form = PostForm(request.POST or None, request.FILES or None)
-    postId = request.GET.get("id")
+    postId = request.GET.get("id", "")
     postType = request.GET.get("type")
-    notValid = False
-
+    post = None
     # check if id has url and get id if it does
     if settings.API_HOST_PATH in postId:
         postId = get_post_id_from_url(postId)
-
-    if postId is not None:
         post = Post.objects.get(id=postId)
-        form = PostForm(instance=post)
-        postType = form.instance.content_type
+        postType = post.content_type
 
+    if request.method == "GET":
+        form = PostForm(instance=post)
+        context = {"form": form, "type": postType, "id": postId}
+        return render(request, "createPost.html", context)
+
+    notValid = False
     if request.method == "POST":
-        if postId is not None:
-            form = PostForm(request.POST, instance=post)
+        if post is None:
+            form = PostForm(request.POST, request.FILES)
         else:
-            form = PostForm(
-                request.POST,
-                request.FILES,
-            )
+            form = PostForm(request.POST, instance=post)
         if form.is_valid():
             form.instance.author = request.user
             form.instance.content_type = postType
