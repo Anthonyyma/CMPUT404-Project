@@ -73,9 +73,8 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
     }
     if "cmsjmnet" in external_user_url:
         data = {"items": [data], "author": get_author_url(local_user)}
-    return requests.post(
-        external_user_url + "inbox/", json=data, auth=get_creds(external_user_url)
-    )
+    url = get_external_user_inbox_url(external_user_url)
+    return requests.post(url, json=data, auth=get_creds(external_user_url))
 
 
 def send_post_to_external_user(post_data: Dict, external_user: User):

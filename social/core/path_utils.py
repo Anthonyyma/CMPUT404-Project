@@ -49,9 +49,10 @@ def get_comment_url(comment: Comment) -> str:
     return get_post_url(comment.post) + f"comments/{comment.id}/"
 
 
-def get_external_user_inbox_url(user: User) -> str:
+def get_external_user_inbox_url(user: Union[User, str]) -> str:
     """
     Returns the api url for a user's inbox
     """
-    suffix = "inbox/" if user.external_url.endswith("/") else "/inbox/"
-    return user.external_url + suffix
+    base_url = user if isinstance(user, str) else user.external_url
+    suffix = "inbox/" if base_url.endswith("/") else "/inbox/"
+    return base_url + suffix
