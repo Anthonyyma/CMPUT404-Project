@@ -1,6 +1,6 @@
 from core import client
 from core.models import Follow, FollowRequest, Post, User
-from core.path_utils import get_author_id_from_url
+from core.path_utils import get_author_id_from_url, get_author_url
 from core.posts.serializers import PostSerializer
 from django.conf import settings
 from django.shortcuts import render
@@ -52,6 +52,7 @@ def user_detail(request):
         context["follow_requests"] = follow_requests
     else:
         context["ownProfile"] = False
+        context["requestUserURL"] = get_author_url
     context["user"] = user
     context["posts"] = posts
     return render(request, "viewUser.html", context)
