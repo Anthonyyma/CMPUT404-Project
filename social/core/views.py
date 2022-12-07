@@ -75,17 +75,17 @@ def showFeed(request):
 
     srlizedPost = PostSerializer(posts, many=True, context={"request": request}).data
 
-    internPosts = Post.objects.filter(inbox__user=request.user)
-    srlizedPost = (
-        srlizedPost
-        + PostSerializer(internPosts, many=True, context={"request": request}).data
-    )
-
     externPosts = Inbox.objects.filter(user=request.user).exclude(
         external_post__isnull=True
     )
     for externPost in externPosts:
         srlizedPost.append(fetch_external_post(externPost.external_post))
+
+    internPosts = Post.objects.filter(inbox__user=request.user)
+    srlizedPost = (
+        PostSerializer(internPosts, many=True, context={"request": request}).data
+        + srlizedPost
+    )
 
     if request.method == "GET":
         return render(request, "feed.html", {"posts": srlizedPost, "form": form, "type": postType, "id": postId})
