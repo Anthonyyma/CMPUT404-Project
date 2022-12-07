@@ -139,7 +139,7 @@ def createPost(request):
             messages.info(request, "No Image")
         with open(form.instance.image.url[1:], "rb") as image_file:
             newPost.content = (
-                "data:image/png;base64" + base64.b64encode(image_file.read()).decode()
+                "data:image/png;base64," + base64.b64encode(image_file.read()).decode()
             )
             newPost.save()
 
