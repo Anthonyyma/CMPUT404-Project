@@ -9,7 +9,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     host = serializers.SerializerMethodField()
     displayName = serializers.CharField(source="username")
     id = serializers.SerializerMethodField()
-    profileimg = serializers.SerializerMethodField()
+    profileImage = serializers.SerializerMethodField()
 
     class Meta:
         model = User
