@@ -113,9 +113,18 @@ def sync_external_authors():
 
     all_authors = []
 
-    all_authors.extend(team11_authors["results"])
-    all_authors.extend(team9_authors["items"])
-    all_authors.extend(team6_authors["items"])
+    try:
+        all_authors.extend(team11_authors["results"])
+    except:
+        pass
+    try:
+        all_authors.extend(team9_authors["items"])
+    except:
+        pass
+    try:
+        all_authors.extend(team6_authors["items"])
+    except:
+        pass
 
     for author in all_authors:
         create_update_external_authors(author)
