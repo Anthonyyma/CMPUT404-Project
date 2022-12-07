@@ -99,8 +99,8 @@ class PostSerializer(serializers.ModelSerializer):
         }
 
     def get_image(self, obj: Post):
-        if "PNG" in obj.content_type:
-            return obj.image
+        if "PNG" in obj.content_type and obj.image is not None:
+            return obj.image.url
 
     def get_contentType(self, obj: Post):
         return obj.get_content_type_display()
