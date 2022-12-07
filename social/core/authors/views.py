@@ -47,6 +47,8 @@ def user_detail(request):
         "requestUserURL": get_author_url(request.user),
         "userURL": get_author_url(user),
     }
+    print (context)
+
     context["following"] = Follow.objects.filter(
         follower=request.user, followee=user
     ).exists()  # is the user being viewed followed by the current user
@@ -57,7 +59,6 @@ def user_detail(request):
         context["follow_requests"] = follow_requests
     else:
         context["ownProfile"] = False
-        context["requestUserURL"] = get_author_url
     context["user"] = user
     context["posts"] = posts
     return render(request, "viewUser.html", context)
