@@ -17,45 +17,44 @@ from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Follow, Inbox, Post, User
 from .path_utils import get_post_id_from_url
 
+# class ImagePostView(APIView):
+#     def get(self, request, author_id, post_id):
+#         try:
+#             post = Post.objects.get(id=post_id, author_id=author_id)
+#             if "image" not in post.content_type:
+#                 return Response(
+#                     {"message": "Post is not an image post"},
+#                     status=status.HTTP_404_NOT_FOUND,
+#                 )
 
-class ImagePostView(APIView):
-    def get(self, request, author_id, post_id):
-        try:
-            post = Post.objects.get(id=post_id, author_id=author_id)
-            if "image" not in post.content_type:
-                return Response(
-                    {"message": "Post is not an image post"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
+#             # Known issue: Remote followers cannot view friends-only image posts
+#             # because this is an architectural limitation
+#             # that is caused by a BS project specification
+#             # (polling based system vs webhooks)
+#             unauthorized = (
+#                 post.visibility != "PUBLIC"
+#                 and post.author.id != request.user.id
+#                 and Follow.objects.filter(
+#                     follower=request.user.id, followee=post.author.id
+#                 ).count()
+#                 == 0
+#             )
+#             if unauthorized:
+#                 return Response(
+#                     {"message": "You are not authorized to view this post"},
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
 
-            # Known issue: Remote followers cannot view friends-only image posts
-            # because this is an architectural limitation
-            # that is caused by a BS project specification
-            # (polling based system vs webhooks)
-            unauthorized = (
-                post.visibility != "PUBLIC"
-                and post.author.id != request.user.id
-                and Follow.objects.filter(
-                    follower=request.user.id, followee=post.author.id
-                ).count()
-                == 0
-            )
-            if unauthorized:
-                return Response(
-                    {"message": "You are not authorized to view this post"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            response_content_type = post.content_type.split(";")[0]
-            image = base64.b64decode(post.content.strip("b'").strip("'"))
-            return Response(
-                image, content_type=response_content_type, status=status.HTTP_200_OK
-            )
-        except Post.DoesNotExist:
-            # TODO: might exist remotely
-            return Response(
-                {"message": "Image post not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+#             response_content_type = post.content_type.split(";")[0]
+#             image = base64.b64decode(post.content.strip("b'").strip("'"))
+#             return Response(
+#                 image, content_type=response_content_type, status=status.HTTP_200_OK
+#             )
+#         except Post.DoesNotExist:
+#             # TODO: might exist remotely
+#             return Response(
+#                 {"message": "Image post not found"}, status=status.HTTP_404_NOT_FOUND
+#             )
 
 
 @login_required
@@ -139,7 +138,9 @@ def createPost(request):
         if not form.instance.image:
             messages.info(request, "No Image")
         with open(form.instance.image.url[1:], "rb") as image_file:
-            newPost.content = base64.b64encode(image_file.read()).decode()
+            newPost.content = (
+                "data:image/png;base64" + base64.b64encode(image_file.read()).decode()
+            )
             newPost.save()
 
     if len(newPost.private_to) != 0:  # if private to someone
