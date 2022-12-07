@@ -111,7 +111,7 @@
             <h1>Github: {{user.github}}</h>
             <h1>{{user.external_url}}</h>
             <br>
-            <img src="{{user.profile_image.url}}"/>
+            <img class="profileImage" src="{{user.profile_image.url}}"/>
         </div>
     </div>
 
@@ -132,7 +132,7 @@
         {% for post in posts %}
             <a  class ="post" href="/postContent/?url={{post.id}}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
                 {% if post.image %}
-                    <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+                    <img src="{{ post.image }}" class="contentImage">
                 {% endif %}
                 <br>{{post.count}} comments
             </a>

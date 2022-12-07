@@ -14,11 +14,6 @@ h1{
     color: white;
 }
 
-img{
-    width: 150px;
-    border-radius: 50%;
-}
-
 .button{
     background-color: black;
     color: white;
@@ -83,3 +78,14 @@ img{
     display: flex;
     flex-direction: column;
 }
+
+.contentImage {
+  width: 50%;
+}
+
+.profileImage {
+  width: 150px;
+  height: 150px;
+  border-radius: 50% !important;
+}
+

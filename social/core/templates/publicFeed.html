@@ -23,7 +23,7 @@
         {% for post in posts %} 
         <div class="post">
             <div class="authorInfo">
-                <a href="/user/?url={{ post.author.id }}"><img class="profilePic" src="{{post.author.profile_image.url}}"/></a>
+                <a href="/user/?url={{ post.author.id }}"><img class="profilePic" src="{{post.author.profileImage}}"/></a>
                 <a class="postAuthor" href="/user/?url={{ post.author.id }}">{{post.author.displayName}}</a>
             </div>
             <br>
