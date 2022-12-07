@@ -38,8 +38,8 @@
             {% else %}
             <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br></a>
             {% endif %}
-            {% if 'image' in post.contentType %}
-                <img class="contentImg" src="{{ post.content }}">
+            {% if post.contentType == 'image/png' or post.contentType == 'image/jpeg;base64' %}
+            <img src="{{ post.content }}" alt="mainImage" style="width: 100%;">
             {% endif %}
             <br>
             <a class="commentInfo" href="{% url 'postContent' %}?url={{ post.id }}">{{post.count}} comments</a>
