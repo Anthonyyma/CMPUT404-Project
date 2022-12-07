@@ -1,7 +1,7 @@
 import base64
 from html.parser import HTMLParser
 
-import requests
+from core import client
 from core.posts.serializers import PostSerializer
 from django.conf import settings
 from django.contrib import messages
@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from .client import fetch_external_post
 from .forms import EditUserForm, PostForm, RegisterForm
 from .models import Follow, Inbox, Post, User
-from .path_utils import get_author_url, get_post_id_from_url
+from .path_utils import get_post_id_from_url
 
 
 class ImagePostView(APIView):
@@ -123,71 +123,42 @@ def createPost(request):
         context = {"form": form, "type": postType, "id": postId}
         return render(request, "createPost.html", context)
 
-    notValid = False
-    if request.method == "POST":
-        if post is None:
-            form = PostForm(request.POST, request.FILES)
-        else:
-            form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            form.instance.author = request.user
-            form.instance.content_type = postType
-            # if postType == "PNG" or postType == "JPEG":
-            if postType == "PNG":
-                if not form.instance.image:
-                    messages.info(request, "No Image")
-                    notValid = True
-            elif postType == "MD":
-                pass
-            if not notValid:
-                newPost = form.save()
-                # convert to b64
-                with open(form.instance.image.url[1:], "rb") as image_file:
-                    newPost.content = base64.b64encode(image_file.read()).decode()
-                    newPost.save()
+    if post is None:
+        form = PostForm(request.POST, request.FILES)
+    else:
+        form = PostForm(request.POST, instance=post)
 
-                if len(newPost.private_to) != 0:  # if private to someone
-                    user = User.objects.filter(username=newPost.private_to).first()
-                    if user:
-                        if user.external_url:  # if external user
-                            follow = Follow.objects.filter(followee=user)
-                            url = getattr(follow, "external_follower") + "inbox/"
-                            msg = PostSerializer(
-                                newPost, context={"request": request}
-                            ).data
-                            msg["description"] = "test"
-                            if "cmsjmnet" in url:
-                                msg = {
-                                    "items": [msg],
-                                    "author": get_author_url(request.user),
-                                }
-                                requests.post(url, json=msg, auth=("team8", "team8"))
-                            else:
-                                requests.post(url, json=msg, auth=("", ""))
-                        else:
-                            Inbox.objects.create(post=newPost, user=user)
-                elif not newPost.unlisted:
-                    for follow in Follow.objects.filter(followee=request.user):
-                        if follow.external_follower:
-                            url = getattr(follow, "external_follower") + "inbox/"
-                            msg = PostSerializer(
-                                newPost, context={"request": request}
-                            ).data
-                            msg["description"] = "test"
-                            if "cmsjmnet" in url:
-                                msg = {
-                                    "items": [msg],
-                                    "author": get_author_url(request.user),
-                                }
-                            requests.post(url, json=msg, auth=("team8", "team8"))
-                        else:
-                            Inbox.objects.create(post=newPost, user=follow.follower)
-                return redirect("/")
-        else:
-            print(form.errors)
+    if not form.is_valid():
+        print(form.errors)
+        return render(request, "createPost.html", {"form": form, "type": postType})
 
-    context = {"form": form, "type": postType, "id": postId}
-    return render(request, "createPost.html", context)
+    form.instance.author = request.user
+    form.instance.content_type = postType
+    newPost = form.save()
+    if postType == "PNG":
+        if not form.instance.image:
+            messages.info(request, "No Image")
+        with open(form.instance.image.url[1:], "rb") as image_file:
+            newPost.content = base64.b64encode(image_file.read()).decode()
+            newPost.save()
+
+    if len(newPost.private_to) != 0:  # if private to someone
+        user = User.objects.filter(username=newPost.private_to).first()
+        if user:
+            if user.external_url:  # if external user
+                msg = PostSerializer(newPost, context={"request": request}).data
+                client.send_post_to_external_user(msg, user)
+            else:
+                Inbox.objects.create(post=newPost, user=user)
+    elif not newPost.unlisted:
+        for follow in Follow.objects.filter(followee=request.user):
+            follower = follow.user
+            if follower.external_url:
+                msg = PostSerializer(newPost, context={"request": request}).data
+                client.send_post_to_external_user(msg, follower)
+            else:
+                Inbox.objects.create(post=newPost, user=follow.follower)
+    return redirect("/")
 
 
 # @login_required

@@ -1,10 +1,11 @@
 import random
 import re
+from typing import Dict
 
 import requests
 from core.authors.serializers import AuthorSerializer
 from core.models import User
-from core.path_utils import get_author_url
+from core.path_utils import get_author_url, get_external_user_inbox_url
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -58,7 +59,7 @@ def fetch_posts_from_external_author(user: User):
         return data["items"]
     if "results" in data:
         return data["results"]
-    print(f"Couldn't find posts in response", data)
+    print("Couldn't find posts in response", data)
     return []
 
 
@@ -75,6 +76,18 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
     return requests.post(
         external_user_url + "inbox/", json=data, auth=get_creds(external_user_url)
     )
+
+
+def send_post_to_external_user(post_data: Dict, external_user: User):
+    post_data["description"] = post_data.get("content", " ")
+    url = get_external_user_inbox_url(external_user)
+    msg = post_data
+    if "cmsjmnet" in url:
+        msg = {
+            "items": [post_data],
+            "author": post_data["author"],
+        }
+    requests.post(url, json=msg, auth=get_creds(url))
 
 
 def sync_external_authors():
