@@ -15,6 +15,8 @@ def get_creds(url: str):
         return ("team8", "team8")
     if "team9" in url:
         return ("admin", "admin")
+    if "socialdistribution-cmput404" in url:
+        return ("Novadrive", "B8fmmUSwpxYcmsm")
     return None
 
 
@@ -73,9 +75,8 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
     }
     if "cmsjmnet" in external_user_url:
         data = {"items": [data], "author": get_author_url(local_user)}
-    return requests.post(
-        external_user_url + "inbox/", json=data, auth=get_creds(external_user_url)
-    )
+    url = get_external_user_inbox_url(external_user_url)
+    return requests.post(url, json=data, auth=get_creds(external_user_url))
 
 
 def send_post_to_external_user(post_data: Dict, external_user: User):
@@ -97,8 +98,8 @@ def sync_external_authors():
 
     team11_authors = requests.get(team11_url, auth=get_creds(team11_url)).json()
     # no need for auth for team9
-    team9_authors = requests.get(team9_url).json()
-    team6_authors = requests.get(team6_url).json()
+    team9_authors = requests.get(team9_url, auth=get_creds(team9_url)).json()
+    team6_authors = requests.get(team6_url, auth=get_creds(team6_url)).json()
 
     all_authors = []
 
@@ -116,7 +117,6 @@ def create_update_external_authors(author):
 
     If duplicate usernames are found then generate
     a random 6 digit number and append it to the end"""
-
     from_database_url = User.objects.filter(external_url=author["url"]).first()
     from_database_username = User.objects.filter(username=author["displayName"]).first()
 
@@ -124,7 +124,7 @@ def create_update_external_authors(author):
         # https://stackoverflow.com/questions/59318332/generate-random-6-digit-id-in-python
         random_id = " ".join([str(random.randint(0, 999)).zfill(3) for _ in range(2)])
 
-        author["displayName"] = author["displayName"], random_id
+        author["displayName"] = author["displayName"] + random_id
 
     if from_database_url is not None:
         pass

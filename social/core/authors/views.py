@@ -1,6 +1,6 @@
 from core import client
 from core.models import Follow, FollowRequest, Post, User
-from core.path_utils import get_author_id_from_url
+from core.path_utils import get_author_id_from_url, get_author_url
 from core.posts.serializers import PostSerializer
 from django.conf import settings
 from django.shortcuts import render
@@ -41,7 +41,14 @@ def user_detail(request):
     else:
         posts = client.fetch_posts_from_external_author(user)
 
-    context = {"user": user, "posts": posts}
+    context = {
+        "user": user,
+        "posts": posts,
+        "requestUserURL": get_author_url(request.user),
+        "userURL": get_author_url(user),
+    }
+    
+
     context["following"] = Follow.objects.filter(
         follower=request.user, followee=user
     ).exists()  # is the user being viewed followed by the current user
@@ -54,4 +61,5 @@ def user_detail(request):
         context["ownProfile"] = False
     context["user"] = user
     context["posts"] = posts
+    print(context)
     return render(request, "viewUser.html", context)
