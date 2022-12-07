@@ -115,7 +115,7 @@ def createPost(request):
     notValid = False
 
     # check if id has url and get id if it does
-    if settings.API_HOST_PATH in postId:
+    if postId is not None and settings.API_HOST_PATH in postId:
         postId = get_post_id_from_url(postId)
 
     if postId is not None:
@@ -134,6 +134,7 @@ def createPost(request):
         if form.is_valid():
             form.instance.author = request.user
             form.instance.content_type = postType
+            breakpoint()
             # if postType == "PNG" or postType == "JPEG":
             if postType == "PNG":
                 if not form.instance.image:
@@ -145,6 +146,7 @@ def createPost(request):
                 newPost = form.save()
                 # convert to b64
                 with open(form.instance.image.url[1:], "rb") as image_file:
+                    breakpoint()
                     newPost.content = base64.b64encode(image_file.read()).decode()
                     newPost.save()
 
