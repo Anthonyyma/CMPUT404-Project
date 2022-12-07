@@ -20,6 +20,7 @@ form {
   border: 1px solid #ccc;
   padding: 10px;
   margin: 20px;
+  padding-bottom: 30px;
   border-radius: 5px;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
@@ -181,13 +182,11 @@ label {
   border-radius: 50% !important;
   width: 50px;
   height: 50px;
-  float:left;
 }
 
 .postAuthor {
-  font-size: 22px !important;
-  margin-top: 10px;
-  margin-left: 10px !important;
+  font-size: 20px !important;
+  margin-left: 5px !important;
 }
 
 .authorInfo {
@@ -196,18 +195,25 @@ label {
 
 .commentInfo {
   float:right;
-  margin-top: -20px;
   margin-right: 3px;
-  color: #006377 !important;
+  color: #0B5ED7 !important;
 }
 
 .postTitle {
   font-size: 20px;
-  margin-left: 2px;
+  margin-left: 5px;
+}
+
+.postContent {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  word-wrap: break-word;
 }
 
 .contentImg {
   margin-top: 10px;
   margin-bottom: 5px;
   width: 100%;
+  border-radius: 10px;
 }

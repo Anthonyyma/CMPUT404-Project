@@ -61,6 +61,37 @@ from .path_utils import get_post_id_from_url
 def showFeed(request):
     # My own posts
 
+    if (request.method == "POST"):
+        form.instance.author = request.user
+        form.instance.content_type = postType
+        newPost = form.save()
+        if postType == "PNG":
+            if not form.instance.image:
+                messages.info(request, "No Image")
+            with open(form.instance.image.url[1:], "rb") as image_file:
+                newPost.content = (
+                    "data:image/png;base64," + base64.b64encode(image_file.read()).decode()
+                )
+                newPost.save()
+
+        if len(newPost.private_to) != 0:  # if private to someone
+            user = User.objects.filter(username=newPost.private_to).first()
+            if user:
+                if user.external_url:  # if external user
+                    msg = PostSerializer(newPost, context={"request": request}).data
+                    client.send_post_to_external_user(msg, user)
+                else:
+                    Inbox.objects.create(post=newPost, user=user)
+        elif not newPost.unlisted:
+            for follow in Follow.objects.filter(followee=request.user):
+                follower = follow.user
+                if follower.external_url:
+                    msg = PostSerializer(newPost, context={"request": request}).data
+                    client.send_post_to_external_user(msg, follower)
+                else:
+                    Inbox.objects.create(post=newPost, user=follow.follower)
+        return redirect("/")
+
     posts = Post.objects.filter(author=request.user)
     srlizedPost = PostSerializer(posts, many=True, context={"request": request}).data
 
@@ -76,7 +107,8 @@ def showFeed(request):
     for externPost in externPosts:
         srlizedPost.append(fetch_external_post(externPost.external_post))
 
-    return render(request, "feed.html", {"posts": srlizedPost})
+    if (request.method == "GET"):
+        return render(request, "feed.html", {"posts": srlizedPost})
 
 
 def publicFeed(request):
