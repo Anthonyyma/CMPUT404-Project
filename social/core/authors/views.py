@@ -47,7 +47,7 @@ def user_detail(request):
         "requestUserURL": get_author_url(request.user),
         "userURL": get_author_url(user),
     }
-    print (context)
+    
 
     context["following"] = Follow.objects.filter(
         follower=request.user, followee=user

@@ -55,7 +55,8 @@
             }
         });
 
-        // Send the server that has the user confirmation of the acceptance
+        // Send the server that has the user confirmation of the acceptance 
+        
     }
     followUser = () => sendFollowRequest("{{ requestUserURL }}", "{{ userURL }}")
 
@@ -76,14 +77,11 @@
             headers: {
                 "X-CSRFToken": cookies["csrftoken"]
             }
-        });
+        }).then(response => {
+            location.reload();
+        })
 
         // send the server that has the user confirmation of the unfollow
-
-        // change the button to say follow
-        const followButton = document.getElementById("follow_button");
-        followButton.innerHTML = "Follow";
-        followButton.onclick = followUser();
         
     }  
 
