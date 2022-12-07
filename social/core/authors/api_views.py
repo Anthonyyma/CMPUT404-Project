@@ -4,10 +4,10 @@ from core.drf_utils import CustomPagination, labelled_pagination
 from core.models import Follow, FollowRequest, Like, User
 from core.path_utils import get_author_id_from_url
 from core.posts.serializers import LikeSerializer
+from django.conf import settings
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
-from django.conf import settings
 
 
 class AuthorViewSet(
@@ -16,7 +16,7 @@ class AuthorViewSet(
     mixins.ListModelMixin,
     mixins.UpdateModelMixin,
 ):
-    queryset = User.objects.order_by("id").all()
+    queryset = User.objects.filter(external_url=None).order_by("id").all()
     serializer_class = AuthorSerializer
     pagination_class = labelled_pagination("authors")
 

@@ -28,6 +28,16 @@ class AuthorTest(APITestCase):
         self.assertIn("items", data)
         self.assertEqual(len(data["items"]), 2)
 
+    def test_get_authors_does_not_return_external_authors(self):
+        self.user1.external_url = "http://external.com"
+        self.user1.save()
+        resp = self.client.get("/api/authors", follow=True)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.json()
+        self.assertEqual(len(data["items"]), 1)
+        self.assertEqual(data["items"][0]["displayName"], self.user2.username)
+
     def test_get_author(self):
         path = f"/api/authors/{self.user1.id}/"
         resp = self.client.get(path, follow=True)
