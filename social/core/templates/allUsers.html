@@ -15,10 +15,7 @@
     {% for user in users %}
         <li><a href="/user/?id={{ user.id }}">
         <b>@{{ user.username }}</b>
-        </a>
-        <a>+ Follow</a>
-        <a>- Unfollow</a>
-        </li>
+            
     {% endfor %}
     </ul>
 
