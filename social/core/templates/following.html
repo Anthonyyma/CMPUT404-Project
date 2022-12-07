@@ -12,7 +12,7 @@
     <h style="margin-top: 30px; text-align: center; font-size: 30px">Following</h>
     <div class="post-display">
         {% for followee in following %}
-            <a href="/user/{{followee.id}}"><b>{{ followee.username }}</b><br>
+            <a href="/user/?id={{followee.id}}"><b>{{ followee.username }}</b><br>
                 {% if followee.profile_image %}
                     <img src="{{ followee.profile_image.url }}" style="width: 100px; transform: translate(100%)">
                 {% endif %}
