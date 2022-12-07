@@ -176,7 +176,7 @@ def createPost(request):
                 Inbox.objects.create(post=newPost, user=user)
     elif not newPost.unlisted:
         for follow in Follow.objects.filter(followee=request.user):
-            follower = follow.user
+            follower = follow.follower
             if follower.external_url:
                 msg = PostSerializer(newPost, context={"request": request}).data
                 client.send_post_to_external_user(msg, follower)
