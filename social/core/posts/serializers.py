@@ -39,7 +39,7 @@ class PostSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     commentsSrc = serializers.SerializerMethodField()
     contentType = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
+    # image = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -59,7 +59,7 @@ class PostSerializer(serializers.ModelSerializer):
             "visibility",
             "published",
             "unlisted",
-            "image",
+            # "image",
         ]
 
     def get_visibility(self, obj: Post) -> str:

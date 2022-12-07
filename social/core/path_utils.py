@@ -54,5 +54,23 @@ def get_external_user_inbox_url(user: Union[User, str]) -> str:
     Returns the api url for a user's inbox
     """
     base_url = user if isinstance(user, str) else user.external_url
+    # this is a hack, team9 author ids point to the frontend instead of the api
+    # https://team9.herokuapp.com/authors/abc/inbox/ ->
+    # https://team9.herokuapp.com/service/authors/abc/inbox/
+    base_url = format_team9_author_url(base_url)
     suffix = "inbox/" if base_url.endswith("/") else "/inbox/"
+    if "team9" in base_url:
+        suffix = suffix[:-1]  # no trailing slash for team9
     return base_url + suffix
+
+
+def format_team9_author_url(url: str) -> str:
+    """
+    https://team9.herokuapp.com/authors/abc/ ->
+    https://team9.herokuapp.com/service/authors/abc/
+    """
+    if "team9" in url and "service" not in url:
+        parts = re.split(r"herokuapp\.com", url)
+        parts.insert(1, "herokuapp.com/service")
+        return "".join(parts)
+    return url

@@ -5,7 +5,11 @@ from typing import Dict
 import requests
 from core.authors.serializers import AuthorSerializer
 from core.models import User
-from core.path_utils import get_author_url, get_external_user_inbox_url
+from core.path_utils import (
+    format_team9_author_url,
+    get_author_url,
+    get_external_user_inbox_url,
+)
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -31,10 +35,7 @@ def fetch_github_feed(user: User):
 
 
 def fetch_external_post(post_url: str):
-    creds = None
-    if "cmsjmnet" in post_url:
-        creds = ("team8", "team8")
-    resp = requests.get(post_url, auth=creds)
+    resp = requests.get(post_url, auth=get_creds(post_url))
     return resp.json()
 
 
@@ -51,6 +52,10 @@ def fetch_posts_from_external_author(user: User):
         if user.external_url.endswith("/")
         else user.external_url + "/posts/"
     )
+    if "team9" in path:
+        path = format_team9_author_url(path)
+    #     path = path[:-1]  # no trailing slashes in team9
+    print("fetching posts from", path)
     resp = requests.get(path, auth=get_creds(path))
     if not resp.ok:
         print(f"Error getting posts from {path}")
@@ -61,7 +66,9 @@ def fetch_posts_from_external_author(user: User):
         return data["items"]
     if "results" in data:
         return data["results"]
-    print("Couldn't find posts in response", data)
+    elif isinstance(data, list):
+        return data
+    print("Couldn't find posts in response", path, data)
     return []
 
 
@@ -76,7 +83,10 @@ def send_external_follow_request(local_user: User, external_user_url: str, reque
     if "cmsjmnet" in external_user_url:
         data = {"items": [data], "author": get_author_url(local_user)}
     url = get_external_user_inbox_url(external_user_url)
-    return requests.post(url, json=data, auth=get_creds(external_user_url))
+    resp = requests.post(url, json=data, auth=get_creds(external_user_url))
+    print(data)
+    print(resp, resp.json())
+    return resp
 
 
 def send_post_to_external_user(post_data: Dict, external_user: User):
@@ -103,9 +113,18 @@ def sync_external_authors():
 
     all_authors = []
 
-    all_authors.extend(team11_authors["results"])
-    all_authors.extend(team9_authors["items"])
-    all_authors.extend(team6_authors["items"])
+    try:
+        all_authors.extend(team11_authors["results"])
+    except:
+        pass
+    try:
+        all_authors.extend(team9_authors["items"])
+    except:
+        pass
+    try:
+        all_authors.extend(team6_authors["items"])
+    except:
+        pass
 
     for author in all_authors:
         create_update_external_authors(author)
