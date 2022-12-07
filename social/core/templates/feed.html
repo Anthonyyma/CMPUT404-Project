@@ -22,31 +22,35 @@
         </div>
         <div>
         <h2 class="text-center">Your Feed</h2>
+        <div class="multi-button">
+            <button onClick="createPost('TEXT')">Plain Text</button>
+            <button onClick="createPost('MD')">Markdown</button>
+            <button onClick="createPost('PNG')">Image</button>
+        </div>
+
         {% for post in posts %} 
         <div class="post">
             <div class="authorInfo">
-                <img class="profilePic" src="{{user.profile_image.url}}"/>
-                <a class="postAuthor" href="/user/?url={{ post.author.id }}">{{post.author.displayName}}</h1>
+                <a href="/user/?url={{ post.author.id }}"><img class="profilePic" src="{{user.profile_image.url}}"/></a>
+                <a class="postAuthor" href="/user/?url={{ post.author.id }}">{{post.author.displayName}}</a>
             </div>
-            <div class="postContent">
+            <br>
             {% if post.contentType == 'text/markdown' %}
             <div>
-                <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title | markdownify }}</b></a><br>
-                {{ post.content | markdownify }}
+                <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title | markdownify }}</b></a>
+                <p class="postContent">{{ post.content | markdownify }}</p>
             </div>
             {% elif post.contentType != 'image/png'%}  
-            <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
-            </a>
+            <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b></a>
+            <p class="postContent">{{ post.content }}</p>
             {% else %}
-            <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>
-            </a>
+            <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br></a>
             {% endif %}
             {% if post.image %}
                 <img class="contentImg" src="{{ post.image.url }}">
             {% endif %}
-            </div>
             <br>
-            <a class="commentInfo" href="#">{{post.count}} comments</a>
+            <a class="commentInfo" href="{% url 'postContent' %}?url={{ post.id }}">{{post.count}} comments</a>
         </div>
         {% endfor %}
         </div>
