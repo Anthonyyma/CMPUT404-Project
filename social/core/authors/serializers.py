@@ -9,6 +9,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     host = serializers.SerializerMethodField()
     displayName = serializers.CharField(source="username")
     id = serializers.SerializerMethodField()
+    profileimg = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -20,6 +21,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
             "displayName",
             "github",
             "email",
+            "profileimg"
         ]
         extra_kwargs = {
             "url": {"read_only": True},
@@ -33,3 +35,6 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         if obj.external_url:
             return obj.external_url
         return get_author_url(obj)
+
+    def get_profileimg(self, obj: User) -> str:
+        return obj.profile_image

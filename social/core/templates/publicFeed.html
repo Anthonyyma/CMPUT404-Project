@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load templatefunc %}
+{% load markdownify %}
 
 {% block head %}
 <title>Public feed</title>
@@ -21,15 +22,29 @@
         <h2 class="text-center">Public Feed</h2>
         {% for post in posts %} 
         <div class="post">
-        {% if post.content_type != "APP64"%}  
-        <a href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
-        {% else %}
-        <a href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>
-        {% endif %}
-            {% if post.image %}
-                <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+            <div class="authorInfo">
+                <img class="profilePic" src="{{user.profile_image.url}}"/><br>
+                <h1 class="postAuthor">{{post.author.displayName}}</h1><br>
+            </div>
+            <div class="postContent">
+            {% if post.contentType == 'text/markdown' %}
+            <div>
+                <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title | markdownify }}</b></a><br>
+                {{ post.content | markdownify }}
+            </div>
+            {% elif post.contentType != 'image/png'%}  
+            <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+            </a>
+            {% else %}
+            <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>
+            </a>
             {% endif %}
-        </a>
+            {% if post.image %}
+                <img class="contentImg" src="{{ post.image.url }}">
+            {% endif %}
+            </div>
+            <br>
+            <a class="commentInfo" href="#">{{post.count}} comments</a>
         </div>
         {% endfor %}
         </div>

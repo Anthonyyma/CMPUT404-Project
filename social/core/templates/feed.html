@@ -24,22 +24,29 @@
         <h2 class="text-center">Your Feed</h2>
         {% for post in posts %} 
         <div class="post">
-        {% if post.content_type == 'MD' %}
-        <div>
-            <a href="{% url 'postContent' %}?url={{ post.id }}">{{ post.title }}</a>
-            {{ post.content | markdownify }}
-        </div>
-        {% elif post.contentType != "image/png"%}  
-        <a href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
-        </a>
-        {% else %}
-        <a href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>
-
-        </a>
-        {% endif %}
-            {% if post.image %}
-                <img src="{{ post.image.url }}" style="width: 100px; transform: translate(100%)">
+            <div class="authorInfo">
+                <img class="profilePic" src="{{user.profile_image.url}}"/>
+                <a class="postAuthor" href="/user/?url={{ post.author.id }}">{{post.author.displayName}}</h1>
+            </div>
+            <div class="postContent">
+            {% if post.contentType == 'text/markdown' %}
+            <div>
+                <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title | markdownify }}</b></a><br>
+                {{ post.content | markdownify }}
+            </div>
+            {% elif post.contentType != 'image/png'%}  
+            <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
+            </a>
+            {% else %}
+            <a class="postTitle" href="{% url 'postContent' %}?url={{ post.id }}"><b>{{ post.title }}</b><br>
+            </a>
             {% endif %}
+            {% if post.image %}
+                <img class="contentImg" src="{{ post.image.url }}">
+            {% endif %}
+            </div>
+            <br>
+            <a class="commentInfo" href="#">{{post.count}} comments</a>
         </div>
         {% endfor %}
         </div>
