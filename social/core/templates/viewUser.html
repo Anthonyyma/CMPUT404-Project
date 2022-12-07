@@ -37,9 +37,10 @@
             },
             body: JSON.stringify(data)
         });
+        const followButton = document.getElementById("follow_button");
+        followButton.innerHTML = "Follow Request Sent";
+        followButton.disabled = true;
 
-        Document.getElementById("follow_button").innerHTML = "Follow Request Sent";
-        Document.getElementById("follow_button").disabled = true;
     }
 
     acceptRequest = (follower_id) =>{
@@ -77,7 +78,13 @@
         });
 
         // send the server that has the user confirmation of the unfollow
-    }
+
+        // change the button to say follow
+        const followButton = document.getElementById("follow_button");
+        followButton.innerHTML = "Follow";
+        followButton.onclick = followUser();
+        
+    }  
 
 </script>
 
