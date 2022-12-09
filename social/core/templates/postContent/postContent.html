@@ -37,7 +37,7 @@
         </div>
         <div class="mainContent">
         {% if post.contentType == 'image/png' or post.contentType == 'image/jpeg;base64' %}
-            <img src="{{ post.content }}" alt="mainImage" style="width: 100%;">
+            <img class="mainImage" src="{{ post.content }}" alt="mainImage" style="width: 100%;">
         {% endif %}
         {% if post.contentType == 'text/markdown' %}
             <p>
@@ -50,19 +50,18 @@
             </p>
         {% endif %}
         </div>
-    </div> 
-
-    <input class="comment-box" id="comment-box" name="data-comment" type="text" placeholder="Write comment here">
-    <!-- No need for links because of the onclick function call -->
-    <div class="button-container">
         <button class="btn" onclick="likePost()">
             <i class="material-icons insert-comment-icon">thumb_up</i>
         </button>
-        <!-- Comment now works href val left blank so that the page automatically gets refreshed as you post your comment -->
+    </div> 
+
+    <div class="commInput">
+        <input class="comment-box" id="comment-box" name="data-comment" type="text" placeholder="Write comment here">
         <button class="btn" onclick="postComment()">
             <i class="material-icons insert-comment-icon" >insert_comment</i>
         </button>
-    </div>
+    </div> 
+
     <script>
         
         /* https://www.geekstrick.com/snippets/how-to-parse-cookies-in-javascript/ */
@@ -133,20 +132,18 @@
     
     <div class="comments">
         <h3>Comments</h3>
-        <div class="comment">
-            {% if not comments %}
-                <p>No comments yet</p>
-            {% else %}
-            <ul class="comment-list">
-                {% for comment in comments %}
+        {% if not comments %}
+            <p>No comments yet</p>
+        {% else %}
+        <ul class="comment-list">
+            {% for comment in comments %}
+                <li>
                     <a href="#"><strong>{{ comment.author.displayName }}</strong></a> on {{ comment.published }}
-                    <li>
-                        {{ comment.comment }}
-                    </li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-        </div>
+                    <h3 class="commContent">{{ comment.comment }}</h3>
+                </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </div>
 </body>
 </html>
