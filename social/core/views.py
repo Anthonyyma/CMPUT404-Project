@@ -278,7 +278,7 @@ def editUser(request):
         if form.is_valid():
             form.save()
             # once registered redirect to a different page
-            return redirect("viewCurrentUser")
+            return redirect("viewUser")
     else:
         form = EditUserForm(instance=request.user)
     # render the registeration html template
