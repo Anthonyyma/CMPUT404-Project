@@ -130,9 +130,10 @@
         </div>
         {% endfor %}
         {% for post in posts %}
-            <a  class ="post" href="/postContent/?url={{post.id}}"><b>{{ post.title }}</b><br>{{ post.content }}<br>
-                {% if post.image %}
-                    <img src="{{ post.image }}" class="contentImage">
+            <a  class ="post" href="/postContent/?url={{post.id}}"><b>{{ post.title }}</b><br>
+
+                {% if post.contentType == 'image/png' or post.contentType == 'image/jpeg;base64' %}
+                    <img src="{{ post.content }}" alt="mainImage" style="width: 100%;">
                 {% endif %}
                 <br>{{post.count}} comments
             </a>
