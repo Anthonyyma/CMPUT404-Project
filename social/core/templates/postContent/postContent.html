@@ -50,9 +50,11 @@
             </p>
         {% endif %}
         </div>
-        <button class="btn" onclick="likePost()">
-            <i class="material-icons insert-comment-icon">thumb_up</i>
-        </button>
+        <div class="likeInput">
+            <button class="btn likeBtn" onclick="likePost()">
+                <h2>{{like}}</h2><i class="material-icons insert-comment-icon">thumb_up</i>
+            </button>
+        </div>
     </div> 
 
     <div class="commInput">

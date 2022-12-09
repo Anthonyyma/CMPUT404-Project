@@ -89,3 +89,8 @@ html {
     border-style: solid;
     border: 2px;
 }
+
+.likeBtn {
+    margin-top: 10px !important;
+    margin-bottom: -10px !important;
+}
