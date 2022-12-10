@@ -14,6 +14,26 @@ username: node
 
 password: cmput404
 
+## Demo and Beyond
+
+Although we weren't able to clearly demo this:
+
+The home page "Your Feed" a user is able to see all posts of people they follow (no matter which node it's created on) including their own. 
+
+The "Public Feed" page shows all public posts no matter which node it was created on. 
+
+The "All Users" page displays a list of all the users in all nodes. 
+
+The "Profile" page displays 
+* username
+* github url
+* if applicable external node URL else None
+* profile picture
+* inbox feed
+
+Since the demo:
+
+
 ## Project Setup
 
 1. Create a virtual environment (optional).
